@@ -6,12 +6,12 @@ Este projeto é um sistema integrado para gerenciar solicitações de suporte t�
 
 Nome | Github  
 ------------ | ------------- 
-Christian Fernandes| [Acessar Github](https://github.com/ChristianFernandesLemos) 
-Juan Vargas | [Acessar Github](https://github.com/RenteriaJuan) 
-Théo Pinto | [Acessar Github](https://github.com/Thorphinm) 
-Ana Beatriz | [Acessar Github](https://github.com/Anasouza2802) 
-Gustavo Gramacho | [Acessar Github](https://github.com/gramachoo) 
-Lukas Keiji | [Acessar Github](https://github.com/Lucaskeiji)  
+Christian Fernandes (PO)| [Acessar Github](https://github.com/ChristianFernandesLemos) 
+Juan Vargas (Scrum Master) | [Acessar Github](https://github.com/RenteriaJuan) 
+Théo Pinto (Dev) | [Acessar Github](https://github.com/Thorphinm) 
+Ana Beatriz (Dev) | [Acessar Github](https://github.com/Anasouza2802) 
+Gustavo Gramacho (Dev) | [Acessar Github](https://github.com/gramachoo) 
+Lukas Keiji (Dev) | [Acessar Github](https://github.com/Lucaskeiji)  
 
 ## Requisitos
 - SQL
