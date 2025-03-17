@@ -2,7 +2,7 @@
 
 Este projeto é um sistema integrado para gerenciar solicitações de suporte técnico em uma empresa.
 
-##Integrantes
+## Integrantes
 
 Nome | Github  
 ------------ | ------------- 
