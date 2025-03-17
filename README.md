@@ -2,10 +2,20 @@
 
 Este projeto é um sistema integrado para gerenciar solicitações de suporte técnico em uma empresa.
 
-## Integrantes 
-NomeGithubChristian Fernandes (PO)Acessar GithubJuan Vargas (Scrum Master)Acessar GithubThéo Pinto (dev)Acessar GithubAna Beatriz (dev)Acessar GithubGustavo Gramacho (dev)Acessar GithubLukas Keiji (dev)Acessar Github
+##Integrantes
+
+Nome | Github  
+------------ | ------------- 
+Christian Fernandes| [Acessar Github](https://github.com/ChristianFernandesLemos) 
+Juan Vargas | [Acessar Github](https://github.com/RenteriaJuan) 
+Théo Pinto | [Acessar Github](https://github.com/Thorphinm) 
+Ana Beatriz | [Acessar Github](https://github.com/Anasouza2802) 
+Gustavo Gramacho | [Acessar Github](https://github.com/gramachoo) 
+Lukas Keiji | [Acessar Github](https://github.com/Lucaskeiji)  
+
 ## Requisitos
 - SQL
+- Orientado a objetos
 
 ## Instalação
 1. clonar o repositório.
