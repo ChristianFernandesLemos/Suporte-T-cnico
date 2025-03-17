@@ -1,21 +1,9 @@
-# Sistema de suporte técnico
+﻿# Sistema de suporte técnico
 
 Este projeto é um sistema integrado para gerenciar solicitações de suporte técnico em uma empresa.
 
 ## Integrantes 
-- Project Owner:
-Christian Fernandes 
-
-- Scrum Master:
-Juan Vargas
-
-- Desenvolvedores:
-• Théo Brasil P. Pinto
-• Ana Beatriz
-• Gustavo Gramacho
-• Lucas Keiji
-
-
+NomeGithubChristian Fernandes (PO)Acessar GithubJuan Vargas (Scrum Master)Acessar GithubThéo Pinto (dev)Acessar GithubAna Beatriz (dev)Acessar GithubGustavo Gramacho (dev)Acessar GithubLukas Keiji (dev)Acessar Github
 ## Requisitos
 - SQL
 
