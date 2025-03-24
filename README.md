@@ -10,12 +10,14 @@ Re002: Tratamento de Chamados via I.A, O sistema deve analisar os chamados por m
 
 Re003: O banco de dados deve ser MS SQL server hospedado em Windows Server.
 
-Prioridade 2: 
+Prioridade 2:
+
 Re004: Gerenciamento de chamados, Os chamados pendentes e concluídos poderão ser acessados pelo(s) responsável técnico, e podem ser marcados como concluídos após o problema ser resolvido.
 
 Re005: Criação de Relatórios: O sistema deve ser capaz de criar relatórios semanais e mensais sobre os chamados criados, resolvidos e pendentes.
 
-Prioridade 3: 
+Prioridade 3:
+
 Re006: Níveis de acesso: O Sistema deve possuir níveis de acesso (funcionário, responsável técnico e administrador).
 
 ## *User Story* ✍️
