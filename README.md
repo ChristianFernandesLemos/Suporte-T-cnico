@@ -1,7 +1,9 @@
 ﻿# Sistema de suporte técnico com IA 🚀
 
 Solução abrangente para automatizar e otimizar o gerenciamento de chamados de suporte técnico. O sistema permite:
-Prioridade 1: 
+
+Prioridade 1:
+
 Re001: Usuários devem ser capazes de criar chamados, estes chamados devem ter descrição, categoria (software e hardware) e quem  ele afeta, se o problema afeta apenas o funcionário, a equipe ou a empresa. 
 
 Re002: Tratamento de Chamados via I.A, O sistema deve analisar os chamados por meio de uma I.A, e após a análise deve atribuir um nível de prioridade com base na descrição, categoria e quem o chamado afeta os enviar para o responsável técnico, e caso necessário recategorizar o chamado.
