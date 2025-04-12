@@ -1,4 +1,3 @@
-{\rtf1}
 # TERCEIRA SPRINT (14/04/2025)
 
 Esse sprint concentrou-se na finalização do backlog do produto, juntamente com os requisitos e diagramas que foram reunidos para apresentação ao cliente.
