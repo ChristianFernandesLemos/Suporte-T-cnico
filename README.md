@@ -83,5 +83,8 @@ Metodología | Scrum + Git FLow
 7. Revisao Final do desenvolvimento
  * Esta é uma revisão final cujo intuito é buscar possíveis aprimoramentos no sistema.
  
-
+## Relatório de Entregas
+- [Relatorio Sprint 1](Scrum/Relatorio Sprints/Sprint1.md)
+- [Relatorio Sprint 2](Scrum/Relatorio Sprints/Sprint2.md)
+- [Relatorio Sprint 3](Scrum/Relatorio Sprints/Sprint3.md)
    
