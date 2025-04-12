@@ -84,7 +84,7 @@ Metodología | Scrum + Git FLow
  * Esta é uma revisão final cujo intuito é buscar possíveis aprimoramentos no sistema.
  
 ## Relatório de Entregas
-- [Relatorio Sprint 1](Scrum/Relatorio Sprints/Sprint1.md)
-- [Relatorio Sprint 2](Scrum/Relatorio Sprints/Sprint2.md)
-- [Relatorio Sprint 3](Scrum/Relatorio Sprints/Sprint3.md)
+- [Relatorio Sprint 1](https://github.com/ChristianFernandesLemos/Suporte-T-cnico/blob/main/Scrum/Relatorio%20Sprints/Sprint1.md)
+- [Relatorio Sprint 2](https://github.com/ChristianFernandesLemos/Suporte-T-cnico/blob/main/Scrum/Relatorio%20Sprints/Sprint2.md)
+- [Relatorio Sprint 3](https://github.com/ChristianFernandesLemos/Suporte-T-cnico/blob/main/Scrum/Relatorio%20Sprints/Sprint3.md)
    
