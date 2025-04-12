@@ -48,18 +48,9 @@ Dev Team     | Ana Beatriz         | [Acessar Github](https://github.com/Anasouz
 Dev Team     |Gustavo Gramacho     | [Acessar Github](https://github.com/gramachoo)               |
 Dev Team     | Lukas Keiji         | [Acessar Github](https://github.com/Lucaskeiji)              |
 
-## Tecnologias Utilizadas 💻
-
-Categoría | Tecnologías
---------- | -------------
-FrontEnd | HTML, CSS e Figma (Modelagem da interface) 
-Base De Dados | SQL Server (Windows Server)
-IA | BlackBox AI
-Metodología | Scrum + Git FLow 
-
 ## Metodologia Scrum 🎯
 
-### Sprint Planing
+## Sprint Planing
 
 1. Estabelecimento de metas e início do desenvolvimento do backlog do produto.
  * A primeira ação tomada em relação ao backlog do produto foi identificar os pontos críticos, com o intuito de compreender o seu alcance e propor melhorias.
@@ -88,3 +79,13 @@ Metodología | Scrum + Git FLow
 - [Relatorio Sprint 2](https://github.com/ChristianFernandesLemos/Suporte-T-cnico/blob/main/Scrum/Relatorio%20Sprints/Sprint2.md)
 - [Relatorio Sprint 3](https://github.com/ChristianFernandesLemos/Suporte-T-cnico/blob/main/Scrum/Relatorio%20Sprints/Sprint3.md)
    
+
+
+## Tecnologias Utilizadas 💻
+
+Categoría | Tecnologías
+--------- | -------------
+FrontEnd | HTML, CSS e Figma (Modelagem da interface) 
+Base De Dados | SQL Server (Windows Server)
+IA | BlackBox AI
+Metodología | Scrum + Git FLow 
