@@ -2,6 +2,7 @@
 
 Solução abrangente para automatizar e otimizar o gerenciamento de chamados de suporte técnico. O sistema permite:
 
+### Requisitos
 Prioridade 1:
 
 Re001: Usuários devem ser capazes de criar chamados, estes chamados devem ter descrição, categoria (software e hardware) e quem  ele afeta, se o problema afeta apenas o funcionário, a equipe ou a empresa. 
@@ -50,7 +51,7 @@ Dev Team     | Lukas Keiji         | [Acessar Github](https://github.com/Lucaske
 
 ## Metodologia Scrum 🎯
 
-## Sprint Planing
+### Sprint Planing
 
 1. Estabelecimento de metas e início do desenvolvimento do backlog do produto.
  * A primeira ação tomada em relação ao backlog do produto foi identificar os pontos críticos, com o intuito de compreender o seu alcance e propor melhorias.
@@ -74,7 +75,7 @@ Dev Team     | Lukas Keiji         | [Acessar Github](https://github.com/Lucaske
 7. Revisao Final do desenvolvimento
  * Esta é uma revisão final cujo intuito é buscar possíveis aprimoramentos no sistema.
  
-## Relatório de Entregas
+### Relatório de Entregas
 - [Relatorio Sprint 1](https://github.com/ChristianFernandesLemos/Suporte-T-cnico/blob/main/Scrum/Relatorio%20Sprints/Sprint1.md)
 - [Relatorio Sprint 2](https://github.com/ChristianFernandesLemos/Suporte-T-cnico/blob/main/Scrum/Relatorio%20Sprints/Sprint2.md)
 - [Relatorio Sprint 3](https://github.com/ChristianFernandesLemos/Suporte-T-cnico/blob/main/Scrum/Relatorio%20Sprints/Sprint3.md)
