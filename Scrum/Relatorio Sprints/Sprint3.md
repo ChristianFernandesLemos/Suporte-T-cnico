@@ -9,3 +9,4 @@ Esse sprint concentrou-se na finalização do [backlog do produto](https://githu
 
 ## Ferramentas utilizadas 
 * Astah UML
+* Word
