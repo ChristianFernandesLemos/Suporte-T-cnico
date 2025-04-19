@@ -51,7 +51,7 @@ Dev Team     | Lukas Keiji         | [Acessar Github](https://github.com/Lucaske
 
 ## Metodologia Scrum 🎯
 
-### Sprint Planing
+### *Sprint Planing*
 
 1. Estabelecimento de metas e início do desenvolvimento do backlog do produto.
  * A primeira ação tomada em relação ao backlog do produto foi identificar os pontos críticos, com o intuito de compreender o seu alcance e propor melhorias.
@@ -62,31 +62,33 @@ Dev Team     | Lukas Keiji         | [Acessar Github](https://github.com/Lucaske
 3. Conclusão do desenvolvimento do backlog do produto.
  * O backlog do produto foi finalizado e está pronto para ser apresentado ao cliente.
 
-4. Desenvolvimento do banco de dados e prototipo Desktop
-(Modelo conceitual, logico e físico)
+4. Desenvolvimento do banco de dados e prototipo Desktop(Modelo conceitual)
  * Inicia-se o desenvolvimento do banco de dados e do protótipo do sistema.
 
-5. Finalizacao de banco de datos (As ferramentas foram BRMODEL E SQL)
+5. Finalização de banco de datos 
  * A modelagem do banco de dados é concluída enquanto o protótipo ainda está em andamento.
 
-6. Finalizacao do Prototipo Desktop
+6. Finalização do Prototipo Desktop
  * Conclusão da modelagem do protótipo do sistema.
 
-7. Revisao Final do desenvolvimento
+7. Revisão Final do desenvolvimento
  * Esta é uma revisão final cujo intuito é buscar possíveis aprimoramentos no sistema.
  
-### Relatório de Entregas
-- [Relatorio Sprint 1](https://github.com/ChristianFernandesLemos/Suporte-T-cnico/blob/main/Scrum/Relatorio%20Sprints/Sprint1.md)
-- [Relatorio Sprint 2](https://github.com/ChristianFernandesLemos/Suporte-T-cnico/blob/main/Scrum/Relatorio%20Sprints/Sprint2.md)
-- [Relatorio Sprint 3](https://github.com/ChristianFernandesLemos/Suporte-T-cnico/blob/main/Scrum/Relatorio%20Sprints/Sprint3.md)
-   
+### *Relatório de Entregas*
+- [Relatório Sprint 1](https://github.com/ChristianFernandesLemos/Suporte-T-cnico/blob/main/Scrum/Relatorio%20Sprints/Sprint1.md)
+- [Relatório Sprint 2](https://github.com/ChristianFernandesLemos/Suporte-T-cnico/blob/main/Scrum/Relatorio%20Sprints/Sprint2.md)
+- [Relatório Sprint 3](https://github.com/ChristianFernandesLemos/Suporte-T-cnico/blob/main/Scrum/Relatorio%20Sprints/Sprint3.md)
+- [Relatório Sprint 4]
 
+### *Relatório de Daily's*
+- [Relatório Daily 1](https://github.com/ChristianFernandesLemos/Suporte-T-cnico/blob/main/Scrum/Relatorio%20Daily's/Daily1.md)
+- [Relatório Daily 2]
 
 ## Tecnologias Utilizadas 💻
 
 Categoría | Tecnologías
 --------- | -------------
 FrontEnd | HTML, CSS e Figma (Modelagem da interface) 
-Base De Dados | SQL Server (Windows Server)
+Base De Dados | BrModel e SQL Server (Windows Server)
 IA | BlackBox AI
 Metodología | Scrum + Git FLow 
