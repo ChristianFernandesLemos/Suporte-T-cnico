@@ -78,11 +78,11 @@ Dev Team     | Lukas Keiji         | [Acessar Github](https://github.com/Lucaske
 - [Relatório Sprint 1](https://github.com/ChristianFernandesLemos/Suporte-T-cnico/blob/main/Scrum/Relatorio%20Sprints/Sprint1.md)
 - [Relatório Sprint 2](https://github.com/ChristianFernandesLemos/Suporte-T-cnico/blob/main/Scrum/Relatorio%20Sprints/Sprint2.md)
 - [Relatório Sprint 3](https://github.com/ChristianFernandesLemos/Suporte-T-cnico/blob/main/Scrum/Relatorio%20Sprints/Sprint3.md)
-- [Relatório Sprint 4]
+- [Relatório Sprint 4](https://github.com/ChristianFernandesLemos/Suporte-T-cnico/blob/main/Scrum/Relatorio%20Sprints/Sprint4.md)
 
 ### *Relatório de Daily's*
 - [Relatório Daily 1](https://github.com/ChristianFernandesLemos/Suporte-T-cnico/blob/main/Scrum/Relatorio%20Daily's/Daily1.md)
-- [Relatório Daily 2]
+- [Relatório Daily 2](https://github.com/ChristianFernandesLemos/Suporte-T-cnico/blob/main/Scrum/Relatorio%20Daily's/Daily2.md)
 
 ## Tecnologias Utilizadas 💻
 
