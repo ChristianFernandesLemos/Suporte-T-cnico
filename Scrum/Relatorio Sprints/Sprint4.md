@@ -5,7 +5,6 @@ Esse sprint concentrou-se no início do desenvolvimento do banco de dados e do p
 ## Modelo Conceitual
 A primeira etapa do banco de dados foi concluída com a finalização do modelo conceitual, fornecendo informações para o modelo lógico que será modelado no BrModel. Os requisitos reunidos para a criação do modelo lógico foram os seguintes:
 
-### MODELO CONCEITUAL
 * Registro de chamados: id_chamado, categoria, descrição, quem afeta, prioridade, quem registrou
 * Funcionário: Nome, id_func, Contato, senha
 * ADM: Nome, id_adm, Contato, senha
@@ -14,11 +13,14 @@ A primeira etapa do banco de dados foi concluída com a finalização do modelo 
 ## Modelo Logico
 Com os requisitos mostrados acima, os diagramas do banco de dados foram feitos e concluídos com o modelo lógico. A seguir, uma demonstração de um diagrama de modelo lógico:
 
-### MODELO LOGICO
+
+![Modelo_Logico](https://github.com/user-attachments/assets/b4da67d5-d2a6-406c-b6da-bb68c3074c8f)
+
 
 ## Prototipo
 Por outro lado, a modelagem do protótipo da interface do sistema está progredindo com as primeiras guias da interface do sistema, e agora mostraremos como a tela de login está planejada. 
 
+![Tela_Login](https://github.com/user-attachments/assets/45ee18cf-7023-4905-875a-981ca02feb5d)
 
 
 ## Ferramentas utilizadas
