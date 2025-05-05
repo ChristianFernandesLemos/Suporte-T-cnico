@@ -35,14 +35,8 @@ Foi utilizada a metodologia Scrum, sabendo disso, primeiro foram reunidos os [re
 4. Desenvolvimento do banco de dados e prototipo Desktop(Modelo conceitual)
  * Inicia-se o desenvolvimento do banco de dados e do protótipo do sistema.
 
-5. Finalização de banco de datos 
- * A modelagem do banco de dados é concluída enquanto o protótipo ainda está em andamento.
-
-6. Finalização do Prototipo Desktop
- * Conclusão da modelagem do protótipo do sistema.
-
-7. Revisão Final do desenvolvimento
- * Esta é uma revisão final cujo intuito é buscar possíveis aprimoramentos no sistema.
+5. Finalização de banco de datos e prototipo Desktop.
+ * A modelagem do banco de dados é concluída enquanto o protótipo tambem está em finalizando.
  
 ### *Relatório de Entregas*
 - [Relatório Sprint 1](https://github.com/ChristianFernandesLemos/Suporte-T-cnico/blob/main/Scrum/Relatorio%20Sprints/Sprint1.md)
