@@ -1,9 +1,9 @@
 ﻿# Sistema de suporte técnico com IA 🚀
  
 ### Quem somos?
-A Intelflix é uma empresa dedicada a transformar o suporte técnico empresarial por meio do uso de inteligência artificial. Nosso objetivo é conectar soluções inteligentes com as necessidades de nossos clientes, oferecendo assistência eficiente, personalizada e em tempo real.
+A InterFix é uma empresa dedicada a transformar o suporte técnico empresarial por meio do uso de inteligência artificial. Nosso objetivo é conectar soluções inteligentes com as necessidades de nossos clientes, oferecendo assistência eficiente, personalizada e em tempo real.
 
-![crear una imagen de una empresa ficticia llamada IntelFlix que se especializa en programas de soporte técnico, ahora integrando inteligencia artificial en estos](https://github.com/user-attachments/assets/39c7e9c2-278d-4742-a19f-e00c5e455f8a)
+![InterFix](https://github.com/user-attachments/assets/8aa8a096-88fa-4be4-952c-946d63ceed66)
 
 
 ## Integrantes 👥
