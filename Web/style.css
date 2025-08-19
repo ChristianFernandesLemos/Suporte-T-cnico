@@ -15,7 +15,7 @@
     --second-color-dark: #222222;
 }
 
-* {
+* { 
     margin: 0;
     padding: 0;
     box-sizing: border-box;
@@ -39,6 +39,7 @@ body {
     border-radius: 15px;
     overflow: hidden;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    text-align: center;
 }
 
 .login-box {
