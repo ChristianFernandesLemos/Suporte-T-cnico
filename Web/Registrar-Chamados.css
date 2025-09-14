@@ -1,0 +1,118 @@
+/* Importando a fonte do Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+
+/* Reset básico e estilos gerais */
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #212529; /* Cor de fundo escura */
+    color: #f8f9fa; /* Cor do texto claro */
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+}
+
+/* Estilizando o cabeçalho superior */
+.top-bar {
+    width: 100%;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.back-link {
+    color: #f8f9fa;
+    text-decoration: none;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+}
+
+.arrow-icon {
+    font-size: 1.5rem;
+    margin-right: 10px;
+}
+
+/* Container principal para centralizar o conteúdo */
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/* Estilo do cartão (o retângulo branco) */
+.card {
+    background-color: #f8f9fa;
+    color: #212529;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 500px;
+    text-align: center;
+}
+
+.card h2 {
+    margin-top: 0;
+    margin-bottom: 25px;
+    font-size: 1.5rem;
+}
+
+/* Estilizando os grupos de formulário (rótulo + input) */
+.form-group {
+    text-align: left;
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 12px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-family: inherit;
+    background-color: #e9ecef;
+    border: none;
+    outline: none;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: 2px solid #007bff; /* Foco azul */
+}
+
+/* Estilizando o botão "Avançar" */
+.form-actions {
+    margin-top: 30px;
+}
+
+.form-actions button {
+    width: 100%;
+    padding: 15px;
+    background-color: #007bff; /* Cor do botão azul */
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.form-actions button:hover {
+    background-color: #0056b3; /* Cor do botão ao passar o mouse */
+}
