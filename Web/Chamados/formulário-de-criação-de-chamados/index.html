@@ -1,0 +1,161 @@
+import { useState } from "react";
+import { ArrowLeft } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
+const TicketForm = () => {
+  const [formData, setFormData] = useState({
+    titulo: "notebook não liga",
+    nome: "Pedro",
+    email: "pedro.santos18@gmail.com",
+    categoria: "Software",
+    descricao: "teste"
+  });
+
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log("Form submitted:", formData);
+  };
+
+  return (
+    <div className="min-h-screen bg-background flex flex-col">
+      {/* Header */}
+      <header className="flex items-center p-4 text-foreground">
+        <Button variant="ghost" size="sm" className="mr-3 p-1">
+          <ArrowLeft className="h-5 w-5" />
+        </Button>
+        <h1 className="text-lg font-medium">Registrar Chamado</h1>
+      </header>
+
+      {/* Main Content */}
+      <div className="flex-1 flex items-center justify-center p-4">
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center pb-6">
+            <CardTitle className="text-xl font-medium text-card-foreground">
+              Novo Chamado
+            </CardTitle>
+          </CardHeader>
+          
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {/* Título */}
+              <div className="space-y-2">
+                <Label htmlFor="titulo" className="text-sm text-card-foreground">
+                  Título:
+                </Label>
+                <Input
+                  id="titulo"
+                  value={formData.titulo}
+                  onChange={(e) => handleInputChange("titulo", e.target.value)}
+                  className="bg-secondary/50"
+                />
+              </div>
+
+              {/* Nome */}
+              <div className="space-y-2">
+                <Label htmlFor="nome" className="text-sm text-card-foreground">
+                  Nome:
+                </Label>
+                <Input
+                  id="nome"
+                  value={formData.nome}
+                  onChange={(e) => handleInputChange("nome", e.target.value)}
+                  className="bg-secondary/50"
+                />
+              </div>
+
+              {/* E-mail */}
+              <div className="space-y-2">
+                <Label htmlFor="email" className="text-sm text-card-foreground">
+                  E-mail:
+                </Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => handleInputChange("email", e.target.value)}
+                  className="bg-secondary/50"
+                />
+              </div>
+
+              {/* Categoria */}
+              <div className="space-y-2">
+                <Label htmlFor="categoria" className="text-sm text-card-foreground">
+                  Categoria:
+                </Label>
+                <Select
+                  value={formData.categoria}
+                  onValueChange={(value) => handleInputChange("categoria", value)}
+                >
+                  <SelectTrigger className="bg-secondary/50">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Software">Software</SelectItem>
+                    <SelectItem value="Hardware">Hardware</SelectItem>
+                    <SelectItem value="Rede">Rede</SelectItem>
+                    <SelectItem value="Outros">Outros</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Descrição */}
+              <div className="space-y-2">
+                <Label htmlFor="descricao" className="text-sm text-card-foreground">
+                  Descrição:
+                </Label>
+                <Textarea
+                  id="descricao"
+                  value={formData.descricao}
+                  onChange={(e) => handleInputChange("descricao", e.target.value)}
+                  className="bg-secondary/50 min-h-20 focus-visible:ring-primary"
+                  placeholder="Descreva o problema..."
+                />
+              </div>
+
+              {/* Submit Button */}
+              <div className="pt-4">
+                <Button 
+                  type="submit" 
+                  className="w-full bg-primary hover:bg-primary/90"
+                >
+                  Avançar
+                </Button>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+};
+
+export default TicketForm;
+import TicketForm from "@/components/TicketForm";
+
+const Index = () => {
+  return (
+    <div className="dark">
+      <TicketForm />
+    </div>
+  );
+};
+
+export default Index;
