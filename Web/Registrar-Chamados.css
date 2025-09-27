@@ -1,11 +1,27 @@
 /* Importando a fonte do Google Fonts */
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
 
+/* DEFINIÇÃO DA NOVA PALETA DE CORES */
+:root {
+    --primary-color-blue: #0d1b2a;
+    --second-color-blue: #1b263b;
+    --third-color-blue: #415a77;
+    --fourth-color-blue: #778da9;
+    --fifth-color-blue: #e0e1dd; /* Cor clara para textos e elementos */
+    --sixth-color-blue: #49a09d;
+    --seventh-color-blue: #004258;
+    --eighth-color-blue: #026687;
+    --ninth-color-blue: #021c33;
+    --tenth-color-blue: #1aa4e5; /* Azul vibrante para ações */
+    --primary-color-dark: #050505;
+    --second-color-dark: #222222;
+}
+
 /* Reset básico e estilos gerais */
 body {
     font-family: 'Roboto', sans-serif;
-    background-color: #212529; /* Cor de fundo escura */
-    color: #f8f9fa; /* Cor do texto claro */
+    background-color: var(--primary-color-dark); /* Fundo principal escuro */
+    color: var(--fifth-color-blue); /* Cor do texto claro */
     margin: 0;
     padding: 0;
     display: flex;
@@ -19,10 +35,12 @@ body {
     width: 100%;
     padding: 20px;
     box-sizing: border-box;
+    /* Fundo da barra superior pode usar um tom um pouco diferente, se quiser */
+    /* background-color: var(--ninth-color-blue); */ 
 }
 
 .back-link {
-    color: #f8f9fa;
+    color: var(--fifth-color-blue); /* Texto do link claro */
     text-decoration: none;
     font-size: 1.2rem;
     display: flex;
@@ -44,13 +62,13 @@ body {
     box-sizing: border-box;
 }
 
-/* Estilo do cartão (o retângulo branco) */
+/* Estilo do cartão (agora uma SECTION ou ARTICLE) */
 .card {
-    background-color: #f8f9fa;
-    color: #212529;
+    background-color: var(--second-color-dark); /* Fundo do card, um pouco mais claro que o body */
+    color: var(--fifth-color-blue); /* Texto dentro do card claro */
     padding: 30px;
     border-radius: 15px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5); /* Sombra mais escura para contraste */
     width: 100%;
     max-width: 500px;
     text-align: center;
@@ -80,19 +98,28 @@ body {
     width: 100%;
     padding: 12px;
     box-sizing: border-box;
-    border: 1px solid #ccc;
+    border: 1px solid var(--third-color-blue); /* Borda sutil */
     border-radius: 8px;
     font-size: 1rem;
     font-family: inherit;
-    background-color: #e9ecef;
-    border: none;
+    background-color: var(--second-color-blue); /* Fundo do campo de input */
+    color: var(--fifth-color-blue); /* Texto dentro do input claro */
     outline: none;
+}
+
+/* Garantindo que o SELECT tenha um fundo correto */
+.form-group select {
+    /* Pode ser necessário forçar a cor de fundo para alguns navegadores */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
 }
 
 .form-group input:focus,
 .form-group select:focus,
 .form-group textarea:focus {
-    outline: 2px solid #007bff; /* Foco azul */
+    outline: 2px solid var(--tenth-color-blue); /* Foco azul vibrante */
+    border-color: var(--tenth-color-blue);
 }
 
 /* Estilizando o botão "Avançar" */
@@ -103,16 +130,17 @@ body {
 .form-actions button {
     width: 100%;
     padding: 15px;
-    background-color: #007bff; /* Cor do botão azul */
-    color: white;
+    background-color: var(--tenth-color-blue); /* Cor do botão azul vibrante */
+    color: var(--primary-color-dark); /* Texto escuro no botão vibrante */
     border: none;
     border-radius: 8px;
     font-size: 1.1rem;
-    font-weight: 500;
+    font-weight: 700;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.3s ease, transform 0.2s;
 }
 
 .form-actions button:hover {
-    background-color: #0056b3; /* Cor do botão ao passar o mouse */
+    background-color: #0d8fd1; /* Tom ligeiramente mais escuro que o tenth-color-blue */
+    transform: translateY(-1px);
 }
