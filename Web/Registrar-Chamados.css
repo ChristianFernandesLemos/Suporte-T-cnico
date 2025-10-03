@@ -20,7 +20,7 @@
 /* Reset básico e estilos gerais */
 body {
     font-family: 'Roboto', sans-serif;
-    background-color: var(--primary-color-dark); /* Fundo principal escuro */
+    background: linear-gradient(to bottom, #111, #222);; /* Fundo principal escuro */
     color: var(--fifth-color-blue); /* Cor do texto claro */
     margin: 0;
     padding: 0;
