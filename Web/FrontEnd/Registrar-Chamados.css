@@ -105,7 +105,9 @@ body {
     background-color: var(--second-color-blue); /* Fundo do campo de input */
     color: var(--fifth-color-blue); /* Texto dentro do input claro */
     outline: none;
-}
+    
+    /* *** ALTERAÇÃO FEITA AQUI: Desativa o redimensionamento do textarea *** */
+    **resize: none;** }
 
 /* Garantindo que o SELECT tenha um fundo correto */
 .form-group select {
