@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrar Chamado - Confirmação</title>
+    
+    <!-- Lincando o arquivo de estilos externo -->
+    <link rel="stylesheet" href="registro.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+</head>
+<body>
+
+    <header class="top-bar">
+        <!-- O link superior de navegação -->
+        <a href="#" class="back-link">
+            <span class="arrow-icon">←</span>
+            Registrar Chamado
+        </a>
+    </header>
+
+    <main class="container">
+        <section class="card">
+            <h2>Novo Chamado</h2>
+            
+            <!-- Texto de Confirmação -->
+            <p class="confirmation-text">Deseja concluir o registro do chamado agora?</p>
+
+            <form action="#" method="post">
+                <div class="form-actions two-buttons">
+                    <!-- Botão Voltar (Secundário) -->
+                    <button type="button" class="back-button">Voltar</button>
+                    <!-- Botão Avançar (Primário) -->
+                    <button type="submit" class="submit-button">Avançar</button>
+                </div>
+            </form>
+        </section>
+    </main>
+
+</body>
+</html>
