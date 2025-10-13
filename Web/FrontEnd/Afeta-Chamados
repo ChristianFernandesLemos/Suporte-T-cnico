@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrar Chamado - Impacto</title>
+    
+    <!-- Lincando o arquivo de estilos externo -->
+    <link rel="stylesheet" href="Registrar-Chamados.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+</head>
+<body>
+
+    <header class="top-bar">
+        <!-- Link superior de navegação -->
+        <a href="#" class="back-link">
+            <span class="arrow-icon">←</span>
+            Registrar Chamado
+        </a>
+    </header>
+
+    <main class="container">
+        <section class="card">
+            <h2>Novo Chamado</h2>
+            
+            <form action="#" method="post">
+                
+                <div class="form-group">
+                    <label for="impacto">Impede totalmente o trabalho?</label>
+                    <div class="radio-group">
+                        <label>
+                            <input type="radio" name="impacto" value="nao" checked>
+                            Não
+                        </label>
+                        <label>
+                            <input type="radio" name="impacto" value="sim">
+                            Sim
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-actions stacked-buttons">
+                    <!-- Botão Voltar (Secundário) -->
+                    <button type="button" class="back-button">Voltar</button>
+                    <!-- Botão Avançar (Primário) -->
+                    <button type="submit" class="submit-button">Avançar</button>
+                </div>
+                
+            </form>
+        </section>
+    </main>
+
+</body>
+</html>
