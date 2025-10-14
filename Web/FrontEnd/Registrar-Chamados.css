@@ -107,7 +107,8 @@ body {
     outline: none;
     
     /* *** ALTERAÇÃO FEITA AQUI: Desativa o redimensionamento do textarea *** */
-    **resize: none;** }
+    resize: none;
+}
 
 /* Garantindo que o SELECT tenha um fundo correto */
 .form-group select {
