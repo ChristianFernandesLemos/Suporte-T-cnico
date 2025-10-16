@@ -1,7 +1,7 @@
-/* Importando a fonte do Google Fonts */
+/* 1. IMPORTAÇÃO DE FONTES: DEVE VIR EM PRIMEIRO LUGAR */
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
 
-/* DEFINIÇÃO DA NOVA PALETA DE CORES */
+/* 2. DEFINIÇÃO DA NOVA PALETA DE CORES: DEVE VIR DEPOIS DO @IMPORT */
 :root {
     --primary-color-blue: #0d1b2a;
     --second-color-blue: #1b263b;
@@ -17,10 +17,13 @@
     --second-color-dark: #222222;
 }
 
+/* 3. INÍCIO DOS ESTILOS GERAIS (UNIFICADOS) */
+
 /* Reset básico e estilos gerais */
 body {
     font-family: 'Roboto', sans-serif;
-    background: linear-gradient(to bottom, #111, #222);; /* Fundo principal escuro */
+    /* Fundo principal escuro com degradê */
+    background: linear-gradient(to bottom, #111, #222);
     color: var(--fifth-color-blue); /* Cor do texto claro */
     margin: 0;
     padding: 0;
@@ -35,12 +38,11 @@ body {
     width: 100%;
     padding: 20px;
     box-sizing: border-box;
-    /* Fundo da barra superior pode usar um tom um pouco diferente, se quiser */
-    /* background-color: var(--ninth-color-blue); */ 
+    background-color: transparent;
 }
 
 .back-link {
-    color: var(--fifth-color-blue); /* Texto do link claro */
+    color: var(--fifth-color-blue);
     text-decoration: none;
     font-size: 1.2rem;
     display: flex;
@@ -60,17 +62,18 @@ body {
     width: 100%;
     padding: 20px;
     box-sizing: border-box;
+    flex-grow: 1;
 }
 
-/* Estilo do cartão (agora uma SECTION ou ARTICLE) */
+/* Estilo do cartão (SECTION/ARTICLE) */
 .card {
-    background-color: var(--second-color-dark); /* Fundo do card, um pouco mais claro que o body */
-    color: var(--fifth-color-blue); /* Texto dentro do card claro */
+    background-color: #ffffff; /* Fundo do card em branco */
+    color: var(--primary-color-dark); /* Texto dentro do card escuro */
     padding: 30px;
     border-radius: 15px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5); /* Sombra mais escura para contraste */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
     width: 100%;
-    max-width: 500px;
+    max-width: 400px;
     text-align: center;
 }
 
@@ -78,6 +81,14 @@ body {
     margin-top: 0;
     margin-bottom: 25px;
     font-size: 1.5rem;
+    color: var(--primary-color-dark);
+}
+
+/* Estilizando o texto de confirmação */
+.confirmation-text {
+    font-size: 1.1rem;
+    margin-bottom: 30px;
+    color: var(--primary-color-dark);
 }
 
 /* Estilizando os grupos de formulário (rótulo + input) */
@@ -90,29 +101,27 @@ body {
     display: block;
     margin-bottom: 5px;
     font-weight: 500;
+    color: var(--primary-color-dark);
 }
 
-.form-group input,
+.form-group input:not([type="radio"]),
 .form-group select,
 .form-group textarea {
     width: 100%;
     padding: 12px;
     box-sizing: border-box;
-    border: 1px solid var(--third-color-blue); /* Borda sutil */
+    border: 1px solid var(--fourth-color-blue);
     border-radius: 8px;
     font-size: 1rem;
     font-family: inherit;
-    background-color: var(--second-color-blue); /* Fundo do campo de input */
-    color: var(--fifth-color-blue); /* Texto dentro do input claro */
+    background-color: var(--fifth-color-blue); /* Fundo do campo claro */
+    color: var(--primary-color-dark); /* Texto escuro */
     outline: none;
-    
-    /* *** ALTERAÇÃO FEITA AQUI: Desativa o redimensionamento do textarea *** */
-    resize: none;
+    resize: none; /* Desativa o redimensionamento do textarea */
 }
 
-/* Garantindo que o SELECT tenha um fundo correto */
+/* Garantindo que o SELECT tenha um fundo correto e remova a aparência nativa */
 .form-group select {
-    /* Pode ser necessário forçar a cor de fundo para alguns navegadores */
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
@@ -121,653 +130,6 @@ body {
 .form-group input:focus,
 .form-group select:focus,
 .form-group textarea:focus {
-    outline: 2px solid var(--tenth-color-blue); /* Foco azul vibrante */
-    border-color: var(--tenth-color-blue);
-}
-
-/* Estilizando o botão "Avançar" */
-.form-actions {
-    margin-top: 30px;
-}
-
-.form-actions button {
-    width: 100%;
-    padding: 15px;
-    background-color: var(--tenth-color-blue); /* Cor do botão azul vibrante */
-    color: var(--primary-color-dark); /* Texto escuro no botão vibrante */
-    border: none;
-    border-radius: 8px;
-    font-size: 1.1rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s;
-}
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
-
-/* DEFINIÇÃO DA PALETA DE CORES */
-:root {
-    --primary-color-blue: #0d1b2a;
-    --second-color-blue: #1b263b;
-    --third-color-blue: #415a77;
-    --fourth-color-blue: #778da9;
-    --fifth-color-blue: #e0e1dd; /* Cor clara para textos e elementos */
-    --sixth-color-blue: #49a09d;
-    --seventh-color-blue: #004258;
-    --eighth-color-blue: #026687;
-    --ninth-color-blue: #021c33;
-    --tenth-color-blue: #1aa4e5; /* Azul vibrante para ações */
-    --primary-color-dark: #050505;
-    --second-color-dark: #222222;
-}
-
-/* Reset básico e estilos gerais */
-body {
-    font-family: 'Roboto', sans-serif;
-    /* Fundo principal escuro com degradê */
-    background: linear-gradient(to bottom, #111, #222);
-    color: var(--fifth-color-blue); /* Cor do texto claro */
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-height: 100vh;
-}
-
-/* Estilizando o cabeçalho superior */
-.top-bar {
-    width: 100%;
-    padding: 20px;
-    box-sizing: border-box;
-    background-color: transparent; /* Mantendo o fundo transparente para ver o gradiente do body */
-}
-
-.back-link {
-    color: var(--fifth-color-blue); /* Texto do link claro */
-    text-decoration: none;
-    font-size: 1.2rem;
-    display: flex;
-    align-items: center;
-}
-
-.arrow-icon {
-    font-size: 1.5rem;
-    margin-right: 10px;
-}
-
-/* Container principal para centralizar o conteúdo */
-.container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    padding: 20px;
-    box-sizing: border-box;
-    flex-grow: 1; /* Permite que o container ocupe o espaço restante */
-}
-
-/* Estilo do cartão (agora uma SECTION ou ARTICLE) */
-.card {
-    background-color: #ffffff; /* Fundo do card em branco, como na imagem */
-    color: var(--primary-color-dark); /* Texto dentro do card escuro */
-    padding: 30px;
-    border-radius: 15px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Sombra suave */
-    width: 100%;
-    max-width: 400px; /* Reduzido para ficar mais centralizado e compacto */
-    text-align: center;
-}
-
-.card h2 {
-    margin-top: 0;
-    margin-bottom: 25px;
-    font-size: 1.5rem;
-    color: var(--primary-color-dark); /* Título escuro */
-}
-
-/* Estilizando os grupos de formulário (rótulo + input) */
-.form-group {
-    text-align: left;
-    margin-bottom: 20px;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: 500;
-    color: var(--primary-color-dark); /* Label escuro */
-}
-
-.form-group select {
-    width: 100%;
-    padding: 12px;
-    box-sizing: border-box;
-    border: 1px solid var(--fourth-color-blue);
-    border-radius: 8px;
-    font-size: 1rem;
-    font-family: inherit;
-    background-color: var(--fifth-color-blue); /* Fundo do select claro */
-    color: var(--primary-color-dark); /* Texto dentro do select escuro */
-    outline: none;
-    /* Remove a aparência nativa em alguns navegadores */
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-}
-
-.form-group select:focus {
-    outline: 2px solid var(--tenth-color-blue); /* Foco azul vibrante */
-    border-color: var(--tenth-color-blue);
-}
-
-/* Estilizando as ações e os botões */
-.form-actions {
-    margin-top: 30px;
-    display: flex;
-    flex-direction: column; /* Empilha botões */
-    gap: 15px; /* Espaço entre botões */
-}
-
-/* Estilo base para todos os botões na seção de ações */
-.form-actions button {
-    width: 100%;
-    padding: 12px 15px;
-    border: none;
-    border-radius: 8px;
-    font-size: 1.1rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s, color 0.3s;
-}
-
-/* Botão Primário/Avançar (Azul Vibrante) */
-.form-actions button[type="submit"] {
-    background-color: var(--tenth-color-blue); /* Cor do botão azul vibrante */
-    color: var(--primary-color-dark); /* Texto escuro no botão vibrante */
-}
-
-.form-actions button[type="submit"]:hover {
-    background-color: #0d8fd1;
-    transform: translateY(-1px);
-}
-
-/* Botão Secundário/Voltar (Fundo transparente, texto escuro) */
-.form-actions .back-button {
-    background-color: transparent;
-    color: var(--primary-color-dark); /* Cor do texto escuro */
-    font-weight: 500; 
-}
-
-.form-actions .back-button:hover {
-    text-decoration: underline;
-    background-color: rgba(0, 0, 0, 0.05);
-    transform: none; 
-}
-
-.form-actions button:hover {
-    background-color: #0d8fd1; /* Tom ligeiramente mais escuro que o tenth-color-blue */
-    transform: translateY(-1px);
-}
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
-
-/* DEFINIÇÃO DA PALETA DE CORES */
-:root {
-    --primary-color-blue: #0d1b2a;
-    --second-color-blue: #1b263b;
-    --third-color-blue: #415a77;
-    --fourth-color-blue: #778da9;
-    --fifth-color-blue: #e0e1dd; /* Cor clara para textos e elementos */
-    --sixth-color-blue: #49a09d;
-    --seventh-color-blue: #004258;
-    --eighth-color-blue: #026687;
-    --ninth-color-blue: #021c33;
-    --tenth-color-blue: #1aa4e5; /* Azul vibrante para ações */
-    --primary-color-dark: #050505;
-    --second-color-dark: #222222;
-}
-
-/* Reset básico e estilos gerais */
-body {
-    font-family: 'Roboto', sans-serif;
-    /* Fundo principal escuro com degradê */
-    background: linear-gradient(to bottom, #111, #222);
-    color: var(--fifth-color-blue); /* Cor do texto claro */
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-height: 100vh;
-}
-
-/* Estilizando o cabeçalho superior */
-.top-bar {
-    width: 100%;
-    padding: 20px;
-    box-sizing: border-box;
-    background-color: transparent; /* Mantendo o fundo transparente para ver o gradiente do body */
-}
-
-.back-link {
-    color: var(--fifth-color-blue); /* Texto do link claro */
-    text-decoration: none;
-    font-size: 1.2rem;
-    display: flex;
-    align-items: center;
-}
-
-.arrow-icon {
-    font-size: 1.5rem;
-    margin-right: 10px;
-}
-
-/* Container principal para centralizar o conteúdo */
-.container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    padding: 20px;
-    box-sizing: border-box;
-    flex-grow: 1; /* Permite que o container ocupe o espaço restante */
-}
-
-/* Estilo do cartão (agora uma SECTION ou ARTICLE) */
-.card {
-    background-color: #ffffff; /* Fundo do card em branco, como na imagem */
-    color: var(--primary-color-dark); /* Texto dentro do card escuro */
-    padding: 30px;
-    border-radius: 15px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Sombra suave */
-    width: 100%;
-    max-width: 400px; /* Reduzido para ficar mais centralizado e compacto */
-    text-align: center;
-}
-
-.card h2 {
-    margin-top: 0;
-    margin-bottom: 25px;
-    font-size: 1.5rem;
-    color: var(--primary-color-dark); /* Título escuro */
-}
-
-/* Estilizando os grupos de formulário (rótulo + input) */
-.form-group {
-    text-align: left;
-    margin-bottom: 20px;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: 500;
-    color: var(--primary-color-dark); /* Label escuro */
-}
-
-.form-group select {
-    width: 100%;
-    padding: 12px;
-    box-sizing: border-box;
-    border: 1px solid var(--fourth-color-blue);
-    border-radius: 8px;
-    font-size: 1rem;
-    font-family: inherit;
-    background-color: var(--fifth-color-blue); /* Fundo do select claro */
-    color: var(--primary-color-dark); /* Texto dentro do select escuro */
-    outline: none;
-    /* Remove a aparência nativa em alguns navegadores */
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-}
-
-.form-group select:focus {
-    outline: 2px solid var(--tenth-color-blue); /* Foco azul vibrante */
-    border-color: var(--tenth-color-blue);
-}
-
-/* Estilizando as ações e os botões */
-.form-actions {
-    margin-top: 30px;
-    /* Permite que os botões se empilhem (Voltar e Finalizar/Avançar) */
-    display: flex;
-    flex-direction: column; 
-    gap: 15px; /* Espaço entre botões */
-}
-
-/* Estilo base para todos os botões na seção de ações */
-.form-actions button {
-    width: 100%;
-    padding: 12px 15px;
-    border: none;
-    border-radius: 8px;
-    font-size: 1.1rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s, color 0.3s;
-}
-
-/* Botão Primário/Finalizar (Azul Vibrante) */
-.form-actions .submit-button {
-    background-color: var(--tenth-color-blue); /* Cor do botão azul vibrante */
-    color: var(--primary-color-dark); /* Texto escuro no botão vibrante */
-}
-
-.form-actions .submit-button:hover {
-    background-color: #0d8fd1;
-    transform: translateY(-1px);
-}
-
-/* Botão Secundário/Voltar (Fundo transparente, texto escuro) */
-.form-actions .back-button {
-    background-color: transparent;
-    color: var(--primary-color-dark); /* Cor do texto escuro */
-    font-weight: 500; 
-}
-
-.form-actions .back-button:hover {
-    text-decoration: underline;
-    background-color: rgba(0, 0, 0, 0.05);
-    transform: none; 
-}
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
-
-/* DEFINIÇÃO DA PALETA DE CORES */
-:root {
-    --primary-color-blue: #0d1b2a;
-    --second-color-blue: #1b263b;
-    --third-color-blue: #415a77;
-    --fourth-color-blue: #778da9;
-    --fifth-color-blue: #e0e1dd; /* Cor clara para textos e elementos */
-    --sixth-color-blue: #49a09d;
-    --seventh-color-blue: #004258;
-    --eighth-color-blue: #026687;
-    --ninth-color-blue: #021c33;
-    --tenth-color-blue: #1aa4e5; /* Azul vibrante para ações */
-    --primary-color-dark: #050505;
-    --second-color-dark: #222222;
-}
-
-/* Reset básico e estilos gerais */
-body {
-    font-family: 'Roboto', sans-serif;
-    /* Fundo principal escuro com degradê */
-    background: linear-gradient(to bottom, #111, #222);
-    color: var(--fifth-color-blue); /* Cor do texto claro */
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-height: 100vh;
-}
-
-/* Estilizando o cabeçalho superior */
-.top-bar {
-    width: 100%;
-    padding: 20px;
-    box-sizing: border-box;
-    background-color: transparent; /* Mantendo o fundo transparente para ver o gradiente do body */
-}
-
-.back-link {
-    color: var(--fifth-color-blue); /* Texto do link claro */
-    text-decoration: none;
-    font-size: 1.2rem;
-    display: flex;
-    align-items: center;
-}
-
-.arrow-icon {
-    font-size: 1.5rem;
-    margin-right: 10px;
-}
-
-/* Container principal para centralizar o conteúdo */
-.container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    padding: 20px;
-    box-sizing: border-box;
-    flex-grow: 1; /* Permite que o container ocupe o espaço restante */
-}
-
-/* Estilo do cartão (agora uma SECTION ou ARTICLE) */
-.card {
-    background-color: #ffffff; /* Fundo do card em branco, como na imagem */
-    color: var(--primary-color-dark); /* Texto dentro do card escuro */
-    padding: 30px;
-    border-radius: 15px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Sombra suave */
-    width: 100%;
-    max-width: 400px; /* Reduzido para ficar mais centralizado e compacto */
-    text-align: center;
-}
-
-.card h2 {
-    margin-top: 0;
-    margin-bottom: 25px;
-    font-size: 1.5rem;
-    color: var(--primary-color-dark); /* Título escuro */
-}
-
-/* Estilizando o texto de confirmação */
-.confirmation-text {
-    font-size: 1.1rem;
-    margin-bottom: 30px;
-    color: var(--primary-color-dark);
-}
-
-/* Estilizando os grupos de formulário (rótulo + input) */
-.form-group {
-    text-align: left;
-    margin-bottom: 20px;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: 500;
-    color: var(--primary-color-dark); /* Label escuro */
-}
-
-.form-group select {
-    width: 100%;
-    padding: 12px;
-    box-sizing: border-box;
-    border: 1px solid var(--fourth-color-blue);
-    border-radius: 8px;
-    font-size: 1rem;
-    font-family: inherit;
-    background-color: var(--fifth-color-blue); /* Fundo do select claro */
-    color: var(--primary-color-dark); /* Texto dentro do select escuro */
-    outline: none;
-    /* Remove a aparência nativa em alguns navegadores */
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-}
-
-.form-group select:focus {
-    outline: 2px solid var(--tenth-color-blue); /* Foco azul vibrante */
-    border-color: var(--tenth-color-blue);
-}
-
-/* Estilizando as ações e os botões */
-.form-actions {
-    margin-top: 30px;
-    /* Padrão para empilhar botões (telas anteriores) */
-    display: flex;
-    flex-direction: column; 
-    gap: 15px; /* Espaço entre botões */
-}
-
-/* Novo estilo para alinhar botões lado a lado na tela de confirmação */
-.form-actions.two-buttons {
-    flex-direction: row; /* Alinha horizontalmente */
-    justify-content: space-between; /* Distribui o espaço */
-}
-
-/* Estilo base para todos os botões na seção de ações */
-.form-actions button {
-    width: 48%; /* 48% para caber dois botões com gap */
-    padding: 12px 15px;
-    border: none;
-    border-radius: 8px;
-    font-size: 1.1rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s, color 0.3s;
-}
-
-/* Botão Primário/Avançar (Azul Vibrante) */
-.form-actions .submit-button {
-    background-color: var(--tenth-color-blue); /* Cor do botão azul vibrante */
-    color: var(--primary-color-dark); /* Texto escuro no botão vibrante */
-}
-
-.form-actions .submit-button:hover {
-    background-color: #0d8fd1;
-    transform: translateY(-1px);
-}
-
-/* Botão Secundário/Voltar (Fundo claro com borda sutil, como na imagem) */
-.form-actions .back-button {
-    background-color: var(--fifth-color-blue); /* Fundo claro */
-    color: var(--primary-color-dark); /* Cor do texto escuro */
-    font-weight: 700; 
-    border: 1px solid var(--fourth-color-blue); /* Borda sutil */
-}
-
-.form-actions .back-button:hover {
-    text-decoration: none;
-    background-color: var(--fourth-color-blue);
-    color: var(--fifth-color-blue);
-    transform: translateY(-1px);
-}
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
-
-/* DEFINIÇÃO DA PALETA DE CORES */
-:root {
-    --primary-color-blue: #0d1b2a;
-    --second-color-blue: #1b263b;
-    --third-color-blue: #415a77;
-    --fourth-color-blue: #778da9;
-    --fifth-color-blue: #e0e1dd; /* Cor clara para textos e elementos */
-    --sixth-color-blue: #49a09d;
-    --seventh-color-blue: #004258;
-    --eighth-color-blue: #026687;
-    --ninth-color-blue: #021c33;
-    --tenth-color-blue: #1aa4e5; /* Azul vibrante para ações */
-    --primary-color-dark: #050505;
-    --second-color-dark: #222222;
-}
-
-/* Reset básico e estilos gerais */
-body {
-    font-family: 'Roboto', sans-serif;
-    /* Fundo principal escuro com degradê */
-    background: linear-gradient(to bottom, #111, #222);
-    color: var(--fifth-color-blue); /* Cor do texto claro */
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-height: 100vh;
-}
-
-/* Estilizando o cabeçalho superior */
-.top-bar {
-    width: 100%;
-    padding: 20px;
-    box-sizing: border-box;
-    background-color: transparent; /* Mantendo o fundo transparente para ver o gradiente do body */
-}
-
-.back-link {
-    color: var(--fifth-color-blue); /* Texto do link claro */
-    text-decoration: none;
-    font-size: 1.2rem;
-    display: flex;
-    align-items: center;
-}
-
-.arrow-icon {
-    font-size: 1.5rem;
-    margin-right: 10px;
-}
-
-/* Container principal para centralizar o conteúdo */
-.container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    padding: 20px;
-    box-sizing: border-box;
-    flex-grow: 1; /* Permite que o container ocupe o espaço restante */
-}
-
-/* Estilo do cartão (agora uma SECTION ou ARTICLE) */
-.card {
-    background-color: #ffffff; /* Fundo do card em branco, como na imagem */
-    color: var(--primary-color-dark); /* Texto dentro do card escuro */
-    padding: 30px;
-    border-radius: 15px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Sombra suave */
-    width: 100%;
-    max-width: 400px; /* Reduzido para ficar mais centralizado e compacto */
-    text-align: center;
-}
-
-.card h2 {
-    margin-top: 0;
-    margin-bottom: 25px;
-    font-size: 1.5rem;
-    color: var(--primary-color-dark); /* Título escuro */
-}
-
-/* Estilizando o texto de confirmação */
-.confirmation-text {
-    font-size: 1.1rem;
-    margin-bottom: 30px;
-    color: var(--primary-color-dark);
-}
-
-/* Estilizando os grupos de formulário (rótulo + input) */
-.form-group {
-    text-align: left;
-    margin-bottom: 20px;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: 500;
-    color: var(--primary-color-dark); /* Label escuro */
-}
-
-.form-group select {
-    width: 100%;
-    padding: 12px;
-    box-sizing: border-box;
-    border: 1px solid var(--fourth-color-blue);
-    border-radius: 8px;
-    font-size: 1rem;
-    font-family: inherit;
-    background-color: var(--fifth-color-blue); /* Fundo do select claro */
-    color: var(--primary-color-dark); /* Texto dentro do select escuro */
-    outline: none;
-    /* Remove a aparência nativa em alguns navegadores */
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-}
-
-.form-group select:focus {
     outline: 2px solid var(--tenth-color-blue); /* Foco azul vibrante */
     border-color: var(--tenth-color-blue);
 }
@@ -784,15 +146,13 @@ body {
     align-items: center;
     cursor: pointer;
     font-weight: 400;
-    color: var(--primary-color-dark); /* Texto das opções escuro */
+    color: var(--primary-color-dark);
 }
 
 .radio-group input[type="radio"] {
-    /* Remove a aparência nativa */
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
-    /* Estilos do rádio personalizado */
     width: 16px;
     height: 16px;
     border: 2px solid var(--third-color-blue);
@@ -804,22 +164,21 @@ body {
 }
 
 .radio-group input[type="radio"]:checked {
-    border: 5px solid var(--tenth-color-blue); /* Borda mais grossa e cor vibrante quando checado */
+    border: 5px solid var(--tenth-color-blue);
 }
 
 /* Estilizando as ações e os botões */
 .form-actions {
     margin-top: 30px;
-    /* Padrão para empilhar botões (como na tela atual) */
     display: flex;
-    flex-direction: column; 
-    gap: 15px; /* Espaço entre botões */
+    flex-direction: column;
+    gap: 15px;
 }
 
-/* Estilo para alinhar botões lado a lado (para tela de confirmação, se necessário) */
+/* Estilo para alinhar botões lado a lado (Confirmação) */
 .form-actions.two-buttons {
-    flex-direction: row; /* Alinha horizontalmente */
-    justify-content: space-between; /* Distribui o espaço */
+    flex-direction: row;
+    justify-content: space-between;
 }
 
 /* Estilo base para todos os botões na seção de ações */
@@ -836,28 +195,26 @@ body {
 
 /* Ajuste de largura para botões lado a lado */
 .form-actions.two-buttons button {
-    width: 48%; /* 48% para caber dois botões com gap */
+    width: 48%;
 }
 
 /* Botão Primário/Avançar (Azul Vibrante) */
-.form-actions .submit-button,
-.form-actions .submit-button:not(.back-button) { /* Garante que o estilo primário não afete o Voltar */
-    background-color: var(--tenth-color-blue); /* Cor do botão azul vibrante */
-    color: var(--primary-color-dark); /* Texto escuro no botão vibrante */
+.form-actions .submit-button {
+    background-color: var(--tenth-color-blue);
+    color: var(--primary-color-dark);
 }
 
-.form-actions .submit-button:hover,
-.form-actions .submit-button:not(.back-button):hover {
+.form-actions .submit-button:hover {
     background-color: #0d8fd1;
     transform: translateY(-1px);
 }
 
-/* Botão Secundário/Voltar (Fundo claro com borda sutil) */
+/* Botão Secundário/Voltar (Fundo claro) */
 .form-actions .back-button {
-    background-color: var(--fifth-color-blue); /* Fundo claro */
-    color: var(--primary-color-dark); /* Cor do texto escuro */
-    font-weight: 700; 
-    border: 1px solid var(--fourth-color-blue); /* Borda sutil */
+    background-color: var(--fifth-color-blue);
+    color: var(--primary-color-dark);
+    font-weight: 700;
+    border: 1px solid var(--fourth-color-blue);
 }
 
 .form-actions .back-button:hover {
