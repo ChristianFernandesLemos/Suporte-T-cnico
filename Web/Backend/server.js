@@ -1,9 +1,17 @@
+// Carrega as variáveis de ambiente
+require('dotenv').config();
+
 // Importa o Express
 const express = require('express');
 const app = express();
 
 // Middleware para interpretar JSON
 app.use(express.json());
+
+// Rota raiz
+app.get('/', (req, res) => {
+  res.send('Bem-vindo ao Interfix! Acesse /api/ para usar a API');
+});
 
 // Rota principal da API
 app.get('/api/', (req, res) => {
@@ -28,7 +36,9 @@ app.post('/api/users', (req, res) => {
 });
 
 // Inicia o servidor
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`🚀 Servidor rodando na porta ${PORT}`);
+  console.log(`📍 Acesse: http://localhost:${PORT}`);
+  console.log(`📍 API: http://localhost:${PORT}/api/`);
 });
