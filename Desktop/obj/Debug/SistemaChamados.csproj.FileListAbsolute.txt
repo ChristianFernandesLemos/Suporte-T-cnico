@@ -15,3 +15,20 @@ C:\Users\USUARIO\Desktop\Interfix C#\sistema-chamados-csharp-windows-forms\obj\D
 C:\Users\USUARIO\Desktop\Interfix C#\sistema-chamados-csharp-windows-forms\obj\Debug\SistemaC.458C2CAD.Up2Date
 C:\Users\USUARIO\Desktop\Interfix C#\sistema-chamados-csharp-windows-forms\obj\Debug\SistemaChamados.exe
 C:\Users\USUARIO\Desktop\Interfix C#\sistema-chamados-csharp-windows-forms\obj\Debug\SistemaChamados.pdb
+C:\Users\USUARIO\Desktop\Github\Suporte Tecnico (chris)\Suporte-T-cnico\Desktop\bin\Debug\SistemaChamados.exe.config
+C:\Users\USUARIO\Desktop\Github\Suporte Tecnico (chris)\Suporte-T-cnico\Desktop\bin\Debug\SistemaChamados.exe
+C:\Users\USUARIO\Desktop\Github\Suporte Tecnico (chris)\Suporte-T-cnico\Desktop\bin\Debug\SistemaChamados.pdb
+C:\Users\USUARIO\Desktop\Github\Suporte Tecnico (chris)\Suporte-T-cnico\Desktop\bin\Debug\BouncyCastle.Cryptography.dll
+C:\Users\USUARIO\Desktop\Github\Suporte Tecnico (chris)\Suporte-T-cnico\Desktop\bin\Debug\itextsharp.dll
+C:\Users\USUARIO\Desktop\Github\Suporte Tecnico (chris)\Suporte-T-cnico\Desktop\bin\Debug\System.Configuration.ConfigurationManager.dll
+C:\Users\USUARIO\Desktop\Github\Suporte Tecnico (chris)\Suporte-T-cnico\Desktop\bin\Debug\BouncyCastle.Cryptography.xml
+C:\Users\USUARIO\Desktop\Github\Suporte Tecnico (chris)\Suporte-T-cnico\Desktop\bin\Debug\itextsharp.xml
+C:\Users\USUARIO\Desktop\Github\Suporte Tecnico (chris)\Suporte-T-cnico\Desktop\bin\Debug\System.Configuration.ConfigurationManager.xml
+C:\Users\USUARIO\Desktop\Github\Suporte Tecnico (chris)\Suporte-T-cnico\Desktop\obj\Debug\SistemaChamados.csproj.AssemblyReference.cache
+C:\Users\USUARIO\Desktop\Github\Suporte Tecnico (chris)\Suporte-T-cnico\Desktop\obj\Debug\SistemaChamados.Forms.LoginForm.resources
+C:\Users\USUARIO\Desktop\Github\Suporte Tecnico (chris)\Suporte-T-cnico\Desktop\obj\Debug\SistemaChamados.Properties.Resources.resources
+C:\Users\USUARIO\Desktop\Github\Suporte Tecnico (chris)\Suporte-T-cnico\Desktop\obj\Debug\SistemaChamados.csproj.GenerateResource.cache
+C:\Users\USUARIO\Desktop\Github\Suporte Tecnico (chris)\Suporte-T-cnico\Desktop\obj\Debug\SistemaChamados.csproj.CoreCompileInputs.cache
+C:\Users\USUARIO\Desktop\Github\Suporte Tecnico (chris)\Suporte-T-cnico\Desktop\obj\Debug\SistemaC.458C2CAD.Up2Date
+C:\Users\USUARIO\Desktop\Github\Suporte Tecnico (chris)\Suporte-T-cnico\Desktop\obj\Debug\SistemaChamados.exe
+C:\Users\USUARIO\Desktop\Github\Suporte Tecnico (chris)\Suporte-T-cnico\Desktop\obj\Debug\SistemaChamados.pdb

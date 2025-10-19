@@ -406,10 +406,16 @@ namespace SistemaChamados.Forms
             // Técnicos podem alterar status e prioridade apenas dos seus chamados
             // Administradores podem fazer tudo
             bool isAdmin = _funcionarioLogado.NivelAcesso >= 3;
+            bool isTecnico = _funcionarioLogado.NivelAcesso == 2;
 
+            // Botões visíveis para Admin
             btnAtribuir.Visible = isAdmin;
-            btnFechar.Visible = isAdmin;
-            btnReabrir.Visible = isAdmin;
+
+            // Botões visíveis para Admin e Técnico ← MODIFICADO
+            btnFechar.Visible = isAdmin || isTecnico;
+            btnReabrir.Visible = isAdmin || isTecnico;
+            btnAlterarStatus.Visible = isAdmin || isTecnico;
+            btnAlterarPrioridade.Visible = isAdmin || isTecnico;
 
             if (!isAdmin)
             {
@@ -722,6 +728,26 @@ namespace SistemaChamados.Forms
                     return;
                 }
 
+                // ← NOVA VALIDAÇÃO: Verificar se técnico está tentando alterar chamados não atribuídos a ele
+                if (_funcionarioLogado.NivelAcesso == 2) // Técnico
+                {
+                    var chamadosNaoAtribuidos = _chamadosCarregados
+                        .Where(c => selecionados.Contains(c.IdChamado) &&
+                               (!c.TecnicoResponsavel.HasValue || c.TecnicoResponsavel.Value != _funcionarioLogado.Id))
+                        .ToList();
+
+                    if (chamadosNaoAtribuidos.Any())
+                    {
+                        MessageBox.Show(
+                            $"Você não pode alterar o status de chamados não atribuídos a você!\n\n" +
+                            $"Chamados inválidos: {string.Join(", ", chamadosNaoAtribuidos.Select(c => c.IdChamado))}",
+                            "Acesso Negado",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Warning);
+                        return;
+                    }
+                }
+
                 var formStatus = new AlterarStatusForm();
                 if (formStatus.ShowDialog() == DialogResult.OK)
                 {
@@ -756,6 +782,26 @@ namespace SistemaChamados.Forms
                     MessageBox.Show("Selecione pelo menos um chamado para alterar a prioridade.", "Nenhum Chamado Selecionado",
                         MessageBoxButtons.OK, MessageBoxIcon.Information);
                     return;
+                }
+
+                // ← NOVA VALIDAÇÃO: Verificar se técnico está tentando alterar chamados não atribuídos a ele
+                if (_funcionarioLogado.NivelAcesso == 2) // Técnico
+                {
+                    var chamadosNaoAtribuidos = _chamadosCarregados
+                        .Where(c => selecionados.Contains(c.IdChamado) &&
+                               (!c.TecnicoResponsavel.HasValue || c.TecnicoResponsavel.Value != _funcionarioLogado.Id))
+                        .ToList();
+
+                    if (chamadosNaoAtribuidos.Any())
+                    {
+                        MessageBox.Show(
+                            $"Você não pode alterar a prioridade de chamados não atribuídos a você!\n\n" +
+                            $"Chamados inválidos: {string.Join(", ", chamadosNaoAtribuidos.Select(c => c.IdChamado))}",
+                            "Acesso Negado",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Warning);
+                        return;
+                    }
                 }
 
                 var formPrioridade = new AlterarPrioridadeForm();
@@ -794,18 +840,57 @@ namespace SistemaChamados.Forms
                     return;
                 }
 
+                // ← NOVA VALIDAÇÃO: Verificar se técnico está tentando fechar chamados não atribuídos a ele
+                if (_funcionarioLogado.NivelAcesso == 2) // Técnico
+                {
+                    var chamadosNaoAtribuidos = _chamadosCarregados
+                        .Where(c => selecionados.Contains(c.IdChamado) &&
+                               (!c.TecnicoResponsavel.HasValue || c.TecnicoResponsavel.Value != _funcionarioLogado.Id))
+                        .ToList();
+
+                    if (chamadosNaoAtribuidos.Any())
+                    {
+                        MessageBox.Show(
+                            $"Você não pode fechar chamados não atribuídos a você!\n\n" +
+                            $"Chamados inválidos: {string.Join(", ", chamadosNaoAtribuidos.Select(c => c.IdChamado))}",
+                            "Acesso Negado",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Warning);
+                        return;
+                    }
+                }
+
                 var resultado = MessageBox.Show($"Deseja realmente fechar {selecionados.Count} chamado(s)?",
                     "Confirmar Fechamento", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 
                 if (resultado == DialogResult.Yes)
                 {
+                    int sucessos = 0;
+                    int falhas = 0;
+
                     foreach (int idChamado in selecionados)
                     {
-                        _chamadosController.FecharChamado(idChamado);
+                        try
+                        {
+                            _chamadosController.FecharChamado(idChamado);
+                            sucessos++;
+                        }
+                        catch (Exception ex)
+                        {
+                            falhas++;
+                            Console.WriteLine($"Erro ao fechar chamado {idChamado}: {ex.Message}");
+                        }
                     }
 
-                    MessageBox.Show($"{selecionados.Count} chamado(s) fechado(s) com sucesso!", "Sucesso",
-                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    if (sucessos > 0)
+                    {
+                        MessageBox.Show(
+                            $"{sucessos} chamado(s) fechado(s) com sucesso!" +
+                            (falhas > 0 ? $"\n{falhas} chamado(s) falharam." : ""),
+                            "Resultado",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Information);
+                    }
 
                     CarregarChamados();
                 }
@@ -830,18 +915,57 @@ namespace SistemaChamados.Forms
                     return;
                 }
 
+                // ← NOVA VALIDAÇÃO: Verificar se técnico está tentando reabrir chamados não atribuídos a ele
+                if (_funcionarioLogado.NivelAcesso == 2) // Técnico
+                {
+                    var chamadosNaoAtribuidos = _chamadosCarregados
+                        .Where(c => selecionados.Contains(c.IdChamado) &&
+                               (!c.TecnicoResponsavel.HasValue || c.TecnicoResponsavel.Value != _funcionarioLogado.Id))
+                        .ToList();
+
+                    if (chamadosNaoAtribuidos.Any())
+                    {
+                        MessageBox.Show(
+                            $"Você não pode reabrir chamados não atribuídos a você!\n\n" +
+                            $"Chamados inválidos: {string.Join(", ", chamadosNaoAtribuidos.Select(c => c.IdChamado))}",
+                            "Acesso Negado",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Warning);
+                        return;
+                    }
+                }
+
                 var resultado = MessageBox.Show($"Deseja realmente reabrir {selecionados.Count} chamado(s)?",
                     "Confirmar Reabertura", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 
                 if (resultado == DialogResult.Yes)
                 {
+                    int sucessos = 0;
+                    int falhas = 0;
+
                     foreach (int idChamado in selecionados)
                     {
-                        _chamadosController.ReabrirChamado(idChamado);
+                        try
+                        {
+                            _chamadosController.ReabrirChamado(idChamado);
+                            sucessos++;
+                        }
+                        catch (Exception ex)
+                        {
+                            falhas++;
+                            Console.WriteLine($"Erro ao reabrir chamado {idChamado}: {ex.Message}");
+                        }
                     }
 
-                    MessageBox.Show($"{selecionados.Count} chamado(s) reaberto(s) com sucesso!", "Sucesso",
-                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    if (sucessos > 0)
+                    {
+                        MessageBox.Show(
+                            $"{sucessos} chamado(s) reaberto(s) com sucesso!" +
+                            (falhas > 0 ? $"\n{falhas} chamado(s) falharam." : ""),
+                            "Resultado",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Information);
+                    }
 
                     CarregarChamados();
                 }
