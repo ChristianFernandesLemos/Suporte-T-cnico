@@ -1,0 +1,10 @@
+{
+  "version": "0.2.1",
+  "tasks": [
+    {
+      "taskLabel": "task-Suporte_Tecnico",
+      "appliesTo": "src/Database/Suporte_Tecnico.sql",
+      "type": "launch"
+    }
+  ]
+}

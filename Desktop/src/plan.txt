@@ -1,0 +1,45 @@
+# Object-Oriented System Plan
+
+## Classes
+
+### 1. Funcionarios (Base Class)
+- **Attributes**:
+  - Nome: char
+  - Cpf: String
+  - E-mail: String
+  - Senha: String
+  - Id: int
+  - Nivel_Acess: int
+- **Methods**:
+  - VisualizarChamados(): void
+
+### 2. Técnico (Derived Class)
+- **Methods**:
+  - MarcarChamadoResolvido(): void
+  - TrocarPrioridadeDoChamado(): void
+
+### 3. ADM (Derived Class)
+- **Methods**:
+  - AdicionarUsuarios(): void
+  - AlterarSenha(): void
+
+### 4. Chamados
+- **Attributes**:
+  - id_Chamado: int
+  - Categoria: string
+  - Contestações: String
+  - Prioridade: int
+  - Descrição: String
+  - Afetado: int
+  - DataChamado: date
+- **Methods**:
+  - CriarChamado(): void
+  - AlterarPrioridade(): void
+  - AlterarStatus(): void
+
+## Interfaces and Control Classes
+- Consider creating interfaces for database operations and user interactions.
+- Control classes may be needed to manage the flow of data between the UI and the business logic.
+
+## Database Connection
+- Implement functionality to connect to MS SQL Server hosted on Windows Server.
