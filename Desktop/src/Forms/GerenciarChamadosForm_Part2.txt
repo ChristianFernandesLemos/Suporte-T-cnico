@@ -1,0 +1,76 @@
+            }
+        }
+
+        private void btnFechar_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                var selecionados = ObterChamadosSelecionados();
+
+                if (selecionados.Count == 0)
+                {
+                    MessageBox.Show("Selecione pelo menos um chamado para fechar.", "Nenhum Chamado Selecionado",
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
+
+                var resultado = MessageBox.Show($"Deseja realmente fechar {selecionados.Count} chamado(s)?",
+                    "Confirmar Fechamento", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+                if (resultado == DialogResult.Yes)
+                {
+                    foreach (int idChamado in selecionados)
+                    {
+                        _chamadosController.FecharChamado(idChamado);
+                    }
+
+                    MessageBox.Show($"{selecionados.Count} chamado(s) fechado(s) com sucesso!", "Sucesso",
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                    CarregarChamados();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Erro ao fechar chamados: {ex.Message}", "Erro",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void btnReabrir_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                var selecionados = ObterChamadosSelecionados();
+
+                if (selecionados.Count == 0)
+                {
+                    MessageBox.Show("Selecione pelo menos um chamado para reabrir.", "Nenhum Chamado Selecionado",
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
+
+                var resultado = MessageBox.Show($"Deseja realmente reabrir {selecionados.Count} chamado(s)?",
+                    "Confirmar Reabertura", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+                if (resultado == DialogResult.Yes)
+                {
+                    foreach (int idChamado in selecionados)
+                    {
+                        _chamadosController.ReabrirChamado(idChamado);
+                    }
+
+                    MessageBox.Show($"{selecionados.Count} chamado(s) reaberto(s) com sucesso!", "Sucesso",
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                    CarregarChamados();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Erro ao reabrir chamados: {ex.Message}", "Erro",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+    }
+}
