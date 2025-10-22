@@ -181,10 +181,12 @@ namespace SistemaChamados.Forms
 
                 if (funcionario != null)
                 {
-                    this.Hide();
+                    // Criar o menú principal
                     var menuPrincipal = new MenuPrincipalForm(funcionario);
-                    menuPrincipal.ShowDialog();
-                    this.Close();
+                    menuPrincipal.FormClosed += (s, args) => this.Close();
+                    // Esconder login e mostrar menú
+                    this.Hide();
+                    menuPrincipal.Show();  // ✅ Usa Show() en lugar de ShowDialog()
                 }
                 else
                 {

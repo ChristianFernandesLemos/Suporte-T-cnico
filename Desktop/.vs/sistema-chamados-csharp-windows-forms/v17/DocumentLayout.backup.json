@@ -5,6 +5,10 @@
     {
       "AbsoluteMoniker": "D:0:0:{12345678-1234-5678-9ABC-123456789ABC}|SistemaChamados.csproj|c:\\users\\usuario\\desktop\\github\\suporte tecnico (chris)\\suporte-t-cnico\\desktop\\src\\forms\\menuprincipalform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{12345678-1234-5678-9ABC-123456789ABC}|SistemaChamados.csproj|solutionrelative:src\\forms\\menuprincipalform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{12345678-1234-5678-9ABC-123456789ABC}|SistemaChamados.csproj|c:\\users\\usuario\\desktop\\github\\suporte tecnico (chris)\\suporte-t-cnico\\desktop\\src\\forms\\loginform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{12345678-1234-5678-9ABC-123456789ABC}|SistemaChamados.csproj|solutionrelative:src\\forms\\loginform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -14,17 +18,30 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 1,
           "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "LoginForm.cs",
+              "DocumentMoniker": "C:\\Users\\USUARIO\\Desktop\\Github\\Suporte Tecnico (chris)\\Suporte-T-cnico\\Desktop\\src\\Forms\\LoginForm.cs",
+              "RelativeDocumentMoniker": "src\\Forms\\LoginForm.cs",
+              "ToolTip": "C:\\Users\\USUARIO\\Desktop\\Github\\Suporte Tecnico (chris)\\Suporte-T-cnico\\Desktop\\src\\Forms\\LoginForm.cs",
+              "RelativeToolTip": "src\\Forms\\LoginForm.cs",
+              "ViewState": "AgIAAK8AAAAAAAAAAAAAALoAAAAoAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-21T19:50:00.81Z",
+              "EditorCaption": ""
+            },
             {
               "$type": "Document",
               "DocumentIndex": 0,
               "Title": "MenuPrincipalForm.cs",
               "DocumentMoniker": "C:\\Users\\USUARIO\\Desktop\\Github\\Suporte Tecnico (chris)\\Suporte-T-cnico\\Desktop\\src\\Forms\\MenuPrincipalForm.cs",
               "RelativeDocumentMoniker": "src\\Forms\\MenuPrincipalForm.cs",
-              "ToolTip": "C:\\Users\\USUARIO\\Desktop\\Github\\Suporte Tecnico (chris)\\Suporte-T-cnico\\Desktop\\src\\Forms\\MenuPrincipalForm.cs*",
-              "RelativeToolTip": "src\\Forms\\MenuPrincipalForm.cs*",
-              "ViewState": "AgIAAJ4AAAAAAAAAAAAMwLIAAABDAAAAAAAAAA==",
+              "ToolTip": "C:\\Users\\USUARIO\\Desktop\\Github\\Suporte Tecnico (chris)\\Suporte-T-cnico\\Desktop\\src\\Forms\\MenuPrincipalForm.cs",
+              "RelativeToolTip": "src\\Forms\\MenuPrincipalForm.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAN8CAAAiAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-10-20T19:49:13.169Z",
               "EditorCaption": ""

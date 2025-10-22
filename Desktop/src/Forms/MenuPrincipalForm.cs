@@ -717,27 +717,25 @@ namespace SistemaChamados.Forms
 
         private void ItemLogout_Click(object sender, EventArgs e)
         {
-            var resultado = MessageBox.Show("Deseja realmente fazer logout?", "Confirmar Logout",
-                MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-                
+            var resultado = MessageBox.Show("Deseja realmente fazer logout?",
+                "Confirmar Logout", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
             if (resultado == DialogResult.Yes)
             {
-                // Parar o timer
+                // Parar el timer
                 if (timerRelogio != null)
                 {
                     timerRelogio.Stop();
                     timerRelogio.Dispose();
                 }
 
-                // Criar novo formulário de login
+                // Cria novo formulario de login
                 var loginForm = new LoginForm();
-                
-                // Quando o login for fechado, liberar recursos deste formulário
                 loginForm.FormClosed += (s, args) => this.Dispose();
-                
-                // Esconder este formulário e mostrar o login
+
+                // Esconder menú e mostrar login
                 this.Hide();
-                loginForm.Show();
+                loginForm.Show();  // ✅ Correcto
             }
         }
 
