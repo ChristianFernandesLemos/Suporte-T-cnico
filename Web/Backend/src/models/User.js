@@ -18,14 +18,17 @@ class Usuarios {
                 .input('email', email)
                 .query(`
                     SELECT 
-                        id_Usuario,
-                        Nome,
-                        Cpf,
-                        E_mail,
-                        Senha,
-                        Nivel_Acesso
-                    FROM usuarios
-                    WHERE E_mail = @email AND ativo = 1
+                        u.Id_usuario,
+                        u.nome,
+                        u.Cpf,
+                        e.E_mail,
+                        u.senha,
+                        u.Acess_codigo,
+                        n.Nivel_acesso
+                    FROM dbo.Usuario u
+                    INNER JOIN dbo.E_mail e ON u.Id_usuario = e.Id_usuario
+                    INNER JOIN dbo.Nivel_de_acesso n ON u.Acess_codigo = n.codigo
+                    WHERE e.E_mail = @email AND u.Ativo = 1
                 `);
             
             if (result.recordset.length === 0) {
@@ -34,12 +37,12 @@ class Usuarios {
 
             const userData = result.recordset[0];
             const usuario = new Usuarios();
-            usuario.id_Usuario = userData.id_Usuario;
-            usuario.Nome = userData.Nome;
+            usuario.id_Usuario = userData.Id_usuario;
+            usuario.Nome = userData.nome;
             usuario.Cpf = userData.Cpf;
             usuario.E_mail = userData.E_mail;
-            usuario.Senha = userData.Senha;
-            usuario.Nivel_Acesso = userData.Nivel_Acesso;
+            usuario.Senha = userData.senha;
+            usuario.Nivel_Acesso = userData.Acess_codigo;
             
             return usuario;
         } catch (error) {
@@ -56,14 +59,17 @@ class Usuarios {
                 .input('id', id)
                 .query(`
                     SELECT 
-                        id_Usuario,
-                        Nome,
-                        Cpf,
-                        E_mail,
-                        Senha,
-                        Nivel_Acesso
-                    FROM usuarios
-                    WHERE id_Usuario = @id AND ativo = 1
+                        u.Id_usuario,
+                        u.nome,
+                        u.Cpf,
+                        e.E_mail,
+                        u.senha,
+                        u.Acess_codigo,
+                        n.Nivel_acesso
+                    FROM dbo.Usuario u
+                    INNER JOIN dbo.E_mail e ON u.Id_usuario = e.Id_usuario
+                    INNER JOIN dbo.Nivel_de_acesso n ON u.Acess_codigo = n.codigo
+                    WHERE u.Id_usuario = @id AND u.Ativo = 1
                 `);
             
             if (result.recordset.length === 0) {
@@ -72,12 +78,12 @@ class Usuarios {
 
             const userData = result.recordset[0];
             const usuario = new Usuarios();
-            usuario.id_Usuario = userData.id_Usuario;
-            usuario.Nome = userData.Nome;
+            usuario.id_Usuario = userData.Id_usuario;
+            usuario.Nome = userData.nome;
             usuario.Cpf = userData.Cpf;
             usuario.E_mail = userData.E_mail;
-            usuario.Senha = userData.Senha;
-            usuario.Nivel_Acesso = userData.Nivel_Acesso;
+            usuario.Senha = userData.senha;
+            usuario.Nivel_Acesso = userData.Acess_codigo;
             
             return usuario;
         } catch (error) {
@@ -93,24 +99,27 @@ class Usuarios {
             const result = await pool.request()
                 .query(`
                     SELECT 
-                        id_Usuario,
-                        Nome,
-                        Cpf,
-                        E_mail,
-                        Nivel_Acesso,
-                        data_criacao
-                    FROM usuarios
-                    WHERE ativo = 1
-                    ORDER BY Nome
+                        u.Id_usuario,
+                        u.nome,
+                        u.Cpf,
+                        e.E_mail,
+                        u.Acess_codigo,
+                        n.Nivel_acesso,
+                        u.DataCadastro
+                    FROM dbo.Usuario u
+                    INNER JOIN dbo.E_mail e ON u.Id_usuario = e.Id_usuario
+                    INNER JOIN dbo.Nivel_de_acesso n ON u.Acess_codigo = n.codigo
+                    WHERE u.Ativo = 1
+                    ORDER BY u.nome
                 `);
             
             return result.recordset.map(userData => {
                 const usuario = new Usuarios();
-                usuario.id_Usuario = userData.id_Usuario;
-                usuario.Nome = userData.Nome;
+                usuario.id_Usuario = userData.Id_usuario;
+                usuario.Nome = userData.nome;
                 usuario.Cpf = userData.Cpf;
                 usuario.E_mail = userData.E_mail;
-                usuario.Nivel_Acesso = userData.Nivel_Acesso;
+                usuario.Nivel_Acesso = userData.Acess_codigo;
                 return usuario;
             });
         } catch (error) {
@@ -121,23 +130,39 @@ class Usuarios {
 
     // Salva usuário no banco (INSERT)
     async salvar() {
+        const pool = await getConnection();
+        const transaction = pool.transaction();
+        
         try {
-            const pool = await getConnection();
-            const result = await pool.request()
+            await transaction.begin();
+            
+            // Insere o usuário
+            const resultUsuario = await transaction.request()
                 .input('nome', this.Nome)
                 .input('cpf', this.Cpf)
-                .input('email', this.E_mail)
                 .input('senha', this.Senha)
-                .input('nivel_acesso', this.Nivel_Acesso)
+                .input('acess_codigo', this.Nivel_Acesso)
                 .query(`
-                    INSERT INTO usuarios (Nome, Cpf, E_mail, Senha, Nivel_Acesso, ativo, data_criacao)
-                    OUTPUT INSERTED.id_Usuario
-                    VALUES (@nome, @cpf, @email, @senha, @nivel_acesso, 1, GETDATE())
+                    INSERT INTO dbo.Usuario (nome, Cpf, senha, Acess_codigo, Ativo, DataCadastro)
+                    OUTPUT INSERTED.Id_usuario
+                    VALUES (@nome, @cpf, @senha, @acess_codigo, 1, GETDATE())
                 `);
             
-            this.id_Usuario = result.recordset[0].id_Usuario;
+            this.id_Usuario = resultUsuario.recordset[0].Id_usuario;
+            
+            // Insere o email na tabela de emails
+            await transaction.request()
+                .input('email', this.E_mail)
+                .input('id_usuario', this.id_Usuario)
+                .query(`
+                    INSERT INTO dbo.E_mail (E_mail, Id_usuario)
+                    VALUES (@email, @id_usuario)
+                `);
+            
+            await transaction.commit();
             return this;
         } catch (error) {
+            await transaction.rollback();
             console.error('Erro ao salvar usuário:', error);
             throw error;
         }
@@ -145,26 +170,40 @@ class Usuarios {
 
     // Atualiza usuário no banco (UPDATE)
     async atualizar() {
+        const pool = await getConnection();
+        const transaction = pool.transaction();
+        
         try {
-            const pool = await getConnection();
-            await pool.request()
+            await transaction.begin();
+            
+            // Atualiza dados do usuário
+            await transaction.request()
                 .input('id', this.id_Usuario)
                 .input('nome', this.Nome)
                 .input('cpf', this.Cpf)
-                .input('email', this.E_mail)
-                .input('nivel_acesso', this.Nivel_Acesso)
+                .input('acess_codigo', this.Nivel_Acesso)
                 .query(`
-                    UPDATE usuarios
-                    SET Nome = @nome,
+                    UPDATE dbo.Usuario
+                    SET nome = @nome,
                         Cpf = @cpf,
-                        E_mail = @email,
-                        Nivel_Acesso = @nivel_acesso,
-                        data_atualizacao = GETDATE()
-                    WHERE id_Usuario = @id
+                        Acess_codigo = @acess_codigo
+                    WHERE Id_usuario = @id
                 `);
             
+            // Atualiza email
+            await transaction.request()
+                .input('id', this.id_Usuario)
+                .input('email', this.E_mail)
+                .query(`
+                    UPDATE dbo.E_mail
+                    SET E_mail = @email
+                    WHERE Id_usuario = @id
+                `);
+            
+            await transaction.commit();
             return this;
         } catch (error) {
+            await transaction.rollback();
             console.error('Erro ao atualizar usuário:', error);
             throw error;
         }
@@ -178,10 +217,9 @@ class Usuarios {
                 .input('id', this.id_Usuario)
                 .input('senha', novaSenha)
                 .query(`
-                    UPDATE usuarios
-                    SET Senha = @senha,
-                        data_atualizacao = GETDATE()
-                    WHERE id_Usuario = @id
+                    UPDATE dbo.Usuario
+                    SET senha = @senha
+                    WHERE Id_usuario = @id
                 `);
             
             this.Senha = novaSenha;
@@ -199,10 +237,9 @@ class Usuarios {
             await pool.request()
                 .input('id', this.id_Usuario)
                 .query(`
-                    UPDATE usuarios
-                    SET ativo = 0,
-                        data_atualizacao = GETDATE()
-                    WHERE id_Usuario = @id
+                    UPDATE dbo.Usuario
+                    SET Ativo = 0
+                    WHERE Id_usuario = @id
                 `);
             
             return true;
@@ -219,10 +256,9 @@ class Usuarios {
             await pool.request()
                 .input('id', this.id_Usuario)
                 .query(`
-                    UPDATE usuarios
-                    SET ativo = 1,
-                        data_atualizacao = GETDATE()
-                    WHERE id_Usuario = @id
+                    UPDATE dbo.Usuario
+                    SET Ativo = 1
+                    WHERE Id_usuario = @id
                 `);
             
             return true;

@@ -1,11 +1,5 @@
 const User = require('../models/User');
 const { createSession, destroySession } = require('../middleware/auth');
-const crypto = require('crypto');
-
-// Função para hash de senha (em produção use bcrypt)
-function hashPassword(password) {
-  return crypto.createHash('sha256').update(password).digest('hex');
-}
 
 class AuthController {
   // Login
@@ -31,10 +25,8 @@ class AuthController {
         });
       }
 
-      // Verifica senha (hash)
-      const senhaHash = hashPassword(senha);
-      
-      if (user.senha !== senhaHash) {
+      // Verifica senha (sem hash - o banco já possui hash)
+      if (user.Senha !== senha) {
         return res.status(401).json({
           success: false,
           message: 'Email ou senha incorretos.'
@@ -45,17 +37,17 @@ class AuthController {
       const token = createSession(user);
 
       // Remove senha do retorno
-      delete user.senha;
+      delete user.Senha;
 
       res.json({
         success: true,
         message: 'Login realizado com sucesso!',
         token,
         user: {
-          id: user.id,
-          nome: user.nome,
-          email: user.email,
-          tipo_usuario: user.tipo_usuario
+          id: user.id_Usuario,
+          nome: user.Nome,
+          email: user.E_mail,
+          tipo_usuario: user.getTipoUsuario()
         }
       });
 
@@ -147,19 +139,16 @@ class AuthController {
         });
       }
 
-      // Verifica senha atual
-      const senhaAtualHash = hashPassword(senhaAtual);
-      
-      if (user.senha !== senhaAtualHash) {
+      // Verifica senha atual (sem hash)
+      if (user.Senha !== senhaAtual) {
         return res.status(401).json({
           success: false,
           message: 'Senha atual incorreta.'
         });
       }
 
-      // Atualiza senha
-      const novaSenhaHash = hashPassword(novaSenha);
-      await User.updatePassword(userId, novaSenhaHash);
+      // Atualiza senha (sem hash - o banco fará isso)
+      await user.alterarSenha(novaSenha);
 
       res.json({
         success: true,
