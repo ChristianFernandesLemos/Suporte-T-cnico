@@ -32,3 +32,21 @@ C:\Users\USUARIO\Desktop\Github\Suporte Tecnico (chris)\Suporte-T-cnico\Desktop\
 C:\Users\USUARIO\Desktop\Github\Suporte Tecnico (chris)\Suporte-T-cnico\Desktop\obj\Debug\SistemaC.458C2CAD.Up2Date
 C:\Users\USUARIO\Desktop\Github\Suporte Tecnico (chris)\Suporte-T-cnico\Desktop\obj\Debug\SistemaChamados.exe
 C:\Users\USUARIO\Desktop\Github\Suporte Tecnico (chris)\Suporte-T-cnico\Desktop\obj\Debug\SistemaChamados.pdb
+C:\Users\Christian\OneDrive\Desktop\Repositorio-pim\Suporte-T-cnico\Desktop\bin\Debug\SistemaChamados.exe.config
+C:\Users\Christian\OneDrive\Desktop\Repositorio-pim\Suporte-T-cnico\Desktop\bin\Debug\SistemaChamados.exe
+C:\Users\Christian\OneDrive\Desktop\Repositorio-pim\Suporte-T-cnico\Desktop\bin\Debug\SistemaChamados.pdb
+C:\Users\Christian\OneDrive\Desktop\Repositorio-pim\Suporte-T-cnico\Desktop\bin\Debug\BouncyCastle.Cryptography.dll
+C:\Users\Christian\OneDrive\Desktop\Repositorio-pim\Suporte-T-cnico\Desktop\bin\Debug\itextsharp.dll
+C:\Users\Christian\OneDrive\Desktop\Repositorio-pim\Suporte-T-cnico\Desktop\bin\Debug\System.Configuration.ConfigurationManager.dll
+C:\Users\Christian\OneDrive\Desktop\Repositorio-pim\Suporte-T-cnico\Desktop\bin\Debug\BouncyCastle.Cryptography.xml
+C:\Users\Christian\OneDrive\Desktop\Repositorio-pim\Suporte-T-cnico\Desktop\bin\Debug\itextsharp.xml
+C:\Users\Christian\OneDrive\Desktop\Repositorio-pim\Suporte-T-cnico\Desktop\bin\Debug\System.Configuration.ConfigurationManager.xml
+C:\Users\Christian\OneDrive\Desktop\Repositorio-pim\Suporte-T-cnico\Desktop\obj\Debug\SistemaChamados.csproj.AssemblyReference.cache
+C:\Users\Christian\OneDrive\Desktop\Repositorio-pim\Suporte-T-cnico\Desktop\obj\Debug\SistemaChamados.exe.config
+C:\Users\Christian\OneDrive\Desktop\Repositorio-pim\Suporte-T-cnico\Desktop\obj\Debug\SistemaChamados.Forms.LoginForm.resources
+C:\Users\Christian\OneDrive\Desktop\Repositorio-pim\Suporte-T-cnico\Desktop\obj\Debug\SistemaChamados.Properties.Resources.resources
+C:\Users\Christian\OneDrive\Desktop\Repositorio-pim\Suporte-T-cnico\Desktop\obj\Debug\SistemaChamados.csproj.GenerateResource.cache
+C:\Users\Christian\OneDrive\Desktop\Repositorio-pim\Suporte-T-cnico\Desktop\obj\Debug\SistemaChamados.csproj.CoreCompileInputs.cache
+C:\Users\Christian\OneDrive\Desktop\Repositorio-pim\Suporte-T-cnico\Desktop\obj\Debug\SistemaC.458C2CAD.Up2Date
+C:\Users\Christian\OneDrive\Desktop\Repositorio-pim\Suporte-T-cnico\Desktop\obj\Debug\SistemaChamados.exe
+C:\Users\Christian\OneDrive\Desktop\Repositorio-pim\Suporte-T-cnico\Desktop\obj\Debug\SistemaChamados.pdb
