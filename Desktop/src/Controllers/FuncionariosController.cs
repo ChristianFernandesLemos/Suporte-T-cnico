@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using SistemaChamados.Data;
 using SistemaChamados.Interfaces;
 using SistemaChamados.Models;
 
@@ -8,19 +7,24 @@ namespace SistemaChamados.Controllers
 {
     public class FuncionariosController
     {
-        private readonly SqlServerConnection _database;
+        private readonly IDatabaseConnection _database;
 
-        public FuncionariosController(SqlServerConnection database)
+        public FuncionariosController(IDatabaseConnection database)
         {
             _database = database ?? throw new ArgumentNullException(nameof(database));
         }
-
-        
 
         public Funcionarios RealizarLogin(string email, string senha)
         {
             try
             {
+                // Validaciones
+                if (string.IsNullOrWhiteSpace(email))
+                    throw new ArgumentException("Email não pode ser vazio");
+
+                if (string.IsNullOrWhiteSpace(senha))
+                    throw new ArgumentException("Senha não pode ser vazia");
+
                 if (_database.ValidarLogin(email, senha))
                 {
                     return _database.BuscarFuncionarioPorEmail(email);
@@ -29,13 +33,11 @@ namespace SistemaChamados.Controllers
             }
             catch (Exception ex)
             {
-                // Log do erro
                 Console.WriteLine($"Erro no login: {ex.Message}");
-                return null;
+                throw;
             }
         }
 
-        // CORRIGIDO: Método implementado
         public Funcionarios BuscarFuncionarioPorId(int idFuncionario)
         {
             try
@@ -49,7 +51,6 @@ namespace SistemaChamados.Controllers
             }
         }
 
-        // CORRIGIDO: Método implementado
         public List<Funcionarios> ListarTodosFuncionarios()
         {
             try
@@ -63,7 +64,6 @@ namespace SistemaChamados.Controllers
             }
         }
 
-        // CORRIGIDO: Método implementado
         public List<Tecnico> ListarTecnicos()
         {
             try
@@ -77,7 +77,6 @@ namespace SistemaChamados.Controllers
             }
         }
 
-        // CORRIGIDO: Adicionar funcionário com polimorfismo
         public int AdicionarFuncionario(Funcionarios funcionario)
         {
             try
@@ -91,7 +90,6 @@ namespace SistemaChamados.Controllers
             }
         }
 
-        // CORRIGIDO: Atualizar funcionário
         public bool AtualizarFuncionario(Funcionarios funcionario)
         {
             try
@@ -105,7 +103,6 @@ namespace SistemaChamados.Controllers
             }
         }
 
-        // CORRIGIDO: Alterar senha implementado
         public bool AlterarSenha(int funcionarioId, string novaSenha)
         {
             try
@@ -122,7 +119,6 @@ namespace SistemaChamados.Controllers
             }
         }
 
-        // CORRIGIDO: Alterar nível de acesso
         public bool AlterarNivelAcesso(int funcionarioId, int novoNivel)
         {
             try
@@ -139,7 +135,6 @@ namespace SistemaChamados.Controllers
             }
         }
 
-        // CORRIGIDO: Excluir funcionário
         public bool ExcluirFuncionario(int funcionarioId)
         {
             try
@@ -153,7 +148,6 @@ namespace SistemaChamados.Controllers
             }
         }
 
-        // Estatísticas
         public EstatisticasFuncionarios ObterEstatisticasFuncionarios(Funcionarios solicitante)
         {
             try

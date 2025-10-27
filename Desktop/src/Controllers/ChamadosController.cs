@@ -1,30 +1,20 @@
-
 using System;
 using System.Collections.Generic;
-using SistemaChamados.Config;
-using SistemaChamados.Data;
+using SistemaChamados.Interfaces;
 using SistemaChamados.Models;
 
 namespace SistemaChamados.Controllers
 {
     public class ChamadosController
     {
-        private readonly SqlServerConnection _database;
+        private readonly IDatabaseConnection _database;
 
-        // Constructor con parámetro
-        public ChamadosController(SqlServerConnection database)
+        
+        public ChamadosController(IDatabaseConnection database)
         {
             _database = database ?? throw new ArgumentNullException(nameof(database));
         }
 
-        // Constructor sin parámetros para compatibilidad
-        public ChamadosController()
-        {
-            string connectionString = DatabaseConfig.ConnectionString;
-            _database = new SqlServerConnection(connectionString);
-        }
-
-        // CORRIGIDO: Criar chamado unificado
         public int CriarChamado(Chamados chamado)
         {
             try
@@ -53,7 +43,6 @@ namespace SistemaChamados.Controllers
             }
         }
 
-        // CORRIGIDO: Listar chamados por funcionário
         public List<Chamados> ListarChamadosPorFuncionario(int funcionarioId)
         {
             try
@@ -67,7 +56,6 @@ namespace SistemaChamados.Controllers
             }
         }
 
-        // CORRIGIDO: Listar chamados por técnico
         public List<Chamados> ListarChamadosPorTecnico(int tecnicoId)
         {
             try
@@ -81,7 +69,6 @@ namespace SistemaChamados.Controllers
             }
         }
 
-        // CORRIGIDO: Listar todos os chamados
         public List<Chamados> ListarTodosChamados()
         {
             try
@@ -95,7 +82,6 @@ namespace SistemaChamados.Controllers
             }
         }
 
-        // CORRIGIDO: Alterar status implementado
         public bool AlterarStatus(int idChamado, int novoStatus)
         {
             try
@@ -112,7 +98,6 @@ namespace SistemaChamados.Controllers
             }
         }
 
-        // Sobrecarga para enum
         public bool AlterarStatus(int idChamado, StatusChamado novoStatus)
         {
             try
@@ -131,7 +116,6 @@ namespace SistemaChamados.Controllers
             }
         }
 
-        // CORRIGIDO: Alterar prioridade implementado
         public bool AlterarPrioridade(int idChamado, int novaPrioridade)
         {
             try
@@ -150,7 +134,6 @@ namespace SistemaChamados.Controllers
             }
         }
 
-        // CORRIGIDO: Atribuir técnico implementado
         public bool AtribuirTecnico(int idChamado, int idTecnico)
         {
             try
@@ -169,7 +152,6 @@ namespace SistemaChamados.Controllers
             }
         }
 
-        // CORRIGIDO: Marcar como resolvido implementado
         public bool MarcarComoResolvido(int idChamado)
         {
             try
@@ -183,7 +165,6 @@ namespace SistemaChamados.Controllers
             }
         }
 
-        // CORRIGIDO: Fechar chamado implementado
         public bool FecharChamado(int idChamado)
         {
             try
@@ -197,7 +178,6 @@ namespace SistemaChamados.Controllers
             }
         }
 
-        // CORRIGIDO: Reabrir chamado implementado
         public bool ReabrirChamado(int idChamado)
         {
             try
@@ -211,7 +191,6 @@ namespace SistemaChamados.Controllers
             }
         }
 
-        // CORRIGIDO: Adicionar contestação implementado
         public bool AdicionarContestacao(int idChamado, string contestacao)
         {
             try
@@ -233,7 +212,6 @@ namespace SistemaChamados.Controllers
             }
         }
 
-        // CORRIGIDO: Atualizar chamado completo
         public bool AtualizarChamado(Chamados chamado)
         {
             try
@@ -250,7 +228,6 @@ namespace SistemaChamados.Controllers
             }
         }
 
-        // Buscar chamado por ID
         public Chamados BuscarChamadoPorId(int idChamado)
         {
             try
@@ -264,7 +241,6 @@ namespace SistemaChamados.Controllers
             }
         }
 
-        // Estatísticas
         public Dictionary<string, int> ObterEstatisticas()
         {
             try

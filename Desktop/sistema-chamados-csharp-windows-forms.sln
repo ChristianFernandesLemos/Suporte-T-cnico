@@ -4,6 +4,8 @@ VisualStudioVersion = 17.5.2.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SistemaChamados", "SistemaChamados.csproj", "{12345678-1234-5678-9ABC-123456789ABC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SistemaChamados.Tests", "SistemaChamados.Tests\SistemaChamados.Tests.csproj", "{53F27C0F-10BA-4B0A-B54D-257F3A32F241}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -14,6 +16,10 @@ Global
 		{12345678-1234-5678-9ABC-123456789ABC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{12345678-1234-5678-9ABC-123456789ABC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{12345678-1234-5678-9ABC-123456789ABC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{53F27C0F-10BA-4B0A-B54D-257F3A32F241}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{53F27C0F-10BA-4B0A-B54D-257F3A32F241}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{53F27C0F-10BA-4B0A-B54D-257F3A32F241}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{53F27C0F-10BA-4B0A-B54D-257F3A32F241}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
