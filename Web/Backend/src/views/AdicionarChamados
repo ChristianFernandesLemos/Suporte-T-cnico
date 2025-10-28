@@ -1,0 +1,205 @@
+@charset "UTF-8";
+
+/*
+|--------------------------------------------------------------------------
+| Variáveis Globais (Sua Paleta de Cores)
+|--------------------------------------------------------------------------
+*/
+:root {
+    --primary-color-blue: #0d1b2a;      /* Principal (fundo escuro ou texto forte) */
+    --second-color-blue: #1b263b;       /* Fundo de elementos */
+    --third-color-blue: #415a77;        /* Elementos secundários/Bordas */
+    --fourth-color-blue: #778da9;       /* Bordas/Divisores leves */
+    --fifth-color-blue: #e0e1dd;        /* Fundo claro principal (corpo) */
+    --sixth-color-blue: #49a09d;        /* Ação principal/Sucesso (Botões) */
+    --seventh-color-blue: #004258;      /* Fundo mais escuro */
+    --eighth-color-blue: #026687;       /* Ação secundária/Destaque */
+    --ninth-color-blue: #021c33;        /* Texto mais escuro */
+    --tenth-color-blue: #1aa4e5;        /* Destaque (Hover de Botões/Links) */
+    --primary-color-dark: #050505;      /* Texto muito escuro */
+    --second-color-dark: #222222;       /* Texto escuro */
+
+    /* Variáveis de layout e tipografia */
+    --color-text: var(--primary-color-dark);
+    --color-background-body: var(--fifth-color-blue);
+    --color-background-element: #fff; /* Mantendo branco puro para contraste em modais, se necessário, ou use var(--fifth-color-blue) */
+    --color-action: var(--sixth-color-blue);
+    --color-action-hover: var(--tenth-color-blue);
+    --color-border: var(--fourth-color-blue);
+    
+    --spacing-default: 1rem;
+    --spacing-large: 2rem;
+    --font-family-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/*
+|--------------------------------------------------------------------------
+| Estilos Base / Reset Básico
+|--------------------------------------------------------------------------
+*/
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--font-family-sans);
+    background-color: var(--color-background-body);
+    color: var(--color-text);
+    line-height: 1.6;
+}
+
+/*
+|--------------------------------------------------------------------------
+| Header e Navegação
+|--------------------------------------------------------------------------
+*/
+.header {
+    /* Usando a cor de elemento para um contraste suave com o body */
+    background-color: var(--color-background-element); 
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: var(--spacing-default) 0;
+}
+
+.navigation {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 var(--spacing-default);
+}
+
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--color-action); /* Cor da ação para links */
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s ease-in-out;
+}
+
+.back-link:hover {
+    color: var(--color-action-hover); /* Destaque ao passar o mouse */
+    text-decoration: underline;
+}
+
+.back-link svg {
+    stroke: currentColor; 
+}
+
+/*
+|--------------------------------------------------------------------------
+| Conteúdo Principal
+|--------------------------------------------------------------------------
+*/
+.main-content {
+    padding: var(--spacing-large) var(--spacing-default);
+    display: flex;
+    justify-content: center;
+}
+
+/*
+|--------------------------------------------------------------------------
+| Seção do Formulário / Modal
+|--------------------------------------------------------------------------
+*/
+.modal-container {
+    /* Fundo branco/claro para destaque */
+    background-color: var(--color-background-element); 
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    padding: var(--spacing-large);
+    width: 100%;
+    max-width: 500px;
+}
+
+.modal-title {
+    font-size: 1.8rem;
+    margin-bottom: var(--spacing-large);
+    color: var(--primary-color-blue); /* Título forte */
+    text-align: center;
+}
+
+/*
+|--------------------------------------------------------------------------
+| Formulário
+|--------------------------------------------------------------------------
+*/
+.user-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-default);
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-label {
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--second-color-dark);
+}
+
+.form-input,
+.form-select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    font-size: 1rem;
+    color: var(--primary-color-dark);
+    transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.form-input:focus,
+.form-select:focus {
+    /* Cor de foco usando a cor de ação ou destaque */
+    border-color: var(--color-action); 
+    outline: none;
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-action) 25%, transparent);
+}
+
+.form-select {
+    appearance: none;
+    /* Para a seta do select (opcional, pode ser ajustado para a paleta) */
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg width='12' height='12' viewBox='0 0 12 12' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M2 4L6 8L10 4' stroke='%23222222' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    padding-right: 2.25rem;
+}
+
+/*
+|--------------------------------------------------------------------------
+| Botão de Envio (Submit)
+|--------------------------------------------------------------------------
+*/
+.submit-button {
+    background-color: var(--color-action); /* Cor de ação primária */
+    color: var(--color-background-element); /* Texto claro no botão */
+    border: none;
+    padding: 0.75rem var(--spacing-large);
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    margin-top: var(--spacing-default);
+    transition: background-color 0.2s ease-in-out, opacity 0.2s ease-in-out;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.submit-button:hover {
+    background-color: var(--tenth-color-blue); /* Cor de destaque/hover */
+}
+
+.submit-button:active {
+    opacity: 0.9;
+}
+
+.submit-button svg {
+    stroke: currentColor; 
+}
