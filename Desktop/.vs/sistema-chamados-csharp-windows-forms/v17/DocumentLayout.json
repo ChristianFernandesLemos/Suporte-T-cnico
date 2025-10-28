@@ -1,12 +1,7 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "C:\\Users\\USUARIO\\Desktop\\Github\\Suporte Tecnico (chris)\\Suporte-T-cnico\\Desktop\\",
-  "Documents": [
-    {
-      "AbsoluteMoniker": "D:0:0:{53F27C0F-10BA-4B0A-B54D-257F3A32F241}|SistemaChamados.Tests\\SistemaChamados.Tests.csproj|c:\\users\\usuario\\desktop\\github\\suporte tecnico (chris)\\suporte-t-cnico\\desktop\\sistemachamados.tests\\class1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{53F27C0F-10BA-4B0A-B54D-257F3A32F241}|SistemaChamados.Tests\\SistemaChamados.Tests.csproj|solutionrelative:sistemachamados.tests\\class1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    }
-  ],
+  "WorkspaceRootPath": "C:\\Users\\Christian\\OneDrive\\Desktop\\Repositorio-pim\\Suporte-T-cnico\\Desktop\\",
+  "Documents": [],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
@@ -14,20 +9,11 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": -1,
           "Children": [
             {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "Class1.cs",
-              "DocumentMoniker": "C:\\Users\\USUARIO\\Desktop\\Github\\Suporte Tecnico (chris)\\Suporte-T-cnico\\Desktop\\SistemaChamados.Tests\\Class1.cs",
-              "RelativeDocumentMoniker": "SistemaChamados.Tests\\Class1.cs",
-              "ToolTip": "C:\\Users\\USUARIO\\Desktop\\Github\\Suporte Tecnico (chris)\\Suporte-T-cnico\\Desktop\\SistemaChamados.Tests\\Class1.cs",
-              "RelativeToolTip": "SistemaChamados.Tests\\Class1.cs",
-              "ViewState": "AgIAABcAAAAAAAAAAAAAAIYBAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-25T17:23:23.867Z",
-              "EditorCaption": ""
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
             }
           ]
         }
