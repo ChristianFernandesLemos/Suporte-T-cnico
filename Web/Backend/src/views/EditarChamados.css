@@ -1,0 +1,213 @@
+@charset "UTF-8";
+
+/*
+|--------------------------------------------------------------------------
+| Variáveis Globais (Paleta de Cores Fornecida) 🎨
+|--------------------------------------------------------------------------
+*/
+:root {
+    /* Cores da sua paleta */
+    --primary-color-blue: #0d1b2a;
+    --second-color-blue: #1b263b;
+    --third-color-blue: #415a77;
+    --fourth-color-blue: #778da9;
+    --fifth-color-blue: #e0e1dd;
+    --sixth-color-blue: #49a09d;
+    --seventh-color-blue: #004258;
+    --eighth-color-blue: #026687;
+    --ninth-color-blue: #021c33;
+    --tenth-color-blue: #1aa4e5;
+    --primary-color-dark: #050505;
+    --second-color-dark: #222222;
+
+    /* Mapeamento Semântico */
+    --color-text: var(--primary-color-dark);
+    --color-background-body: var(--fifth-color-blue); /* Fundo claro principal */
+    --color-background-element: #fff; /* Fundo do container do formulário */
+    --color-action: var(--sixth-color-blue); /* Botão principal (Salvar) */
+    --color-action-hover: var(--tenth-color-blue); /* Hover do botão */
+    --color-border: var(--fourth-color-blue); /* Bordas dos inputs */
+    --color-title: var(--primary-color-blue);
+    
+    --spacing-default: 1rem;
+    --spacing-large: 2rem;
+    --font-family-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/*
+|--------------------------------------------------------------------------
+| Estilos Base / Reset Básico
+|--------------------------------------------------------------------------
+*/
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--font-family-sans);
+    background-color: var(--color-background-body);
+    color: var(--color-text);
+    line-height: 1.6;
+}
+
+/*
+|--------------------------------------------------------------------------
+| Header e Navegação
+|--------------------------------------------------------------------------
+*/
+.header {
+    background-color: var(--color-background-element);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: var(--spacing-default) 0;
+}
+
+.navigation {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 var(--spacing-default);
+}
+
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--third-color-blue); /* Cor menos intensa para o link de voltar */
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s ease-in-out;
+}
+
+.back-link:hover {
+    color: var(--eighth-color-blue); /* Destaque ao passar o mouse */
+    text-decoration: underline;
+}
+
+.back-link svg {
+    stroke: currentColor; 
+}
+
+/*
+|--------------------------------------------------------------------------
+| Conteúdo Principal e Seção do Formulário
+|--------------------------------------------------------------------------
+*/
+.main-content {
+    padding: var(--spacing-large) var(--spacing-default);
+    display: flex;
+    justify-content: center;
+}
+
+.form-section {
+    background-color: var(--color-background-element);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    padding: var(--spacing-large);
+    width: 100%;
+    max-width: 800px; /* Um pouco mais largo para formulários complexos */
+}
+
+.form-title {
+    font-size: 2rem;
+    margin-bottom: var(--spacing-large);
+    color: var(--color-title); 
+    text-align: center;
+}
+
+/*
+|--------------------------------------------------------------------------
+| Formulário de Chamado (Ticket)
+|--------------------------------------------------------------------------
+*/
+.ticket-form {
+    display: grid;
+    /* Layout de duas colunas para telas maiores */
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+    gap: var(--spacing-default) var(--spacing-large);
+}
+
+/* Garante que o textarea e o botão ocupem a largura total */
+.form-group:nth-child(10), /* Descrição */
+.submit-button {
+    grid-column: 1 / -1; 
+}
+
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-label {
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--second-color-dark);
+}
+
+.form-input,
+.form-textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    font-size: 1rem;
+    color: var(--primary-color-dark);
+    transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    background-color: #fff; /* Fundo branco nos inputs para melhor leitura */
+}
+
+.form-input:focus,
+.form-textarea:focus {
+    border-color: var(--color-action); 
+    outline: none;
+    /* Sombra suave com a cor de ação */
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-action) 25%, transparent); 
+}
+
+.form-textarea {
+    resize: vertical;
+}
+
+/*
+|--------------------------------------------------------------------------
+| Botão de Envio (Submit)
+|--------------------------------------------------------------------------
+*/
+.submit-button {
+    background-color: var(--color-action); /* Cor de ação primária (verde azulado) */
+    color: var(--color-background-element); /* Texto claro no botão */
+    border: none;
+    padding: 0.85rem var(--spacing-large);
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-top: var(--spacing-default);
+    transition: background-color 0.2s ease-in-out, opacity 0.2s ease-in-out;
+}
+
+.submit-button:hover {
+    background-color: var(--tenth-color-blue); /* Cor de destaque/hover (azul mais vibrante) */
+}
+
+.submit-button:active {
+    opacity: 0.9;
+}
+
+/*
+|--------------------------------------------------------------------------
+| Responsividade (Ajuste para telas pequenas)
+|--------------------------------------------------------------------------
+*/
+@media (max-width: 768px) {
+    .form-section {
+        max-width: 100%;
+    }
+
+    .ticket-form {
+        /* Garante que em telas pequenas, ele volte para layout de coluna única */
+        grid-template-columns: 1fr; 
+        gap: var(--spacing-default);
+    }
+}
