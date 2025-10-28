@@ -3,8 +3,8 @@
   "WorkspaceRootPath": "C:\\Users\\USUARIO\\Desktop\\Github\\Suporte Tecnico (chris)\\Suporte-T-cnico\\Desktop\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{53F27C0F-10BA-4B0A-B54D-257F3A32F241}|SistemaChamados.Tests\\SistemaChamados.Tests.csproj|c:\\users\\usuario\\desktop\\github\\suporte tecnico (chris)\\suporte-t-cnico\\desktop\\sistemachamados.tests\\class1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{53F27C0F-10BA-4B0A-B54D-257F3A32F241}|SistemaChamados.Tests\\SistemaChamados.Tests.csproj|solutionrelative:sistemachamados.tests\\class1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{12345678-1234-5678-9ABC-123456789ABC}|SistemaChamados.csproj|c:\\users\\usuario\\desktop\\github\\suporte tecnico (chris)\\suporte-t-cnico\\desktop\\src\\forms\\menuprincipalform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{12345678-1234-5678-9ABC-123456789ABC}|SistemaChamados.csproj|solutionrelative:src\\forms\\menuprincipalform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -19,14 +19,14 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "Class1.cs",
-              "DocumentMoniker": "C:\\Users\\USUARIO\\Desktop\\Github\\Suporte Tecnico (chris)\\Suporte-T-cnico\\Desktop\\SistemaChamados.Tests\\Class1.cs",
-              "RelativeDocumentMoniker": "SistemaChamados.Tests\\Class1.cs",
-              "ToolTip": "C:\\Users\\USUARIO\\Desktop\\Github\\Suporte Tecnico (chris)\\Suporte-T-cnico\\Desktop\\SistemaChamados.Tests\\Class1.cs",
-              "RelativeToolTip": "SistemaChamados.Tests\\Class1.cs",
-              "ViewState": "AgIAAAEAAAAAAAAAAAAAAIYBAAAAAAAAAAAAAA==",
+              "Title": "MenuPrincipalForm.cs",
+              "DocumentMoniker": "C:\\Users\\USUARIO\\Desktop\\Github\\Suporte Tecnico (chris)\\Suporte-T-cnico\\Desktop\\src\\Forms\\MenuPrincipalForm.cs",
+              "RelativeDocumentMoniker": "src\\Forms\\MenuPrincipalForm.cs",
+              "ToolTip": "C:\\Users\\USUARIO\\Desktop\\Github\\Suporte Tecnico (chris)\\Suporte-T-cnico\\Desktop\\src\\Forms\\MenuPrincipalForm.cs",
+              "RelativeToolTip": "src\\Forms\\MenuPrincipalForm.cs",
+              "ViewState": "AgIAANEEAAAAAAAAAAAAAMQEAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-25T17:23:23.867Z",
+              "WhenOpened": "2025-10-28T18:14:16.763Z",
               "EditorCaption": ""
             }
           ]

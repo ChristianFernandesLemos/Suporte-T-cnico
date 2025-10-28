@@ -25,26 +25,11 @@ namespace SistemaChamados.Forms
         private Label lblTipoUsuario;
         private PictureBox picAvatar;
 
-        // Botões do menu
-        private Button btnDashboard;
-        private Button btnNovoChamado;
-        private Button btnVisualizarChamados;
-        private Button btnGerenciarChamados;
-        private Button btnNovoUsuario;
-        private Button btnGerenciarUsuarios;
-        private Button btnRelatorios;
-        private Button btnConfiguracoes;
-        private Button btnSair;
-        private Button btnLogout;
         // Status bar
         private StatusStrip statusBar;
         private ToolStripStatusLabel lblDataHora;
         private ToolStripStatusLabel lblStatus;
-
-        // Timer
         private System.Windows.Forms.Timer timerRelogio;
-
-        // Panel principal
         private Panel panelPrincipal;
 
         public MenuPrincipalForm(Funcionarios usuarioLogado)
@@ -57,7 +42,6 @@ namespace SistemaChamados.Forms
 
             InitializeComponent();
             ConfigurarFormulario();
-            ConfigurarPermissoes();
             MostrarDashboard();
         }
 
@@ -94,7 +78,6 @@ namespace SistemaChamados.Forms
                 SizeMode = PictureBoxSizeMode.StretchImage,
                 BorderStyle = BorderStyle.FixedSingle
             };
-            // Crear avatar con iniciales
             this.picAvatar.Image = CriarAvatarComIniciais(_usuarioLogado.Nome);
 
             this.lblNomeUsuario = new Label
@@ -115,73 +98,12 @@ namespace SistemaChamados.Forms
             {
                 Dock = DockStyle.Fill,
                 BackColor = Color.FromArgb(32, 33, 36),
-                AutoScroll = true
+                AutoScroll = true,
+                Padding = new Padding(0, 10, 0, 10)
             };
 
-            int yPos = 20;
-
-            // Botão Dashboard
-            this.btnDashboard = CriarBotaoMenu("🏠  Dashboard", yPos);
-            this.btnDashboard.Click += (s, e) => MostrarDashboard();
-            yPos += 55;
-
-            // Seção: Chamados
-            var lblChamados = CriarLabelSecao("CHAMADOS", yPos);
-            this.panelMenu.Controls.Add(lblChamados);
-            yPos += 30;
-
-            this.btnNovoChamado = CriarBotaoMenu("➕  Novo Chamado", yPos);
-            this.btnNovoChamado.Click += (s, e) => ItemNovoChamado_Click(s, e);
-            yPos += 55;
-
-            this.btnVisualizarChamados = CriarBotaoMenu("👁️  Visualizar Chamados", yPos);
-            this.btnVisualizarChamados.Click += (s, e) => ItemVisualizarChamados_Click(s, e);
-            yPos += 55;
-
-            this.btnGerenciarChamados = CriarBotaoMenu("⚙️  Gerenciar Chamados", yPos);
-            this.btnGerenciarChamados.Click += (s, e) => ItemGerenciarChamados_Click(s, e);
-            yPos += 55;
-
-            // Seção: Usuários
-            var lblUsuarios = CriarLabelSecao("USUÁRIOS", yPos);
-            this.panelMenu.Controls.Add(lblUsuarios);
-            yPos += 30;
-
-            this.btnNovoUsuario = CriarBotaoMenu("👤  Novo Usuário", yPos);
-            this.btnNovoUsuario.Click += (s, e) => ItemNovoUsuario_Click(s, e);
-            yPos += 55;
-
-            this.btnGerenciarUsuarios = CriarBotaoMenu("👥  Gerenciar Usuários", yPos);
-            this.btnGerenciarUsuarios.Click += (s, e) => ItemGerenciarUsuarios_Click(s, e);
-            yPos += 55;
-
-            // Seção: Relatórios
-            var lblRelatorios = CriarLabelSecao("RELATÓRIOS", yPos);
-            this.panelMenu.Controls.Add(lblRelatorios);
-            yPos += 30;
-
-            this.btnRelatorios = CriarBotaoMenu("📊  Relatórios", yPos);
-            this.btnRelatorios.Click += (s, e) => ItemRelatorioChamados_Click(s, e);
-            yPos += 55;
-
-            // Seção: Sistema
-            var lblSistema = CriarLabelSecao("SISTEMA", yPos);
-            this.panelMenu.Controls.Add(lblSistema);
-            yPos += 30;
-
-            this.btnConfiguracoes = CriarBotaoMenu("🔧  Alterar Senha", yPos);
-            this.btnConfiguracoes.Click += (s, e) => ItemAlterarSenha_Click(s, e);
-            yPos += 55;
-
-            // Botão Logout (separado de Sair)
-            this.btnLogout = CriarBotaoMenu("🔓  Logout", yPos);
-            this.btnLogout.Click += (s, e) => ItemLogout_Click(s, e);
-            this.btnLogout.BackColor = Color.FromArgb(255, 193, 7);
-            yPos += 55;
-
-            this.btnSair = CriarBotaoMenu("🚪  Sair do Sistema", yPos);
-            this.btnSair.Click += (s, e) => ItemSair_Click(s, e);
-            this.btnSair.BackColor = Color.FromArgb(220, 53, 69);
+            // 🎯 CONSTRUIR MENU DINÁMICO POR NIVEL DE ACCESO
+            ConstruirMenuSidebarPorNivel();
 
             // Footer do Sidebar
             this.panelFooter = new Panel
@@ -269,6 +191,168 @@ namespace SistemaChamados.Forms
             this.FormClosing += MenuPrincipalForm_FormClosing;
         }
 
+        /// <summary>
+        /// 🎯 Construir sidebar dinámicamente según nivel de acceso
+        /// </summary>
+        private void ConstruirMenuSidebarPorNivel()
+        {
+            panelMenu.Controls.Clear();
+            int yPos = 10;
+
+            // ========================================
+            // BOTÓN DASHBOARD - TODOS
+            // ========================================
+            var btnDashboard = CriarBotaoMenu("🏠  Dashboard", yPos);
+            btnDashboard.Click += (s, e) => MostrarDashboard();
+            yPos += 55;
+
+            // ========================================
+            // MENÚ SEGÚN NIVEL DE ACCESO
+            // ========================================
+            switch (_usuarioLogado.NivelAcesso)
+            {
+                case 1: // 👤 FUNCIONÁRIO
+                    yPos = ConstruirMenuFuncionario(yPos);
+                    break;
+
+                case 2: // 🔧 TÉCNICO
+                    yPos = ConstruirMenuTecnico(yPos);
+                    break;
+
+                case 3: // 👑 ADMINISTRADOR
+                    yPos = ConstruirMenuAdministrador(yPos);
+                    break;
+            }
+
+            // ========================================
+            // SEÇÃO AJUDA - TODOS
+            // ========================================
+            var lblAjuda = CriarLabelSecao("AJUDA", yPos);
+            yPos += 30;
+
+            var btnManual = CriarBotaoMenu("📖  Manual do Usuário", yPos);
+            btnManual.Click += (s, e) => ItemManual_Click(s, e);
+            yPos += 55;
+
+            // ========================================
+            // SEÇÃO SISTEMA - TODOS
+            // ========================================
+            var lblSistema = CriarLabelSecao("SISTEMA", yPos);
+            yPos += 30;
+
+            // Alterar Senha - SOLO ADMIN
+            if (_usuarioLogado.NivelAcesso == 3)
+            {
+                var btnConfiguracoes = CriarBotaoMenu("🔧  Alterar Senha", yPos);
+                btnConfiguracoes.Click += (s, e) => ItemAlterarSenha_Click(s, e);
+                yPos += 55;
+            }
+
+            // Logout - TODOS
+            var btnLogout = CriarBotaoMenu("🔓  Logout", yPos);
+            btnLogout.Click += (s, e) => ItemLogout_Click(s, e);
+            btnLogout.BackColor = Color.FromArgb(255, 193, 7);
+            btnLogout.ForeColor = Color.Black;
+            yPos += 55;
+
+            // Sair - TODOS
+            var btnSair = CriarBotaoMenu("🚪  Sair do Sistema", yPos);
+            btnSair.Click += (s, e) => ItemSair_Click(s, e);
+            btnSair.BackColor = Color.FromArgb(220, 53, 69);
+        }
+
+        /// <summary>
+        /// Menu específico para FUNCIONÁRIO
+        /// </summary>
+        private int ConstruirMenuFuncionario(int yPos)
+        {
+            var lblChamados = CriarLabelSecao("CHAMADOS", yPos);
+            yPos += 30;
+
+            var btnNovo = CriarBotaoMenu("➕  Novo Chamado", yPos);
+            btnNovo.Click += (s, e) => ItemNovoChamado_Click(s, e);
+            yPos += 55;
+
+            var btnVisualizar = CriarBotaoMenu("👁️  Meus Chamados", yPos);
+            btnVisualizar.Click += (s, e) => ItemVisualizarChamados_Click(s, e);
+            yPos += 55;
+
+            return yPos;
+        }
+
+        /// <summary>
+        /// Menu específico para TÉCNICO
+        /// </summary>
+        private int ConstruirMenuTecnico(int yPos)
+        {
+            var lblChamados = CriarLabelSecao("CHAMADOS", yPos);
+            yPos += 30;
+
+            var btnVisualizar = CriarBotaoMenu("👁️  Visualizar Chamados", yPos);
+            btnVisualizar.Click += (s, e) => ItemVisualizarChamados_Click(s, e);
+            yPos += 55;
+
+            var btnGerenciar = CriarBotaoMenu("⚙️  Gerenciar Chamados", yPos);
+            btnGerenciar.Click += (s, e) => ItemGerenciarChamados_Click(s, e);
+            yPos += 55;
+
+            // Seção Relatórios
+            var lblRelatorios = CriarLabelSecao("RELATÓRIOS", yPos);
+            yPos += 30;
+
+            var btnRelatorios = CriarBotaoMenu("📊  Relatórios", yPos);
+            btnRelatorios.Click += (s, e) => ItemRelatorioChamados_Click(s, e);
+            yPos += 55;
+
+            return yPos;
+        }
+
+        /// <summary>
+        /// Menu específico para ADMINISTRADOR
+        /// </summary>
+        private int ConstruirMenuAdministrador(int yPos)
+        {
+            // Seção Chamados
+            var lblChamados = CriarLabelSecao("CHAMADOS", yPos);
+            yPos += 30;
+
+            var btnNovo = CriarBotaoMenu("➕  Novo Chamado", yPos);
+            btnNovo.Click += (s, e) => ItemNovoChamado_Click(s, e);
+            yPos += 55;
+
+            var btnVisualizar = CriarBotaoMenu("👁️  Visualizar Chamados", yPos);
+            btnVisualizar.Click += (s, e) => ItemVisualizarChamados_Click(s, e);
+            yPos += 55;
+
+            var btnGerenciar = CriarBotaoMenu("⚙️  Gerenciar Chamados", yPos);
+            btnGerenciar.Click += (s, e) => ItemGerenciarChamados_Click(s, e);
+            yPos += 55;
+
+            // Seção Usuários
+            var lblUsuarios = CriarLabelSecao("USUÁRIOS", yPos);
+            yPos += 30;
+
+            var btnNovoUsuario = CriarBotaoMenu("👤  Novo Usuário", yPos);
+            btnNovoUsuario.Click += (s, e) => ItemNovoUsuario_Click(s, e);
+            yPos += 55;
+
+            var btnGerenciarUsuarios = CriarBotaoMenu("👥  Gerenciar Usuários", yPos);
+            btnGerenciarUsuarios.Click += (s, e) => ItemGerenciarUsuarios_Click(s, e);
+            yPos += 55;
+
+            // Seção Relatórios
+            var lblRelatorios = CriarLabelSecao("RELATÓRIOS", yPos);
+            yPos += 30;
+
+            var btnRelatorios = CriarBotaoMenu("📊  Relatórios", yPos);
+            btnRelatorios.Click += (s, e) => ItemRelatorioChamados_Click(s, e);
+            yPos += 55;
+
+            return yPos;
+        }
+
+        #region Métodos Auxiliares de UI
+
         private Button CriarBotaoMenu(string texto, int yPos)
         {
             var btn = new Button
@@ -295,7 +379,7 @@ namespace SistemaChamados.Forms
 
         private Label CriarLabelSecao(string texto, int yPos)
         {
-            return new Label
+            var lbl = new Label
             {
                 Text = texto,
                 Location = new Point(15, yPos),
@@ -304,6 +388,8 @@ namespace SistemaChamados.Forms
                 ForeColor = Color.FromArgb(150, 150, 150),
                 TextAlign = ContentAlignment.MiddleLeft
             };
+            this.panelMenu.Controls.Add(lbl);
+            return lbl;
         }
 
         private Image CriarAvatarComIniciais(string nome)
@@ -311,10 +397,8 @@ namespace SistemaChamados.Forms
             var bitmap = new Bitmap(100, 100);
             using (var graphics = Graphics.FromImage(bitmap))
             {
-                // Fundo
                 graphics.Clear(Color.FromArgb(0, 123, 255));
 
-                // Iniciais
                 string iniciais = ObterIniciais(nome);
                 using (var font = new Font("Segoe UI", 32F, FontStyle.Bold))
                 using (var brush = new SolidBrush(Color.White))
@@ -338,35 +422,9 @@ namespace SistemaChamados.Forms
             return nome.Length >= 2 ? nome.Substring(0, 2).ToUpper() : nome.ToUpper();
         }
 
-        private void ConfigurarFormulario()
-        {
-            TimerRelogio_Tick(null, null);
-        }
+        #endregion
 
-        private void ConfigurarPermissoes()
-        {
-            switch (_usuarioLogado.NivelAcesso)
-            {
-                case 1: // Funcionário
-                    btnNovoUsuario.Visible = false;
-                    btnGerenciarUsuarios.Visible = false;
-                    btnRelatorios.Visible = false;
-                    btnGerenciarChamados.Visible = false;
-                    btnConfiguracoes.Visible = false;
-                    break;
-
-                case 2: // Técnico
-                    btnNovoUsuario.Visible = false;
-                    btnGerenciarUsuarios.Visible = false;
-                    btnNovoChamado.Visible = false;
-                    btnConfiguracoes.Visible = false;
-                    break;
-
-                case 3: // Administrador
-                    // Acesso completo
-                    break;
-            }
-        }
+        #region Dashboard
 
         private void MostrarDashboard()
         {
@@ -469,21 +527,25 @@ namespace SistemaChamados.Forms
             panelPrincipal.Controls.Add(lblAtalhos);
             yPos += 50;
 
-            // Botões de atalho
+            // Botões de atalho según nivel
+            int xPosAtalho = 40;
+
             if (_usuarioLogado.NivelAcesso == 1 || _usuarioLogado.NivelAcesso == 3)
             {
-                var btnAtalhoNovo = CriarBotaoAtalho("➕ Novo Chamado", new Point(40, yPos));
+                var btnAtalhoNovo = CriarBotaoAtalho("➕ Novo Chamado", new Point(xPosAtalho, yPos));
                 btnAtalhoNovo.Click += (s, e) => ItemNovoChamado_Click(s, e);
                 panelPrincipal.Controls.Add(btnAtalhoNovo);
+                xPosAtalho += 240;
             }
 
-            var btnAtalhoVisualizar = CriarBotaoAtalho("👁️ Ver Meus Chamados", new Point(280, yPos));
+            var btnAtalhoVisualizar = CriarBotaoAtalho("👁️ Ver Chamados", new Point(xPosAtalho, yPos));
             btnAtalhoVisualizar.Click += (s, e) => ItemVisualizarChamados_Click(s, e);
             panelPrincipal.Controls.Add(btnAtalhoVisualizar);
+            xPosAtalho += 240;
 
             if (_usuarioLogado.NivelAcesso >= 2)
             {
-                var btnAtalhoGerenciar = CriarBotaoAtalho("⚙️ Gerenciar", new Point(520, yPos));
+                var btnAtalhoGerenciar = CriarBotaoAtalho("⚙️ Gerenciar", new Point(xPosAtalho, yPos));
                 btnAtalhoGerenciar.Click += (s, e) => ItemGerenciarChamados_Click(s, e);
                 panelPrincipal.Controls.Add(btnAtalhoGerenciar);
             }
@@ -501,7 +563,6 @@ namespace SistemaChamados.Forms
                 BorderStyle = BorderStyle.FixedSingle
             };
 
-            // Barra colorida no topo
             var barraTop = new Panel
             {
                 Dock = DockStyle.Top,
@@ -550,30 +611,17 @@ namespace SistemaChamados.Forms
             return btn;
         }
 
-        private string ObterTextoNivelAcesso(int nivel)
-        {
-            switch (nivel)
-            {
-                case 1: return "Funcionário";
-                case 2: return "Técnico";
-                case 3: return "Administrador";
-                default: return "Desconhecido";
-            }
-        }
+        #endregion
 
-        private void TimerRelogio_Tick(object sender, EventArgs e)
-        {
-            lblDataHora.Text = DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss");
-        }
+        #region Eventos del Menú
 
-        // Eventos dos botões
         private void ItemNovoChamado_Click(object sender, EventArgs e)
         {
             try
             {
                 var formCriarChamado = new CriarChamadoForm(_usuarioLogado, _chamadosController);
                 formCriarChamado.ShowDialog(this);
-                MostrarDashboard(); // Atualizar dashboard
+                MostrarDashboard();
             }
             catch (Exception ex)
             {
@@ -689,11 +737,40 @@ namespace SistemaChamados.Forms
             }
         }
 
+        private void ItemManual_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                string manualPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Manual_Usuario.pdf");
+
+                if (System.IO.File.Exists(manualPath))
+                {
+                    // Abrir el PDF com el programa predeterminado
+                    System.Diagnostics.Process.Start(manualPath);
+                }
+                else
+                {
+                    // Mostrar manual de ayuda integrado
+                    var formManual = new ManualUsuarioForm(_usuarioLogado.NivelAcesso);
+                    formManual.ShowDialog(this);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    "Manual do usuário em breve.\n\n" +
+                    "Para dúvidas, entre em contato com o suporte técnico.\n\n" +
+                    $"Erro: {ex.Message}",
+                    "Manual do Usuário",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
+            }
+        }
+
         private void ItemAlterarSenha_Click(object sender, EventArgs e)
         {
             try
             {
-
                 if (!ConfirmarSenhaAdmin())
                 {
                     MessageBox.Show("Operação cancelada.", "Cancelado",
@@ -719,23 +796,17 @@ namespace SistemaChamados.Forms
         {
             var resultado = MessageBox.Show("Deseja realmente fazer logout?", "Confirmar Logout",
                 MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-                
+
             if (resultado == DialogResult.Yes)
             {
-                // Parar o timer
                 if (timerRelogio != null)
                 {
                     timerRelogio.Stop();
                     timerRelogio.Dispose();
                 }
 
-                // Criar novo formulário de login
                 var loginForm = new LoginForm();
-                
-                // Quando o login for fechado, liberar recursos deste formulário
                 loginForm.FormClosed += (s, args) => this.Dispose();
-                
-                // Esconder este formulário e mostrar o login
                 this.Hide();
                 loginForm.Show();
             }
@@ -750,6 +821,32 @@ namespace SistemaChamados.Forms
             {
                 Application.Exit();
             }
+        }
+
+        #endregion
+
+        #region Métodos de Suporte
+
+        private void ConfigurarFormulario()
+        {
+            TimerRelogio_Tick(null, null);
+        }
+
+        private string ObterTextoNivelAcesso(int nivel)
+        {
+            if (nivel == 1)
+                return "Funcionário";
+            else if (nivel == 2)
+                return "Técnico";
+            else if (nivel == 3)
+                return "Administrador";
+            else
+                return "Desconhecido";
+        }
+
+        private void TimerRelogio_Tick(object sender, EventArgs e)
+        {
+            lblDataHora.Text = DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss");
         }
 
         private void MenuPrincipalForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -771,5 +868,381 @@ namespace SistemaChamados.Forms
             var formConfirmar = new ConfirmarSenhaAdminForm(_usuarioLogado);
             return formConfirmar.ShowDialog() == DialogResult.OK;
         }
+
+        #endregion
     }
+
+    #region Formulario Manual de Usuario
+
+    /// <summary>
+    /// Formulário integrado para mostrar manual do usuário
+    /// </summary>
+    public class ManualUsuarioForm : Form
+    {
+        private int _nivelAcesso;
+        private TabControl tabControl;
+        private Button btnFechar;
+
+        public ManualUsuarioForm(int nivelAcesso)
+        {
+            _nivelAcesso = nivelAcesso;
+            InitializeComponent();
+            CarregarConteudo();
+        }
+
+        private void InitializeComponent()
+        {
+            this.Text = "Manual do Usuário - InterFix";
+            this.Size = new Size(900, 650);
+            this.StartPosition = FormStartPosition.CenterParent;
+            this.FormBorderStyle = FormBorderStyle.FixedDialog;
+            this.MaximizeBox = false;
+            this.BackColor = Color.White;
+
+            // Header
+            var lblTitulo = new Label
+            {
+                Text = "📖 Manual do Usuário",
+                Font = new Font("Segoe UI", 18F, FontStyle.Bold),
+                Location = new Point(30, 20),
+                Size = new Size(400, 35),
+                ForeColor = Color.FromArgb(0, 123, 255)
+            };
+            this.Controls.Add(lblTitulo);
+
+            // TabControl
+            tabControl = new TabControl
+            {
+                Location = new Point(20, 70),
+                Size = new Size(840, 480),
+                Font = new Font("Segoe UI", 10F)
+            };
+            this.Controls.Add(tabControl);
+
+            // Botão Fechar
+            btnFechar = new Button
+            {
+                Text = "Fechar",
+                Location = new Point(760, 560),
+                Size = new Size(100, 35),
+                BackColor = Color.FromArgb(108, 117, 125),
+                ForeColor = Color.White,
+                FlatStyle = FlatStyle.Flat,
+                Font = new Font("Segoe UI", 10F),
+                Cursor = Cursors.Hand
+            };
+            btnFechar.FlatAppearance.BorderSize = 0;
+            btnFechar.Click += (s, e) => this.Close();
+            this.Controls.Add(btnFechar);
+        }
+
+        private void CarregarConteudo()
+        {
+            // Aba: Primeiros Passos
+            var tabInicio = new TabPage("🚀 Início");
+            tabInicio.BackColor = Color.White;
+            tabInicio.Controls.Add(CriarPanelConteudo(ObterConteudoInicio()));
+            tabControl.TabPages.Add(tabInicio);
+
+            // Aba: Como Criar Chamado (Funcionário e Admin)
+            if (_nivelAcesso == 1 || _nivelAcesso == 3)
+            {
+                var tabCriar = new TabPage("➕ Criar Chamado");
+                tabCriar.BackColor = Color.White;
+                tabCriar.Controls.Add(CriarPanelConteudo(ObterConteudoCriarChamado()));
+                tabControl.TabPages.Add(tabCriar);
+            }
+
+            // Aba: Gerenciar Chamados (Técnico e Admin)
+            if (_nivelAcesso >= 2)
+            {
+                var tabGerenciar = new TabPage("⚙️ Gerenciar");
+                tabGerenciar.BackColor = Color.White;
+                tabGerenciar.Controls.Add(CriarPanelConteudo(ObterConteudoGerenciar()));
+                tabControl.TabPages.Add(tabGerenciar);
+            }
+
+            // Aba: Usuários (Solo Admin)
+            if (_nivelAcesso == 3)
+            {
+                var tabUsuarios = new TabPage("👥 Usuários");
+                tabUsuarios.BackColor = Color.White;
+                tabUsuarios.Controls.Add(CriarPanelConteudo(ObterConteudoUsuarios()));
+                tabControl.TabPages.Add(tabUsuarios);
+            }
+
+            // Aba: FAQ
+            var tabFAQ = new TabPage("❓ Perguntas Frequentes");
+            tabFAQ.BackColor = Color.White;
+            tabFAQ.Controls.Add(CriarPanelConteudo(ObterConteudoFAQ()));
+            tabControl.TabPages.Add(tabFAQ);
+        }
+
+        private Panel CriarPanelConteudo(string conteudo)
+        {
+            var panel = new Panel
+            {
+                Dock = DockStyle.Fill,
+                AutoScroll = true,
+                Padding = new Padding(20)
+            };
+
+            var richTextBox = new RichTextBox
+            {
+                Dock = DockStyle.Fill,
+                ReadOnly = true,
+                BorderStyle = BorderStyle.None,
+                BackColor = Color.White,
+                Font = new Font("Segoe UI", 10F),
+                Text = conteudo
+            };
+
+            panel.Controls.Add(richTextBox);
+            return panel;
+        }
+
+        private string ObterConteudoInicio()
+        {
+            return @"BEM-VINDO AO SISTEMA INTERFIX!
+
+Este é o Sistema de Gerenciamento de Chamados da InterFix.
+
+📋 O QUE É O SISTEMA?
+O sistema permite que você registre e acompanhe problemas técnicos, solicitações de suporte e manutenções.
+
+👤 SEU NÍVEL DE ACESSO: " + ObterTextoNivel() + @"
+
+🎯 FUNCIONALIDADES DISPONÍVEIS:
+" + ObterFuncionalidadesDisponiveis() + @"
+
+⌨️ ATALHOS DE TECLADO:
+• Dashboard: Clique no botão 🏠 na barra lateral
+• F1: Abrir este manual
+• Alt+F4: Fechar o sistema
+
+💡 DICA:
+Use a barra lateral à esquerda para navegar entre as diferentes seções do sistema.
+
+Para mais informações sobre cada funcionalidade, navegue pelas abas acima.";
+        }
+
+        private string ObterConteudoCriarChamado()
+        {
+            return @"COMO CRIAR UM NOVO CHAMADO
+
+📝 PASSO A PASSO:
+
+1. ACESSAR CRIAÇÃO
+   • Clique em '➕ Novo Chamado' na barra lateral
+   • Ou use o atalho rápido no Dashboard
+
+2. ETAPA 1 - DESCRIÇÃO DO PROBLEMA
+   • Digite um título claro (ex: ""Impressora não funciona"")
+   • Selecione a categoria: Hardware, Software, Rede ou Outros
+   • Descreva detalhadamente o problema (mínimo 20 caracteres)
+
+3. ETAPA 2 - QUEM É AFETADO
+   • Apenas eu: Problema afeta só você
+   • Meu departamento: Afeta seu setor
+   • Empresa toda: Problema generalizado
+
+4. ETAPA 3 - IMPACTO NO TRABALHO
+   • Sim, não consigo trabalhar: Alta prioridade
+   • Não, consigo trabalhar: Prioridade normal
+
+5. CONFIRMAÇÃO
+   • Revise as informações
+   • Clique em 'Concluir'
+   • Anote o número do chamado gerado
+
+📊 PRIORIDADES (calculadas automaticamente):
+• Baixa: Não impede trabalho, afeta só você
+• Média: Não impede, mas afeta departamento
+• Alta: Impede trabalho do departamento
+• Crítica: Impede trabalho da empresa toda
+
+✅ DEPOIS DE CRIAR:
+• Você receberá um número de protocolo
+• Pode acompanhar o status em 'Ver Meus Chamados'
+• Receberá notificações de atualizações";
+        }
+
+        private string ObterConteudoGerenciar()
+        {
+            return @"GERENCIAMENTO DE CHAMADOS (TÉCNICO/ADMIN)
+
+⚙️ FUNCIONALIDADES:
+
+1. VISUALIZAR CHAMADOS
+   • Ver todos os chamados do sistema
+   • Filtrar por status, prioridade, técnico
+   • Buscar por palavra-chave
+
+2. ATRIBUIR CHAMADO
+   • Selecione o chamado
+   • Clique em 'Atribuir Técnico'
+   • Escolha o técnico responsável
+   • Status muda para 'Em Andamento'
+
+3. ALTERAR PRIORIDADE
+   • Selecione o chamado
+   • Clique em 'Alterar Prioridade'
+   • Escolha: Baixa, Média, Alta ou Crítica
+
+4. RESOLVER CHAMADO
+   • Selecione o chamado
+   • Clique em 'Marcar como Resolvido'
+   • Adicione a solução aplicada
+   • Status muda para 'Resolvido'
+
+5. FECHAR CHAMADO
+   • Após resolver, aguarde confirmação
+   • Clique em 'Fechar Chamado'
+   • Status muda para 'Fechado'
+
+📋 STATUS DOS CHAMADOS:
+• Aberto: Aguardando atribuição
+• Em Andamento: Técnico está trabalhando
+• Resolvido: Problema foi solucionado
+• Fechado: Chamado finalizado
+• Cancelado: Chamado foi cancelado
+
+🎯 BOAS PRÁTICAS:
+• Sempre adicione comentários ao resolver
+• Mantenha os chamados atualizados
+• Priorize chamados críticos
+• Comunique-se com o solicitante";
+        }
+
+        private string ObterConteudoUsuarios()
+        {
+            return @"GERENCIAMENTO DE USUÁRIOS (ADMINISTRADOR)
+
+👥 FUNCIONALIDADES ADMINISTRATIVAS:
+
+1. CRIAR NOVO USUÁRIO
+   • Clique em '👤 Novo Usuário'
+   • Confirme sua senha de administrador
+   • Preencha os dados do novo usuário
+   • Defina o nível de acesso:
+     - Funcionário: Pode criar e ver seus chamados
+     - Técnico: Pode gerenciar chamados
+     - Administrador: Acesso completo
+
+2. EDITAR USUÁRIO
+   • Em 'Gerenciar Usuários', selecione o usuário
+   • Clique em 'Editar'
+   • Confirme sua senha
+   • Altere os dados necessários
+
+3. ALTERAR NÍVEL DE ACESSO
+   • Selecione o usuário
+   • Clique em 'Alterar Nível'
+   • Confirme sua senha
+   • Escolha o novo nível
+
+4. ALTERAR SENHA DE USUÁRIO
+   • Selecione o usuário
+   • Clique em 'Alterar Senha'
+   • Confirme sua senha de admin
+   • Digite a nova senha do usuário
+
+5. ATIVAR/DESATIVAR USUÁRIO
+   • Selecione o usuário
+   • Clique em 'Ativar/Desativar'
+   • Confirme a ação
+
+6. EXCLUIR USUÁRIO
+   • Selecione o usuário
+   • Clique em 'Excluir'
+   • ATENÇÃO: Ação irreversível!
+   • Confirme sua senha
+
+⚠️ RESTRIÇÕES DE SEGURANÇA:
+• Não pode alterar seu próprio nível
+• Não pode desativar sua própria conta
+• Não pode excluir sua própria conta
+• Todas as ações críticas requerem confirmação de senha
+
+🔒 NÍVEIS DE ACESSO:
+• Funcionário (Nível 1): Criar e visualizar próprios chamados
+• Técnico (Nível 2): Gerenciar todos os chamados
+• Administrador (Nível 3): Controle total do sistema";
+        }
+
+        private string ObterConteudoFAQ()
+        {
+            return @"PERGUNTAS FREQUENTES (FAQ)
+
+❓ COMO FAÇO LOGIN?
+Use seu e-mail corporativo e a senha fornecida pelo administrador.
+
+❓ ESQUECI MINHA SENHA
+Entre em contato com o administrador do sistema.
+
+❓ QUANTO TEMPO LEVA PARA RESOLVER UM CHAMADO?
+Depende da prioridade:
+• Crítica: Até 4 horas
+• Alta: Até 1 dia útil
+• Média: Até 3 dias úteis
+• Baixa: Até 1 semana
+
+❓ POSSO CANCELAR UM CHAMADO?
+Sim, entre em contato com o técnico responsável ou administrador.
+
+❓ COMO ACOMPANHO MEU CHAMADO?
+Acesse 'Ver Meus Chamados' na barra lateral.
+
+❓ POSSO CRIAR CHAMADO PARA OUTRA PESSOA?
+Não, cada usuário deve criar seus próprios chamados.
+
+❓ O QUE FAZER SE O PROBLEMA PERSISTIR?
+Adicione uma contestação ao chamado ou crie um novo chamado relacionado.
+
+❓ COMO ALTERO MINHA SENHA?
+Apenas administradores podem alterar senhas no menu 'Alterar Senha'.
+
+❓ POSSO VER CHAMADOS DE OUTRAS PESSOAS?
+• Funcionário: Não, apenas seus próprios
+• Técnico: Sim, todos os chamados
+• Admin: Sim, todos os chamados
+
+❓ PRECISO DE TREINAMENTO?
+Este manual contém todas as informações necessárias. Para dúvidas específicas, contate o suporte.
+
+📞 SUPORTE TÉCNICO:
+• E-mail: suporte@interfix.com
+• Telefone: (12) 3456-7890
+• Horário: Segunda a Sexta, 8h às 18h";
+        }
+
+        private string ObterTextoNivel()
+        {
+            switch (_nivelAcesso)
+            {
+                case 1:
+                    return "Funcionário";
+                case 2:
+                    return "Técnico";
+                case 3:
+                    return "Administrador";
+                default:
+                    return "Desconhecido";
+            }
+        }
+
+        private string ObterFuncionalidadesDisponiveis()
+        {
+            if (_nivelAcesso == 1)
+                return "• Criar novos chamados\n• Visualizar seus chamados\n• Adicionar contestações";
+            else if (_nivelAcesso == 2)
+                return "• Visualizar todos os chamados\n• Gerenciar chamados\n• Atribuir técnicos\n• Resolver chamados\n• Gerar relatórios";
+            else if (_nivelAcesso == 3)
+                return "• Todas as funcionalidades de Técnico\n• Criar e gerenciar usuários\n• Alterar senhas\n• Configurações do sistema";
+            else
+                return "Nenhuma funcionalidade disponível";
+        }
+    }
+
+    #endregion
 }
