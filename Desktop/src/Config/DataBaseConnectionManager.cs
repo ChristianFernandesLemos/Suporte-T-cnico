@@ -55,6 +55,68 @@ namespace SistemaChamados.Config
             }
         }
 
+        #region ➕ NOVOS MÉTODOS PARA REPOSITÓRIOS
+
+        /// <summary>
+        /// Cria e retorna uma nova conexão SQL (NÃO abre automaticamente)
+        /// </summary>
+        public static SqlConnection CreateConnection()
+        {
+            string connectionString = GetConnectionString();
+            return new SqlConnection(connectionString);
+        }
+
+        /// <summary>
+        /// Cria, abre e retorna uma conexão SQL (pronta para usar)
+        /// ⚠️ LEMBRE-SE de fazer Dispose() ou usar using()
+        /// </summary>
+        public static SqlConnection OpenConnection()
+        {
+            var connection = CreateConnection();
+            try
+            {
+                connection.Open();
+                return connection;
+            }
+            catch
+            {
+                connection?.Dispose();
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Executa uma ação com uma conexão aberta (gerencia Dispose automaticamente)
+        /// Exemplo: DatabaseConnectionManager.ExecuteWithConnection(conn => { ... });
+        /// </summary>
+        public static void ExecuteWithConnection(Action<SqlConnection> action)
+        {
+            if (action == null)
+                throw new ArgumentNullException(nameof(action));
+
+            using (var connection = OpenConnection())
+            {
+                action(connection);
+            }
+        }
+
+        /// <summary>
+        /// Executa uma função com uma conexão aberta e retorna resultado
+        /// Exemplo: var result = DatabaseConnectionManager.ExecuteWithConnection(conn => { return ...; });
+        /// </summary>
+        public static T ExecuteWithConnection<T>(Func<SqlConnection, T> func)
+        {
+            if (func == null)
+                throw new ArgumentNullException(nameof(func));
+
+            using (var connection = OpenConnection())
+            {
+                return func(connection);
+            }
+        }
+
+        #endregion
+
         /// <summary>
         /// Testa a conexão com o banco de dados
         /// </summary>

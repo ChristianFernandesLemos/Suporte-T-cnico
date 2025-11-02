@@ -145,6 +145,9 @@
       <DependentUpon>FormDiagnostico.cs</DependentUpon>
     </Compile>
     <Compile Include="src\Config\DataBaseConnectionManager.cs" />
+    <Compile Include="src\Data\Repositories\ChamadosRepository.cs" />
+    <Compile Include="src\Data\Repositories\FuncionariosRepository.cs" />
+    <Compile Include="src\Data\Repositories\RelatoriosRepository.cs" />
     <Compile Include="src\Forms\AlterarPrioridadeForm.cs">
       <SubType>Form</SubType>
     </Compile>
