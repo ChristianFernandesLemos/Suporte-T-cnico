@@ -1,25 +1,13 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "C:\\Users\\USUARIO\\Desktop\\Github\\Suporte Tecnico (chris)\\Suporte-T-cnico\\Desktop\\",
+  "WorkspaceRootPath": "C:\\Users\\Usuario\\OneDrive\\Desktop\\Github\\Git\\Suporte-T-cnico\\Desktop\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{12345678-1234-5678-9ABC-123456789ABC}|SistemaChamados.csproj|c:\\users\\usuario\\desktop\\github\\suporte tecnico (chris)\\suporte-t-cnico\\desktop\\src\\data\\repositories\\relatoriosrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{12345678-1234-5678-9ABC-123456789ABC}|SistemaChamados.csproj|solutionrelative:src\\data\\repositories\\relatoriosrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{12345678-1234-5678-9ABC-123456789ABC}|SistemaChamados.csproj|c:\\users\\usuario\\desktop\\github\\suporte tecnico (chris)\\suporte-t-cnico\\desktop\\src\\data\\repositories\\funcionariosrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{12345678-1234-5678-9ABC-123456789ABC}|SistemaChamados.csproj|c:\\users\\usuario\\onedrive\\desktop\\github\\git\\suporte-t-cnico\\desktop\\src\\data\\repositories\\funcionariosrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{12345678-1234-5678-9ABC-123456789ABC}|SistemaChamados.csproj|solutionrelative:src\\data\\repositories\\funcionariosrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{12345678-1234-5678-9ABC-123456789ABC}|SistemaChamados.csproj|c:\\users\\usuario\\desktop\\github\\suporte tecnico (chris)\\suporte-t-cnico\\desktop\\src\\data\\repositories\\chamadosrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{12345678-1234-5678-9ABC-123456789ABC}|SistemaChamados.csproj|solutionrelative:src\\data\\repositories\\chamadosrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{12345678-1234-5678-9ABC-123456789ABC}|SistemaChamados.csproj|c:\\users\\usuario\\desktop\\github\\suporte tecnico (chris)\\suporte-t-cnico\\desktop\\src\\config\\databaseconnectionmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{12345678-1234-5678-9ABC-123456789ABC}|SistemaChamados.csproj|solutionrelative:src\\config\\databaseconnectionmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{12345678-1234-5678-9ABC-123456789ABC}|SistemaChamados.csproj|C:\\Users\\USUARIO\\Desktop\\Github\\Suporte Tecnico (chris)\\Suporte-T-cnico\\Desktop\\src\\data\\sqlserverconnection.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{12345678-1234-5678-9ABC-123456789ABC}|SistemaChamados.csproj|c:\\users\\usuario\\onedrive\\desktop\\github\\git\\suporte-t-cnico\\desktop\\src\\data\\sqlserverconnection.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{12345678-1234-5678-9ABC-123456789ABC}|SistemaChamados.csproj|solutionrelative:src\\data\\sqlserverconnection.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
@@ -30,71 +18,37 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 1,
           "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{b1e99781-ab81-11d0-b683-00aa00a3ee26}"
+            },
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "RelatoriosRepository.cs",
-              "DocumentMoniker": "C:\\Users\\USUARIO\\Desktop\\Github\\Suporte Tecnico (chris)\\Suporte-T-cnico\\Desktop\\src\\Data\\Repositories\\RelatoriosRepository.cs",
-              "RelativeDocumentMoniker": "src\\Data\\Repositories\\RelatoriosRepository.cs",
-              "ToolTip": "C:\\Users\\USUARIO\\Desktop\\Github\\Suporte Tecnico (chris)\\Suporte-T-cnico\\Desktop\\src\\Data\\Repositories\\RelatoriosRepository.cs",
-              "RelativeToolTip": "src\\Data\\Repositories\\RelatoriosRepository.cs",
-              "ViewState": "AgIAAAgAAAAAAAAAAAAAAJYBAAABAAAAAAAAAA==",
+              "Title": "FuncionariosRepository.cs",
+              "DocumentMoniker": "C:\\Users\\Usuario\\OneDrive\\Desktop\\Github\\Git\\Suporte-T-cnico\\Desktop\\src\\Data\\Repositories\\FuncionariosRepository.cs",
+              "RelativeDocumentMoniker": "src\\Data\\Repositories\\FuncionariosRepository.cs",
+              "ToolTip": "C:\\Users\\Usuario\\OneDrive\\Desktop\\Github\\Git\\Suporte-T-cnico\\Desktop\\src\\Data\\Repositories\\FuncionariosRepository.cs",
+              "RelativeToolTip": "src\\Data\\Repositories\\FuncionariosRepository.cs",
+              "ViewState": "AgIAAMgBAAAAAAAAAADwv9UBAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-02T20:57:20.235Z",
+              "WhenOpened": "2025-11-03T01:08:55.389Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 1,
-              "Title": "FuncionariosRepository.cs",
-              "DocumentMoniker": "C:\\Users\\USUARIO\\Desktop\\Github\\Suporte Tecnico (chris)\\Suporte-T-cnico\\Desktop\\src\\Data\\Repositories\\FuncionariosRepository.cs",
-              "RelativeDocumentMoniker": "src\\Data\\Repositories\\FuncionariosRepository.cs",
-              "ToolTip": "C:\\Users\\USUARIO\\Desktop\\Github\\Suporte Tecnico (chris)\\Suporte-T-cnico\\Desktop\\src\\Data\\Repositories\\FuncionariosRepository.cs",
-              "RelativeToolTip": "src\\Data\\Repositories\\FuncionariosRepository.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAAjAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-02T20:56:20.098Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "ChamadosRepository.cs",
-              "DocumentMoniker": "C:\\Users\\USUARIO\\Desktop\\Github\\Suporte Tecnico (chris)\\Suporte-T-cnico\\Desktop\\src\\Data\\Repositories\\ChamadosRepository.cs",
-              "RelativeDocumentMoniker": "src\\Data\\Repositories\\ChamadosRepository.cs",
-              "ToolTip": "C:\\Users\\USUARIO\\Desktop\\Github\\Suporte Tecnico (chris)\\Suporte-T-cnico\\Desktop\\src\\Data\\Repositories\\ChamadosRepository.cs",
-              "RelativeToolTip": "src\\Data\\Repositories\\ChamadosRepository.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAADUCAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-02T20:54:36.462Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "DataBaseConnectionManager.cs",
-              "DocumentMoniker": "C:\\Users\\USUARIO\\Desktop\\Github\\Suporte Tecnico (chris)\\Suporte-T-cnico\\Desktop\\src\\Config\\DataBaseConnectionManager.cs",
-              "RelativeDocumentMoniker": "src\\Config\\DataBaseConnectionManager.cs",
-              "ToolTip": "C:\\Users\\USUARIO\\Desktop\\Github\\Suporte Tecnico (chris)\\Suporte-T-cnico\\Desktop\\src\\Config\\DataBaseConnectionManager.cs",
-              "RelativeToolTip": "src\\Config\\DataBaseConnectionManager.cs",
-              "ViewState": "AgIAAHAAAAAAAAAAAAAAAIMAAAANAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-02T02:32:21.209Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
               "Title": "SqlServerConnection.cs",
-              "DocumentMoniker": "C:\\Users\\USUARIO\\Desktop\\Github\\Suporte Tecnico (chris)\\Suporte-T-cnico\\Desktop\\src\\Data\\SqlServerConnection.cs",
+              "DocumentMoniker": "C:\\Users\\Usuario\\OneDrive\\Desktop\\Github\\Git\\Suporte-T-cnico\\Desktop\\src\\Data\\SqlServerConnection.cs",
               "RelativeDocumentMoniker": "src\\Data\\SqlServerConnection.cs",
-              "ToolTip": "C:\\Users\\USUARIO\\Desktop\\Github\\Suporte Tecnico (chris)\\Suporte-T-cnico\\Desktop\\src\\Data\\SqlServerConnection.cs*",
-              "RelativeToolTip": "src\\Data\\SqlServerConnection.cs*",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAANAAAAAAAAAA==",
+              "ToolTip": "C:\\Users\\Usuario\\OneDrive\\Desktop\\Github\\Git\\Suporte-T-cnico\\Desktop\\src\\Data\\SqlServerConnection.cs",
+              "RelativeToolTip": "src\\Data\\SqlServerConnection.cs",
+              "ViewState": "AgIAAGIEAAAAAAAAAAAqwHIEAAAJAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-02T02:18:28.3Z"
+              "WhenOpened": "2025-11-02T23:43:01.494Z",
+              "EditorCaption": ""
             }
           ]
         }

@@ -1015,44 +1015,46 @@ namespace SistemaChamados.Data
             {
                 System.Diagnostics.Debug.WriteLine("--- CRIAR FUNCIONÁRIO POR TIPO ---");
 
-                // Verificar se existe coluna NivelAcesso
-                int colIndex = -1;
-                try
+                // ✅ CORREÇÃO: Converter DECIMAL para INT corretamente
+                int nivelAcesso;
+
+                // Verificar o tipo real da coluna
+                var tipoColuna = reader.GetFieldType(reader.GetOrdinal("NivelAcesso"));
+                System.Diagnostics.Debug.WriteLine($"Tipo da coluna NivelAcesso: {tipoColuna.Name}");
+
+                // Fazer conversão segura
+                var valorNivel = reader["NivelAcesso"];
+                if (valorNivel is decimal decimalValue)
                 {
-                    colIndex = reader.GetOrdinal("NivelAcesso");
-                    System.Diagnostics.Debug.WriteLine($"✅ Coluna NivelAcesso encontrada no índice {colIndex}");
+                    nivelAcesso = Convert.ToInt32(decimalValue);
                 }
-                catch
+                else if (valorNivel is int intValue)
                 {
-                    System.Diagnostics.Debug.WriteLine("❌ Coluna NivelAcesso não encontrada!");
-
-                    // Listar todas as colunas disponíveis
-                    System.Diagnostics.Debug.WriteLine("Colunas disponíveis na VIEW:");
-                    for (int i = 0; i < reader.FieldCount; i++)
-                    {
-                        System.Diagnostics.Debug.WriteLine($"   [{i}] {reader.GetName(i)} ({reader.GetFieldType(i).Name})");
-                    }
-
-                    throw new Exception("Coluna NivelAcesso não existe na VIEW!");
+                    nivelAcesso = intValue;
+                }
+                else
+                {
+                    // Tentar conversão genérica
+                    nivelAcesso = Convert.ToInt32(valorNivel);
                 }
 
-                int nivelAcesso = (int)reader["NivelAcesso"];
-                System.Diagnostics.Debug.WriteLine($"Nível de Acesso: {nivelAcesso}");
+                System.Diagnostics.Debug.WriteLine($"Nível de Acesso convertido: {nivelAcesso}");
 
+                // Criar instância baseada no nível
                 Funcionarios funcionario;
                 if (nivelAcesso == 1)
                 {
-                    funcionario = new Funcionario();  // Funcionário comum
+                    funcionario = new Funcionario();
                     System.Diagnostics.Debug.WriteLine("Criando: Funcionario (comum)");
                 }
                 else if (nivelAcesso == 2)
                 {
-                    funcionario = new Tecnico();      // Técnico
+                    funcionario = new Tecnico();
                     System.Diagnostics.Debug.WriteLine("Criando: Tecnico");
                 }
                 else if (nivelAcesso == 3)
                 {
-                    funcionario = new ADM();          // Administrador
+                    funcionario = new ADM();
                     System.Diagnostics.Debug.WriteLine("Criando: ADM (Administrador)");
                 }
                 else
@@ -1061,7 +1063,7 @@ namespace SistemaChamados.Data
                 }
 
                 // Propriedades básicas
-                funcionario.Id = (int)reader["Id"];
+                funcionario.Id = Convert.ToInt32(reader["Id"]);
                 funcionario.Nome = reader["Nome"].ToString();
                 funcionario.Cpf = reader["Cpf"].ToString();
                 funcionario.Email = reader["Email"].ToString();
@@ -1070,28 +1072,22 @@ namespace SistemaChamados.Data
                 funcionario.DataCadastro = (DateTime)reader["DataCadastro"];
                 funcionario.Ativo = (bool)reader["Ativo"];
 
-                System.Diagnostics.Debug.WriteLine($"Dados preenchidos:");
+                System.Diagnostics.Debug.WriteLine($"✅ Funcionário criado:");
                 System.Diagnostics.Debug.WriteLine($"   Id: {funcionario.Id}");
                 System.Diagnostics.Debug.WriteLine($"   Nome: {funcionario.Nome}");
                 System.Diagnostics.Debug.WriteLine($"   Email: {funcionario.Email}");
-                System.Diagnostics.Debug.WriteLine($"   Cpf: {funcionario.Cpf}");
                 System.Diagnostics.Debug.WriteLine($"   NivelAcesso: {funcionario.NivelAcesso}");
-                System.Diagnostics.Debug.WriteLine($"   Ativo: {funcionario.Ativo}");
 
-                // Campos opcionais que podem não existir na VIEW
+                // Campos opcionais
                 try
                 {
                     int ordTipo = reader.GetOrdinal("TipoFuncionario");
                     if (!reader.IsDBNull(ordTipo))
                     {
                         funcionario.TipoFuncionario = reader["TipoFuncionario"].ToString();
-                        System.Diagnostics.Debug.WriteLine($"   TipoFuncionario: {funcionario.TipoFuncionario}");
                     }
                 }
-                catch
-                {
-                    System.Diagnostics.Debug.WriteLine("   TipoFuncionario: (coluna não existe na view)");
-                }
+                catch { }
 
                 // Especialização para Técnico
                 if (funcionario is Tecnico tecnico)
@@ -1102,13 +1098,9 @@ namespace SistemaChamados.Data
                         if (!reader.IsDBNull(ordEspec))
                         {
                             tecnico.Especializacao = reader["Especializacao"].ToString();
-                            System.Diagnostics.Debug.WriteLine($"   Especializacao: {tecnico.Especializacao}");
                         }
                     }
-                    catch
-                    {
-                        System.Diagnostics.Debug.WriteLine("   Especializacao: (coluna não existe)");
-                    }
+                    catch { }
                 }
 
                 // Departamento e Cargo para Funcionário comum
@@ -1120,13 +1112,9 @@ namespace SistemaChamados.Data
                         if (!reader.IsDBNull(ordDept))
                         {
                             func.Departamento = reader["Departamento"].ToString();
-                            System.Diagnostics.Debug.WriteLine($"   Departamento: {func.Departamento}");
                         }
                     }
-                    catch
-                    {
-                        System.Diagnostics.Debug.WriteLine("   Departamento: (coluna não existe)");
-                    }
+                    catch { }
 
                     try
                     {
@@ -1134,16 +1122,11 @@ namespace SistemaChamados.Data
                         if (!reader.IsDBNull(ordCargo))
                         {
                             func.Cargo = reader["Cargo"].ToString();
-                            System.Diagnostics.Debug.WriteLine($"   Cargo: {func.Cargo}");
                         }
                     }
-                    catch
-                    {
-                        System.Diagnostics.Debug.WriteLine("   Cargo: (coluna não existe)");
-                    }
+                    catch { }
                 }
 
-                System.Diagnostics.Debug.WriteLine("✅ Funcionário criado com sucesso!");
                 return funcionario;
             }
             catch (Exception ex)

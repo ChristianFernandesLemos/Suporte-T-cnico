@@ -459,20 +459,49 @@ namespace SistemaChamados.Data.Repositories
         {
             try
             {
-                int nivelAcesso = (int)reader["NivelAcesso"];
+                System.Diagnostics.Debug.WriteLine("--- CRIAR FUNCIONÁRIO POR TIPO ---");
 
+                // ✅ CORREÇÃO: Converter DECIMAL para INT corretamente
+                int nivelAcesso;
+
+                // Verificar o tipo real da coluna
+                var tipoColuna = reader.GetFieldType(reader.GetOrdinal("NivelAcesso"));
+                System.Diagnostics.Debug.WriteLine($"Tipo da coluna NivelAcesso: {tipoColuna.Name}");
+
+                // Fazer conversão segura
+                var valorNivel = reader["NivelAcesso"];
+                if (valorNivel is decimal decimalValue)
+                {
+                    nivelAcesso = Convert.ToInt32(decimalValue);
+                }
+                else if (valorNivel is int intValue)
+                {
+                    nivelAcesso = intValue;
+                }
+                else
+                {
+                    // Tentar conversão genérica
+                    nivelAcesso = Convert.ToInt32(valorNivel);
+                }
+
+                System.Diagnostics.Debug.WriteLine($"Nível de Acesso convertido: {nivelAcesso}");
+
+                // Criar instância baseada no nível
                 Funcionarios funcionario;
                 if (nivelAcesso == 1)
                 {
-                    funcionario = new Funcionario();  // Funcionário comum
+                    funcionario = new Funcionario();
+                    System.Diagnostics.Debug.WriteLine("Criando: Funcionario (comum)");
                 }
                 else if (nivelAcesso == 2)
                 {
-                    funcionario = new Tecnico();      // Técnico
+                    funcionario = new Tecnico();
+                    System.Diagnostics.Debug.WriteLine("Criando: Tecnico");
                 }
                 else if (nivelAcesso == 3)
                 {
-                    funcionario = new ADM();          // Administrador
+                    funcionario = new ADM();
+                    System.Diagnostics.Debug.WriteLine("Criando: ADM (Administrador)");
                 }
                 else
                 {
@@ -480,7 +509,7 @@ namespace SistemaChamados.Data.Repositories
                 }
 
                 // Propriedades básicas
-                funcionario.Id = (int)reader["Id"];
+                funcionario.Id = Convert.ToInt32(reader["Id"]);
                 funcionario.Nome = reader["Nome"].ToString();
                 funcionario.Cpf = reader["Cpf"].ToString();
                 funcionario.Email = reader["Email"].ToString();
@@ -488,6 +517,12 @@ namespace SistemaChamados.Data.Repositories
                 funcionario.NivelAcesso = nivelAcesso;
                 funcionario.DataCadastro = (DateTime)reader["DataCadastro"];
                 funcionario.Ativo = (bool)reader["Ativo"];
+
+                System.Diagnostics.Debug.WriteLine($"✅ Funcionário criado:");
+                System.Diagnostics.Debug.WriteLine($"   Id: {funcionario.Id}");
+                System.Diagnostics.Debug.WriteLine($"   Nome: {funcionario.Nome}");
+                System.Diagnostics.Debug.WriteLine($"   Email: {funcionario.Email}");
+                System.Diagnostics.Debug.WriteLine($"   NivelAcesso: {funcionario.NivelAcesso}");
 
                 // Campos opcionais
                 try
@@ -543,6 +578,7 @@ namespace SistemaChamados.Data.Repositories
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"❌ ERRO ao criar funcionário: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"Stack: {ex.StackTrace}");
                 Console.WriteLine($"Erro ao criar funcionário: {ex.Message}");
                 return null;
             }
