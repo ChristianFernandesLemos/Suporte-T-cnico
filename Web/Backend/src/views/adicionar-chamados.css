@@ -1,0 +1,152 @@
+/* ==========
+   Variáveis globais e reset
+   ========== */
+:root {
+    --primary-color-blue: #0d1b2a;
+    --second-color-blue: #1b263b;
+    --third-color-blue: #415a77;
+    --fourth-color-blue: #778da9;
+    --fifth-color-blue: #e0e1dd;
+    --sixth-color-blue: #49a09d;
+    --seventh-color-blue: #004258;
+    --eighth-color-blue: #026687;
+    --ninth-color-blue: #021c33;
+    --tenth-color-blue: #1aa4e5;
+    --primary-color-dark: #050505;
+    --second-color-dark: #222222;
+
+    --color-bg: var(--primary-color-blue);
+    --color-surface: var(--second-color-blue);
+    --color-surface-light: var(--third-color-blue);
+    --color-border: var(--fourth-color-blue);
+    --color-text: var(--fifth-color-blue);
+    --color-accent: var(--sixth-color-blue);
+    --color-accent-hover: var(--tenth-color-blue);
+
+    --font-family: "Inter", Arial, sans-serif;
+    --radius: 8px;
+    --transition: 0.2s ease-in-out;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-family);
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    line-height: 1.5;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ==========
+   Cabeçalho
+   ========== */
+.header {
+    background-color: var(--second-color-blue);
+    border-bottom: 1px solid var(--color-border);
+    padding: 1rem 2rem;
+}
+
+.navigation .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--color-accent);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color var(--transition);
+}
+
+.navigation .back-link:hover {
+    color: var(--color-accent-hover);
+}
+
+/* ==========
+   Conteúdo principal
+   ========== */
+.main-content {
+    flex: 1;
+    padding: 2rem;
+    display: flex;
+    justify-content: center;
+}
+
+.ticket-details {
+    background-color: var(--color-surface);
+    border-radius: var(--radius);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    padding: 2rem;
+    max-width: 800px;
+    width: 100%;
+}
+
+.ticket-title {
+    font-size: 1.5rem;
+    color: var(--fifth-color-blue);
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid var(--color-border);
+    padding-bottom: 0.75rem;
+}
+
+/* ==========
+   Lista de detalhes (dl, dt, dd)
+   ========== */
+.details-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.detail-item {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    border-bottom: 1px solid var(--color-surface-light);
+    padding-bottom: 0.75rem;
+}
+
+.detail-label {
+    font-weight: 600;
+    color: var(--fourth-color-blue);
+    min-width: 140px;
+}
+
+.detail-value {
+    color: var(--fifth-color-blue);
+}
+
+.detail-item:last-child {
+    border-bottom: none;
+}
+
+/* ==========
+   Responsividade
+   ========== */
+@media (max-width: 600px) {
+    .main-content {
+        padding: 1rem;
+    }
+
+    .ticket-details {
+        padding: 1.25rem;
+    }
+
+    .ticket-title {
+        font-size: 1.25rem;
+    }
+
+    .detail-item {
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+
+    .detail-label {
+        min-width: auto;
+    }
+}
