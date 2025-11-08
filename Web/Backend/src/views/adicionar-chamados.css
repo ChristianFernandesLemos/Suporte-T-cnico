@@ -1,0 +1,221 @@
+/* =========================================================
+   1. IMPORTAÇÃO DE FONTES (DEVE VIR EM PRIMEIRO)
+   ========================================================= */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+
+/* =========================================================
+   2. VARIÁVEIS DE CORES E CONFIGURAÇÕES GLOBAIS
+   ========================================================= */
+:root {
+    --primary-color-blue: #0d1b2a;
+    --second-color-blue: #1b263b;
+    --third-color-blue: #415a77;
+    --fourth-color-blue: #778da9;
+    --fifth-color-blue: #e0e1dd;
+    --sixth-color-blue: #49a09d;
+    --seventh-color-blue: #004258;
+    --eighth-color-blue: #026687;
+    --ninth-color-blue: #021c33;
+    --tenth-color-blue: #1aa4e5;
+    --primary-color-dark: #050505;
+    --second-color-dark: #222222;
+
+    --color-bg: var(--primary-color-blue);
+    --color-surface: var(--second-color-blue);
+    --color-surface-light: var(--third-color-blue);
+    --color-border: var(--fourth-color-blue);
+    --color-text: var(--fifth-color-blue);
+    --color-accent: var(--sixth-color-blue);
+    --color-accent-hover: var(--tenth-color-blue);
+
+    --font-family: 'Roboto', sans-serif;
+    --radius: 8px;
+    --transition: 0.25s ease-in-out;
+}
+
+/* =========================================================
+   3. RESETS E ESTRUTURA GERAL
+   ========================================================= */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-family);
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    line-height: 1.5;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* =========================================================
+   4. CABEÇALHO E NAVEGAÇÃO
+   ========================================================= */
+.header {
+    background-color: var(--second-color-blue);
+    border-bottom: 1px solid var(--color-border);
+    padding: 1rem 2rem;
+}
+
+.navigation .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--color-accent);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color var(--transition);
+}
+
+.navigation .back-link:hover {
+    color: var(--color-accent-hover);
+}
+
+/* =========================================================
+   5. CONTEÚDO PRINCIPAL
+   ========================================================= */
+.main-content {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    padding: 2rem;
+}
+
+/* =========================================================
+   6. SEÇÃO DO FORMULÁRIO
+   ========================================================= */
+.form-section {
+    width: 100%;
+    max-width: 600px;
+    background-color: var(--color-surface);
+    padding: 2rem;
+    border-radius: var(--radius);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.modal-title {
+    text-align: center;
+    font-size: 1.75rem;
+    margin-bottom: 1.5rem;
+    color: var(--fifth-color-blue);
+}
+
+/* =========================================================
+   7. GRUPOS DE FORMULÁRIO
+   ========================================================= */
+.user-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-label {
+    font-weight: 500;
+    color: var(--fifth-color-blue);
+}
+
+.form-input,
+.form-select {
+    width: 100%;
+    padding: 12px 14px;
+    font-size: 1rem;
+    font-family: inherit;
+    background-color: var(--fifth-color-blue);
+    color: var(--primary-color-dark);
+    border: 1px solid var(--fourth-color-blue);
+    border-radius: var(--radius);
+    outline: none;
+    transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.form-input::placeholder {
+    color: var(--fourth-color-blue);
+}
+
+.form-select {
+    appearance: none;
+    background-image: url('data:image/svg+xml;utf8,<svg fill="%23415a77" height="20" width="20" viewBox="0 0 20 20"><path d="M5 7l5 5 5-5z"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 14px;
+}
+
+.form-input:focus,
+.form-select:focus {
+    border-color: var(--color-accent-hover);
+    box-shadow: 0 0 0 3px rgba(26, 164, 229, 0.25);
+}
+
+/* =========================================================
+   8. BOTÃO DE ENVIO
+   ========================================================= */
+.submit-button {
+    margin-top: 1rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background-color: var(--color-accent);
+    color: var(--fifth-color-blue);
+    border: none;
+    padding: 0.9rem 1.5rem;
+    border-radius: var(--radius);
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color var(--transition), transform var(--transition);
+}
+
+.submit-button:hover {
+    background-color: var(--color-accent-hover);
+    transform: translateY(-1px);
+}
+
+.submit-button svg {
+    stroke: currentColor;
+}
+
+/* =========================================================
+   9. RESPONSIVIDADE
+   ========================================================= */
+@media (max-width: 600px) {
+    .main-content {
+        padding: 1rem;
+    }
+
+    .form-section {
+        padding: 1.5rem;
+    }
+
+    .modal-title {
+        font-size: 1.4rem;
+    }
+}
+
+    .ticket-details {
+        padding: 1.25rem;
+    }
+
+    .ticket-title {
+        font-size: 1.25rem;
+    }
+
+    .detail-item {
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+
+    .detail-label {
+        min-width: auto;
+    }
+}
