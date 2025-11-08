@@ -12,13 +12,14 @@ const { testConnection } = require('./db');
 // Importa as rotas
 const authRoutes = require('./src/routes/auth');
 const userRoutes = require('./src/routes/users');
+
 const pagesRoutes = require('./src/routes/pages');
 
 // Middleware para interpretar JSON
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Serve arquivos estáticos (CSS, imagens, etc)
+// Serve arquivos estáticos (CSS, imagens, JS)
 app.use('/static', express.static(path.join(__dirname, 'src/views')));
 
 // Middleware de log (desenvolvimento)
@@ -40,6 +41,7 @@ app.use('/', pagesRoutes);
 // Rotas da API
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
+
 
 // Rota de health check (verifica conexão com banco)
 app.get('/api/health', async (req, res) => {
@@ -95,6 +97,7 @@ app.listen(PORT, async () => {
   console.log('================================');
   console.log(`📍 Auth: http://localhost:${PORT}/api/auth/login`);
   console.log(`📍 Users: http://localhost:${PORT}/api/users`);
+
   console.log(`📍 Health: http://localhost:${PORT}/api/health`);
   console.log('================================\n');
   

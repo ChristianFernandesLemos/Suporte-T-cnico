@@ -1,5 +1,11 @@
 const User = require('../models/User');
 const { createSession, destroySession } = require('../middleware/auth');
+const crypto = require('crypto');
+
+// Função para hash de senha SHA256
+function hashPassword(password) {
+  return crypto.createHash('sha256').update(password).digest('hex');
+}
 
 class AuthController {
   // Login
@@ -15,23 +21,39 @@ class AuthController {
         });
       }
 
+      console.log('🔍 Tentativa de login:');
+      console.log('   Email:', email);
+      console.log('   Senha digitada:', senha);
+      console.log('   Hash da senha:', hashPassword(senha));
+
       // Busca usuário
       const user = await User.findByEmail(email);
 
       if (!user) {
+        console.log('❌ Usuário não encontrado');
         return res.status(401).json({
           success: false,
           message: 'Email ou senha incorretos.'
         });
       }
 
-      // Verifica senha (sem hash - o banco já possui hash)
-      if (user.Senha !== senha) {
+      console.log('✅ Usuário encontrado:', user.Nome);
+      console.log('   Hash no banco:', user.Senha);
+
+      // Verifica senha (com hash SHA256)
+      const senhaHash = hashPassword(senha);
+      
+      if (user.Senha !== senhaHash) {
+        console.log('❌ Senha incorreta');
+        console.log('   Esperado:', user.Senha);
+        console.log('   Recebido:', senhaHash);
         return res.status(401).json({
           success: false,
           message: 'Email ou senha incorretos.'
         });
       }
+
+      console.log('✅ Login bem-sucedido!');
 
       // Cria sessão
       const token = createSession(user);
@@ -139,16 +161,19 @@ class AuthController {
         });
       }
 
-      // Verifica senha atual (sem hash)
-      if (user.Senha !== senhaAtual) {
+      // Verifica senha atual (com hash)
+      const senhaAtualHash = hashPassword(senhaAtual);
+      
+      if (user.Senha !== senhaAtualHash) {
         return res.status(401).json({
           success: false,
           message: 'Senha atual incorreta.'
         });
       }
 
-      // Atualiza senha (sem hash - o banco fará isso)
-      await user.alterarSenha(novaSenha);
+      // Atualiza senha (com hash)
+      const novaSenhaHash = hashPassword(novaSenha);
+      await user.alterarSenha(novaSenhaHash);
 
       res.json({
         success: true,

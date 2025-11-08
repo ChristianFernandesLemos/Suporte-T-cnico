@@ -20,6 +20,19 @@ router.get('/registrar-chamado', (req, res) => {
   res.sendFile(path.join(viewsPath, 'Registrar-Chamados.html'));
 });
 
+router.get('/registrar-chamado-p2', (req, res) => {
+  res.sendFile(path.join(viewsPath, 'RegistrarChamado-2 Etapa.html'))
+});
+
+router.get('/registrar-chamado-p3', (req, res) => {
+  res.sendFile(path.join(viewsPath, 'RegistrarChamado-2 Etapa.html'))
+});
+
+router.get('/registrar-chamado-p4', (req, res) => {
+  res.sendFile(path.join(viewsPath, 'RegistrarChamado-2 Etapa.html'))
+});
+
+
 // Página de visualizar chamados
 router.get('/chamados', (req, res) => {
   res.sendFile(path.join(viewsPath, 'Afeta-Chamados.html'));

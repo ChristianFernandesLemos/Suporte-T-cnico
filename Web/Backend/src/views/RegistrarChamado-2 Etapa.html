@@ -4,19 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registrar Chamado - Etapa 2</title>
-    
-    <!-- Lincando o arquivo de estilos externo -->
     <link rel="stylesheet" href="/static/Forms.css">
-
-    <!-- Os links de fonte agora são gerenciados pelo @import dentro do registro.css -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
 </head>
 <body>
+    <script src="/static/RegistrarChamado2-Etapa.js"></script>
 
     <header class="top-bar">
-        <!-- O link superior de navegação -->
         <a href="#" class="back-link">
             <span class="arrow-icon">←</span>
             Registrar Chamado
@@ -27,10 +22,9 @@
         <section class="card">
             <h2>Novo Chamado</h2>
             <form action="#" method="post">
-                <!-- Campo que corresponde à imagem: Seleção do Afetado -->
                 <div class="form-group">
                     <label for="afetado">Quem está sendo afetado?</label>
-                    <select id="afetado" name="afetado">
+                    <select id="afetado" name="afetado" required>
                         <option value="">Selecione...</option>
                         <option value="apenas eu">Apenas eu</option>
                         <option value="equipe">Equipe</option>
@@ -39,7 +33,6 @@
                 </div>
 
                 <div class="form-actions">
-                    <!-- Botões de Ação -->
                     <button type="button" class="back-button">Voltar</button>
                     <button type="submit">Avançar</button>
                 </div>

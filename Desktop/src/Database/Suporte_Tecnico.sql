@@ -278,7 +278,6 @@ PRINT '=== MIGRATION COMPLETA COM SUCESSO ==='
 -- ============================================
 -- SCRIPT DE CRIAÇÃO DO BANCO DE DADOS
 -- Sistema de Chamados InterFix
--- Versão: 1.0.0
 -- ============================================
 
 USE master;
@@ -319,7 +318,7 @@ GO
 CREATE TABLE Usuario (
     Id_usuario INT NOT NULL IDENTITY(1,1) PRIMARY KEY,
     nome VARCHAR(100) NOT NULL,
-    senha VARCHAR(100) NOT NULL, -- Hash SHA256
+    senha VARCHAR(100) NOT NULL, 
     Cpf CHAR(11) NOT NULL UNIQUE,
     Acess_codigo DECIMAL(18, 0) NOT NULL,
     DataCadastro DATETIME NOT NULL DEFAULT GETDATE(),
