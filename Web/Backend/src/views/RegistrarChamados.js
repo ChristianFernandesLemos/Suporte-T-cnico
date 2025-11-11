@@ -176,7 +176,7 @@ function inicializarEtapa2() {
       console.log('✅ Etapa 2 concluída');
       alert('✅ Chamado salvo com sucesso! (Etapa 3 ainda não implementada)');
       // Quando criar a etapa 3, descomente:
-      // window.location.href = '/registrar-chamado-p3';
+      window.location.href = '/registrar-chamado-p3';
     } else {
       alert('❌ Erro ao salvar. Tente novamente.');
     }
@@ -188,6 +188,77 @@ function inicializarEtapa2() {
     btnVoltar.addEventListener('click', function(e) {
       e.preventDefault();
       window.location.href = '/registrar-chamado';
+    });
+  }
+}
+
+// ========================================
+// ETAPA 3 - Quem está sendo afetado
+// ========================================
+
+function inicializarEtapa3(){
+  const form = document.querySelector('form');
+  
+   if (!form) return;
+
+
+  // Verifica dados da etapa 2
+  console.log('📝 Etapa 3 inicializada');
+  const dadosEtapa2 = chamadoStorage.obterEtapa
+  ('etapa2')
+  if (!dadosEtapa2) {
+    alert('⚠️ Nenhum dado encontrado. Voltando para a segunda etapa.');
+    window.location.href = '/registrar-chamado-p2';
+    return;
+  }
+
+  //Carrega dados salvos
+  const dadosSalvos = chamadoStorage.obterEtapa('etapa3');
+  if (dadosSalvos) {
+    document.getElementById('impede').value = dadosSalvos.impede || '';
+  }
+
+  // Atualiza link do header
+  const headerBackLink = document.querySelector('.back-link');
+  if (headerBackLink) {
+    headerBackLink.textContent = '← Voltar';
+    headerBackLink.addEventListener('click', function(e) {
+      e.preventDefault();
+      window.location.href = 'registrar-chamado-p2';
+    });
+  }
+
+  // Evento de submit
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const dados = {
+      impede: document.getElementById('impede').value
+    };
+
+    // Validação
+    if (!dados.afetado) {
+      alert('⚠️ Por favor, selecione se o problema impede o trabalho.');
+      return;
+    }
+
+    // Salva e avança
+    if (chamadoStorage.salvarEtapa('etapa3', dados)) {
+      console.log('✅ Etapa 3 concluída');
+      alert('✅ Chamado salvo com sucesso! (Etapa 4 ainda não implementada)');
+      // Quando criar a etapa 3, descomente:
+      // window.location.href = '/registrar-chamado-p4';
+    } else {
+      alert('❌ Erro ao salvar. Tente novamente.');
+    }
+  });
+
+  // Botão voltar
+  const btnVoltar = document.querySelector('.back-button');
+  if (btnVoltar) {
+    btnVoltar.addEventListener('click', function(e) {
+      e.preventDefault();
+      window.location.href = '/registrar-chamado-p2';
     });
   }
 }

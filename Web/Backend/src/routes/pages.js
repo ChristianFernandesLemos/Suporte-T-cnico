@@ -25,7 +25,7 @@ router.get('/registrar-chamado-p2', (req, res) => {
 });
 
 router.get('/registrar-chamado-p3', (req, res) => {
-  res.sendFile(path.join(viewsPath, 'RegistrarChamado-2 Etapa.html'))
+  res.sendFile(path.join(viewsPath, 'Interrompe o serviço-Chamados.html'))
 });
 
 router.get('/registrar-chamado-p4', (req, res) => {
