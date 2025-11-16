@@ -174,7 +174,7 @@ function inicializarEtapa2() {
     // Salva e avança
     if (chamadoStorage.salvarEtapa('etapa2', dados)) {
       console.log('✅ Etapa 2 concluída');
-      alert('✅ Chamado salvo com sucesso! (Etapa 3 ainda não implementada)');
+      //alert('✅ Chamado salvo com sucesso! (Etapa 3 ainda não implementada)');
       // Quando criar a etapa 3, descomente:
       window.location.href = '/registrar-chamado-p3';
     } else {
@@ -193,29 +193,32 @@ function inicializarEtapa2() {
 }
 
 // ========================================
-// ETAPA 3 - Quem está sendo afetado
+// ETAPA 3 - O problema impede o trabalho?
 // ========================================
-
-function inicializarEtapa3(){
+function inicializarEtapa3() {
   const form = document.querySelector('form');
   
-   if (!form) return;
+  if (!form) return;
 
+  console.log('📝 Etapa 3 inicializada');
 
   // Verifica dados da etapa 2
-  console.log('📝 Etapa 3 inicializada');
-  const dadosEtapa2 = chamadoStorage.obterEtapa
-  ('etapa2')
+  const dadosEtapa2 = chamadoStorage.obterEtapa('etapa2');
   if (!dadosEtapa2) {
     alert('⚠️ Nenhum dado encontrado. Voltando para a segunda etapa.');
     window.location.href = '/registrar-chamado-p2';
     return;
   }
 
-  //Carrega dados salvos
+  // Carrega dados salvos (para radio buttons)
   const dadosSalvos = chamadoStorage.obterEtapa('etapa3');
-  if (dadosSalvos) {
-    document.getElementById('impede').value = dadosSalvos.impede || '';
+  if (dadosSalvos && dadosSalvos.impacto) {
+    console.log('📂 Carregando dados salvos:', dadosSalvos.impacto);
+    // Marca o radio button correto
+    const radioSelecionado = document.querySelector(`input[name="impacto"][value="${dadosSalvos.impacto}"]`);
+    if (radioSelecionado) {
+      radioSelecionado.checked = true;
+    }
   }
 
   // Atualiza link do header
@@ -224,7 +227,7 @@ function inicializarEtapa3(){
     headerBackLink.textContent = '← Voltar';
     headerBackLink.addEventListener('click', function(e) {
       e.preventDefault();
-      window.location.href = 'registrar-chamado-p2';
+      window.location.href = '/registrar-chamado-p2';
     });
   }
 
@@ -232,21 +235,25 @@ function inicializarEtapa3(){
   form.addEventListener('submit', function(e) {
     e.preventDefault();
 
-    const dados = {
-      impede: document.getElementById('impede').value
-    };
-
-    // Validação
-    if (!dados.afetado) {
+    // ✅ CORREÇÃO: Pega o valor do radio button selecionado
+    const impactoSelecionado = document.querySelector('input[name="impacto"]:checked');
+    
+    if (!impactoSelecionado) {
       alert('⚠️ Por favor, selecione se o problema impede o trabalho.');
       return;
     }
+
+    const dados = {
+      impacto: impactoSelecionado.value  // 'sim' ou 'nao'
+    };
+
+    console.log('📊 Dados da Etapa 3:', dados);
 
     // Salva e avança
     if (chamadoStorage.salvarEtapa('etapa3', dados)) {
       console.log('✅ Etapa 3 concluída');
       alert('✅ Chamado salvo com sucesso! (Etapa 4 ainda não implementada)');
-      // Quando criar a etapa 3, descomente:
+      // Quando criar a etapa 4, descomente:
       // window.location.href = '/registrar-chamado-p4';
     } else {
       alert('❌ Erro ao salvar. Tente novamente.');
@@ -263,15 +270,21 @@ function inicializarEtapa3(){
   }
 }
 
+
+//==========================================
+// Etapa 4 - Confirmação de Conclusão de chamado
+
 // ========================================
-// INICIALIZAÇÃO
+// INICIALIZAÇÃO - ATUALIZADA
 // ========================================
 document.addEventListener('DOMContentLoaded', function() {
   const url = window.location.pathname;
   
   console.log('📍 URL atual:', url);
 
-  if (url.includes('registrar-chamado-p2')) {
+  if (url.includes('registrar-chamado-p3')) {
+    inicializarEtapa3();
+  } else if (url.includes('registrar-chamado-p2')) {
     inicializarEtapa2();
   } else if (url.includes('registrar-chamado') || url.includes('Registrar-Chamados')) {
     inicializarEtapa1();
