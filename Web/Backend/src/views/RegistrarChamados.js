@@ -55,9 +55,9 @@ const chamadoStorage = {
   }
 };
 
-// ========================================
+// =========================================================================================================
 // ETAPA 1 - Informações Básicas
-// ========================================
+// =========================================================================================================
 function inicializarEtapa1() {
   const form = document.querySelector('form');
   
@@ -123,9 +123,9 @@ function inicializarEtapa1() {
   }
 }
 
-// ========================================
+// ====================================================================================================================
 // ETAPA 2 - Quem está sendo afetado
-// ========================================
+// ====================================================================================================================
 function inicializarEtapa2() {
   const form = document.querySelector('form');
   
@@ -192,9 +192,9 @@ function inicializarEtapa2() {
   }
 }
 
-// ========================================
+// ============================================================================================================
 // ETAPA 3 - O problema impede o trabalho?
-// ========================================
+// ===========================================================================================================
 function inicializarEtapa3() {
   const form = document.querySelector('form');
   
@@ -252,9 +252,9 @@ function inicializarEtapa3() {
     // Salva e avança
     if (chamadoStorage.salvarEtapa('etapa3', dados)) {
       console.log('✅ Etapa 3 concluída');
-      alert('✅ Chamado salvo com sucesso! (Etapa 4 ainda não implementada)');
+      //alert('✅ Chamado salvo com sucesso! (Etapa 4 ainda não implementada)');
       // Quando criar a etapa 4, descomente:
-      // window.location.href = '/registrar-chamado-p4';
+      window.location.href = '/registrar-chamado-p4';
     } else {
       alert('❌ Erro ao salvar. Tente novamente.');
     }
@@ -271,22 +271,165 @@ function inicializarEtapa3() {
 }
 
 
-//==========================================
+//========================================================================================================
 // Etapa 4 - Confirmação de Conclusão de chamado
+//=========================================================================================================
 
-// ========================================
+// Evento de submit
+  
+function inicializarEtapa4() {
+  const form = document.querySelector('form');
+  
+  if (!form) return;
+
+  console.log('📝 Etapa 4 inicializada');
+
+  // Verifica etapa anterior
+  const dadosEtapa3 = chamadoStorage.obterEtapa('etapa3');
+  if (!dadosEtapa3) {
+    alert('⚠️ Nenhum dado encontrado. Voltando para a terceira etapa.');
+    window.location.href = '/registrar-chamado-p3';
+    return;
+  }
+
+  // Atualiza header
+  const headerBackLink = document.querySelector('.back-link');
+  if (headerBackLink) {
+    headerBackLink.textContent = '← Voltar';
+    headerBackLink.addEventListener('click', function(e) {
+      e.preventDefault();
+      window.location.href = '/registrar-chamado-p3';
+    });
+  }
+
+  // Evento de submit
+  
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    // Cria dados
+    const dados = {
+    finalizado: true,
+    dataFinalizacao: new Date().toISOString()
+};
+
+     // Salva e avança
+    if (chamadoStorage.salvarEtapa('etapa4', dados)) {
+      console.log('✅ Etapa 4 concluída');
+      //alert('✅ Chamado salvo com sucesso! (Etapa 4 ainda não implementada)');
+      // Quando criar a etapa 4, descomente:
+      window.location.href = '/PrioridadeIA';
+    } else {
+      alert('❌ Erro ao salvar. Tente novamente.');
+    }
+  });
+
+  // Botão voltar
+  const btnVoltar = document.querySelector('.back-button');
+  if (btnVoltar) {
+    btnVoltar.addEventListener('click', function(e) {
+      e.preventDefault();
+      window.location.href = '/registrar-chamado-p3';
+    });
+  }
+}
+
+//=====================================================================================================
+// PRIORIDADE ATRIBUIDA PELA I.A
+//=====================================================================================================
+
+function iniciarPrioridadeIA(){
+   const form=document.querySelector('form');
+  
+   if(!form) return;
+   console.log('prioridade I.A mostrada')
+
+   // verifica etapa anterior
+   const dadosEtapa4 = chamadoStorage.obterEtapa('etapa4');
+   if(!dadosEtapa4){
+    alert('Nenhum dado encontrado. Voltando para a quarta etapa.');
+    window.location.href = '/registrar-chamado-p3';
+    return;
+   }
+
+   // atualizar header
+   const headerBackLink = document.querySelector('.back-link');
+  if (headerBackLink) {
+    headerBackLink.textContent = '← Voltar';
+    headerBackLink.addEventListener('click', function(e) {
+      e.preventDefault();
+      window.location.href = '/registrar-chamado-p4';
+    });
+  }
+
+    const dados = {
+    finalizado: true,
+     dataFinalizacao: new Date().toISOString()
+     };
+
+    // Concorda com a prioridade Salva e finaliza
+    if (chamadoStorage.salvarEtapa('Prioridade', dados)) {
+      console.log('✅ Prioridade concluída');
+      //finalizarChamado(); // Função para enviar para API
+    } else {
+      alert('❌ Erro ao salvar. Tente novamente.');
+    }
+
+    // Não concorda com a prioridade
+  const btnVoltar = document.querySelector('.back-button');
+  if (btnVoltar) {
+    btnVoltar.addEventListener('click', function(e) {
+      e.preventDefault();
+      window.location.href = '/Contestação';
+    });
+  }
+}
+
+
+//=======================================================
+// CONTESTAÇÃO
+//=======================================================
+
+function iniciarContestacao(){
+     const form = document.querySelector('form');
+     if (!form) return;
+     console.log('Contestação iniciada');
+
+
+
+
+}
+
+
+
+
+
+
+
+//===================================================================================
 // INICIALIZAÇÃO - ATUALIZADA
-// ========================================
+// ==================================================================================
 document.addEventListener('DOMContentLoaded', function() {
   const url = window.location.pathname;
   
   console.log('📍 URL atual:', url);
 
-  if (url.includes('registrar-chamado-p3')) {
+  if (url.includes('Contestação')){
+    iniciarContestacao()
+  }
+  else if (url.includes('PrioridadeIA')){
+    iniciarPrioridadeIA();
+  }
+  if(url.includes('registrar-chamado-p4')){
+    inicializarEtapa4();
+  }
+  else if (url.includes('registrar-chamado-p3')) {
     inicializarEtapa3();
-  } else if (url.includes('registrar-chamado-p2')) {
+  } 
+  else if (url.includes('registrar-chamado-p2')) {
     inicializarEtapa2();
-  } else if (url.includes('registrar-chamado') || url.includes('Registrar-Chamados')) {
+  } 
+  else if (url.includes('registrar-chamado') || url.includes('Registrar-Chamados')) {
     inicializarEtapa1();
   }
 

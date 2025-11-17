@@ -29,8 +29,16 @@ router.get('/registrar-chamado-p3', (req, res) => {
 });
 
 router.get('/registrar-chamado-p4', (req, res) => {
-  res.sendFile(path.join(viewsPath, 'RegistrarChamado-2 Etapa.html'))
+  res.sendFile(path.join(viewsPath, 'Concluir-Chamados.html'))
 });
+
+router.get('/PrioridadeIA', (req, res) => {
+  res.sendFile(path.join(viewsPath, 'ConcordaPrioridade.html'))
+});
+
+router.get('/Contestação', (req,res) => {
+  res.sendFile(path.join(viewsPath, 'Contestação.html'))
+})
 
 
 // Página de visualizar chamados
