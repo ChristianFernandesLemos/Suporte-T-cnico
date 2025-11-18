@@ -19,7 +19,7 @@ Dev Team     | Lukas Keiji         | [Acessar Github](https://github.com/Lucaske
 
 ## Metodologia Scrum 🎯
 
-Foi utilizada a metodologia Scrum, sabendo disso, primeiro foram reunidos os [requisitos](https://github.com/ChristianFernandesLemos/Suporte-T-cnico/blob/main/Backlog/Requisitos.txt), essa parte dos requisitos aborda os requisitos funcionais, os requisitos não funcionais, o plano de negócios e outros fatores, como a [*User Strory*](https://github.com/ChristianFernandesLemos/Suporte-T-cnico/blob/main/Backlog/User%20Story.md). e com base no que foi dito o sistema foi modelado da forma efetiva. Depois de reunir os requisitos foi feito o backlog das sprints.
+Foi utilizada a metodologia Scrum, sabendo disso, primeiro foram reunidos os [requisitos](https://github.com/ChristianFernandesLemos/Suporte-T-cnico/blob/main/Backlog/User%20Story%20e%20Requisitos.md), essa parte dos requisitos aborda os requisitos funcionais, os requisitos não funcionais, o plano de negócios e outros fatores, como a [*User Strory*](https://github.com/ChristianFernandesLemos/Suporte-T-cnico/blob/main/Backlog/User%20Story%20e%20Requisitos.md). e com base no que foi dito o sistema foi modelado da forma efetiva. Depois de reunir os requisitos foi feito o backlog das sprints.
 
 ### *Sprint Planing*
 
