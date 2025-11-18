@@ -3,19 +3,10 @@
 ### Quem somos?
 A InterFix é uma empresa dedicada a transformar o suporte técnico empresarial por meio do uso de inteligência artificial. Nosso objetivo é conectar soluções inteligentes com as necessidades de nossos clientes, oferecendo assistência eficiente, personalizada e em tempo real.
 
-![InterFix](https://github.com/user-attachments/assets/8aa8a096-88fa-4be4-952c-946d63ceed66)
+<p><img width="700 height="500" alt="Logo Empresa" src="https://github.com/user-attachments/assets/8aa8a096-88fa-4be4-952c-946d63ceed66">
 
+</p>
 
-## Integrantes 👥
-
-Função       | Nome                | Github                                                       |
------------- | --------------------| -------------------------------------------------------------|
-Project Owner| Christian Fernandes | [Acessar Github](https://github.com/ChristianFernandesLemos) |
-Scrum Master | Juan Vargas         | [Acessar Github](https://github.com/RenteriaJuan)            |
-Dev Team     | Théo Pinto          | [Acessar Github](https://github.com/Thorphinm)               |
-Dev Team     | Ana Beatriz         | [Acessar Github](https://github.com/Anasouza2802)            |
-Dev Team     |Gustavo Gramacho     | [Acessar Github](https://github.com/gramachoo)               |
-Dev Team     | Lukas Keiji         | [Acessar Github](https://github.com/Lucaskeiji)              |
 
 ## Metodologia Scrum 🎯
 
@@ -54,6 +45,32 @@ Foi utilizada a metodologia Scrum, sabendo disso, primeiro foram reunidos os [re
 Categoría | Tecnologías
 --------- | -------------
 FrontEnd | HTML, CSS e Figma (Modelagem da interface) 
+BackEnd | C#, JS, TS
 Base De Dados | BrModel e SQL Server (Windows Server)
 IA | BlackBox AI
 Metodología | Scrum + Git FLow 
+
+## Integrantes 👥
+
+Função       | Nome                | Github                                                       |
+------------ | --------------------| -------------------------------------------------------------|
+Project Owner| Christian Fernandes | [Acessar Github](https://github.com/ChristianFernandesLemos) |
+Scrum Master | Juan Vargas         | [Acessar Github](https://github.com/RenteriaJuan)            |
+Dev Team     | Théo Pinto          | [Acessar Github](https://github.com/Thorphinm)               |
+Dev Team     | Ana Beatriz         | [Acessar Github](https://github.com/Anasouza2802)            |
+Dev Team     |Gustavo Gramacho     | [Acessar Github](https://github.com/gramachoo)               |
+Dev Team     | Lukas Keiji         | [Acessar Github](https://github.com/Lucaskeiji)              |
+
+## DoR - Definition of Ready <a id="dor"></a> 🏃
+
+* User Stories com **Critérios de Aceitação**
+* Design no **Figma**
+* Modelagem do **Banco de Dados**
+* Criação das Classes
+* Modelo de iteração
+
+
+## DoD - Definition of Done 🏆 <a id="dod"></a>
+
+* [Manual da Aplicação](https://github.com/ChristianFernandesLemos/Suporte-T-cnico/blob/main/Docs/Manual%20de%20Instalção.md).
+* [Manual de Usuário](https://github.com/ChristianFernandesLemos/Suporte-T-cnico/blob/main/Docs/Manual_de_Uso_InterFix%20.docx).
