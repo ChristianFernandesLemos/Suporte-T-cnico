@@ -1,0 +1,181 @@
+/* ==========
+   Variáveis globais e resets
+   ========== */
+:root {
+    --primary-color-blue: #0d1b2a;
+    --second-color-blue: #1b263b;
+    --third-color-blue: #415a77;
+    --fourth-color-blue: #778da9;
+    --fifth-color-blue: #e0e1dd;
+    --sixth-color-blue: #49a09d;
+    --seventh-color-blue: #004258;
+    --eighth-color-blue: #026687;
+    --ninth-color-blue: #021c33;
+    --tenth-color-blue: #1aa4e5;
+    --primary-color-dark: #050505;
+    --second-color-dark: #222222;
+
+    --color-bg: var(--primary-color-blue);
+    --color-surface: var(--second-color-blue);
+    --color-surface-light: var(--third-color-blue);
+    --color-border: var(--fourth-color-blue);
+    --color-text: var(--fifth-color-blue);
+    --color-accent: var(--sixth-color-blue);
+    --color-accent-hover: var(--tenth-color-blue);
+
+    --font-family: "Inter", Arial, sans-serif;
+    --radius: 8px;
+    --transition: 0.2s ease-in-out;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-family);
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    line-height: 1.5;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ==========
+   Cabeçalho
+   ========== */
+.header {
+    background-color: var(--second-color-blue);
+    border-bottom: 1px solid var(--color-border);
+    padding: 1rem 2rem;
+}
+
+.navigation .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--color-accent);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color var(--transition);
+}
+
+.navigation .back-link:hover {
+    color: var(--color-accent-hover);
+}
+
+/* ==========
+   Conteúdo principal
+   ========== */
+.main-content {
+    flex: 1;
+    padding: 2rem;
+    display: flex;
+    justify-content: center;
+}
+
+.access-levels-section {
+    background-color: var(--color-surface);
+    border-radius: var(--radius);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    padding: 2rem;
+    max-width: 900px;
+    width: 100%;
+}
+
+.section-title {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    color: var(--fifth-color-blue);
+    text-align: left;
+}
+
+/* ==========
+   Tabela
+   ========== */
+.table-container {
+    overflow-x: auto;
+    border-radius: var(--radius);
+    border: 1px solid var(--color-border);
+    margin-bottom: 2rem;
+}
+
+.users-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 600px;
+    color: var(--fifth-color-blue);
+}
+
+.users-table th,
+.users-table td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.users-table thead {
+    background-color: var(--third-color-blue);
+    color: var(--fifth-color-blue);
+    text-transform: uppercase;
+    font-size: 0.875rem;
+    letter-spacing: 0.03em;
+}
+
+.users-table tbody tr:hover {
+    background-color: var(--ninth-color-blue);
+    transition: background-color var(--transition);
+}
+
+/* ==========
+   Botão principal
+   ========== */
+.add-user-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: var(--color-accent);
+    color: var(--fifth-color-blue);
+    border: none;
+    padding: 0.75rem 1.25rem;
+    border-radius: var(--radius);
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color var(--transition), transform var(--transition);
+}
+
+.add-user-button:hover {
+    background-color: var(--color-accent-hover);
+    transform: translateY(-1px);
+}
+
+.add-user-button svg {
+    stroke: currentColor;
+}
+
+/* ==========
+   Responsividade
+   ========== */
+@media (max-width: 600px) {
+    .main-content {
+        padding: 1rem;
+    }
+
+    .access-levels-section {
+        padding: 1.25rem;
+    }
+
+    .section-title {
+        font-size: 1.25rem;
+    }
+
+    .users-table th,
+    .users-table td {
+        padding: 0.75rem;
+        font-size: 0.9rem;
+    }
+}

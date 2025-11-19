@@ -1,0 +1,186 @@
+/**
+ * create-chamados-table.sql
+ * Script para criar a tabela de Chamados no banco de dados
+ */
+
+-- Remove a tabela se já existir (CUIDADO: isso apaga todos os dados!)
+-- IF OBJECT_ID('Chamados', 'U') IS NOT NULL
+--     DROP TABLE Chamados;
+
+-- Cria a tabela de Chamados
+CREATE TABLE Chamados (
+    -- Identificador único do chamado
+    id_chamado INT PRIMARY KEY IDENTITY(1,1),
+    
+    -- Dados básicos do chamado (Etapa 1)
+    titulo VARCHAR(200) NOT NULL,
+    nome_solicitante VARCHAR(100) NOT NULL,
+    email_solicitante VARCHAR(100) NOT NULL,
+    categoria VARCHAR(50) NOT NULL,
+    descricao TEXT NOT NULL,
+    
+    -- Dados de impacto (Etapa 2)
+    afetado VARCHAR(100) NOT NULL,
+    
+    -- Dados de serviço (Etapa 3)
+    impede_trabalho VARCHAR(10) DEFAULT 'nao',
+    
+    -- Prioridade (Etapa 4)
+    prioridade INT NOT NULL CHECK (prioridade BETWEEN 1 AND 4),
+    -- 1 = Baixa, 2 = Média, 3 = Alta, 4 = Crítica/Urgente
+    
+    -- Dados de controle
+    dataChamados DATETIME DEFAULT GETDATE(),
+    status VARCHAR(50) DEFAULT 'Aberto',
+    -- Status possíveis: Aberto, Em Andamento, Resolvido, Fechado, Cancelado, Urgente
+    
+    -- Contestações e atualizações
+    contestacoes TEXT NULL,
+    
+    -- Técnico atribuído (pode ser NULL inicialmente)
+    tecnico_atribuido INT NULL,
+    
+    -- Data de resolução
+    data_resolucao DATETIME NULL,
+    
+    -- Índices para melhorar performance
+    INDEX idx_status (status),
+    INDEX idx_categoria (categoria),
+    INDEX idx_prioridade (prioridade),
+    INDEX idx_data (dataChamados),
+    INDEX idx_email (email_solicitante)
+);
+
+-- Comentários sobre os campos (documentação)
+EXEC sp_addextendedproperty 
+    @name = N'MS_Description', @value = 'Identificador único do chamado',
+    @level0type = N'SCHEMA', @level0name = 'dbo',
+    @level1type = N'TABLE', @level1name = 'Chamados',
+    @level2type = N'COLUMN', @level2name = 'id_chamado';
+
+EXEC sp_addextendedproperty 
+    @name = N'MS_Description', @value = 'Título resumido do problema',
+    @level0type = N'SCHEMA', @level0name = 'dbo',
+    @level1type = N'TABLE', @level1name = 'Chamados',
+    @level2type = N'COLUMN', @level2name = 'titulo';
+
+EXEC sp_addextendedproperty 
+    @name = N'MS_Description', @value = 'Nome completo do solicitante',
+    @level0type = N'SCHEMA', @level0name = 'dbo',
+    @level1type = N'TABLE', @level1name = 'Chamados',
+    @level2type = N'COLUMN', @level2name = 'nome_solicitante';
+
+EXEC sp_addextendedproperty 
+    @name = N'MS_Description', @value = 'E-mail de contato do solicitante',
+    @level0type = N'SCHEMA', @level0name = 'dbo',
+    @level1type = N'TABLE', @level1name = 'Chamados',
+    @level2type = N'COLUMN', @level2name = 'email_solicitante';
+
+EXEC sp_addextendedproperty 
+    @name = N'MS_Description', @value = 'Categoria do problema (Software, Hardware, Rede, Outros)',
+    @level0type = N'SCHEMA', @level0name = 'dbo',
+    @level1type = N'TABLE', @level1name = 'Chamados',
+    @level2type = N'COLUMN', @level2name = 'categoria';
+
+EXEC sp_addextendedproperty 
+    @name = N'MS_Description', @value = 'Descrição detalhada do problema',
+    @level0type = N'SCHEMA', @level0name = 'dbo',
+    @level1type = N'TABLE', @level1name = 'Chamados',
+    @level2type = N'COLUMN', @level2name = 'descricao';
+
+EXEC sp_addextendedproperty 
+    @name = N'MS_Description', @value = 'Quem está sendo afetado (apenas eu, equipe, departamento)',
+    @level0type = N'SCHEMA', @level0name = 'dbo',
+    @level1type = N'TABLE', @level1name = 'Chamados',
+    @level2type = N'COLUMN', @level2name = 'afetado';
+
+EXEC sp_addextendedproperty 
+    @name = N'MS_Description', @value = 'Se o problema impede totalmente o trabalho (sim/nao)',
+    @level0type = N'SCHEMA', @level0name = 'dbo',
+    @level1type = N'TABLE', @level1name = 'Chamados',
+    @level2type = N'COLUMN', @level2name = 'impede_trabalho';
+
+EXEC sp_addextendedproperty 
+    @name = N'MS_Description', @value = 'Nível de prioridade: 1=Baixa, 2=Média, 3=Alta, 4=Crítica',
+    @level0type = N'SCHEMA', @level0name = 'dbo',
+    @level1type = N'TABLE', @level1name = 'Chamados',
+    @level2type = N'COLUMN', @level2name = 'prioridade';
+
+EXEC sp_addextendedproperty 
+    @name = N'MS_Description', @value = 'Data e hora de abertura do chamado',
+    @level0type = N'SCHEMA', @level0name = 'dbo',
+    @level1type = N'TABLE', @level1name = 'Chamados',
+    @level2type = N'COLUMN', @level2name = 'dataChamados';
+
+EXEC sp_addextendedproperty 
+    @name = N'MS_Description', @value = 'Status atual do chamado',
+    @level0type = N'SCHEMA', @level0name = 'dbo',
+    @level1type = N'TABLE', @level1name = 'Chamados',
+    @level2type = N'COLUMN', @level2name = 'status';
+
+EXEC sp_addextendedproperty 
+    @name = N'MS_Description', @value = 'Histórico de atualizações e contestações',
+    @level0type = N'SCHEMA', @level0name = 'dbo',
+    @level1type = N'TABLE', @level1name = 'Chamados',
+    @level2type = N'COLUMN', @level2name = 'contestacoes';
+
+-- Dados de exemplo para teste
+INSERT INTO Chamados (
+    titulo, 
+    nome_solicitante, 
+    email_solicitante, 
+    categoria, 
+    descricao, 
+    afetado, 
+    impede_trabalho, 
+    prioridade,
+    status
+) VALUES 
+(
+    'Impressora não funciona',
+    'João Silva',
+    'joao.silva@empresa.com',
+    'Hardware',
+    'A impressora da sala 301 não está ligando. Tentei verificar os cabos mas continua sem funcionar.',
+    'equipe',
+    'nao',
+    2,
+    'Aberto'
+),
+(
+    'Sistema ERP travando',
+    'Maria Santos',
+    'maria.santos@empresa.com',
+    'Software',
+    'O sistema ERP está travando constantemente ao tentar gerar relatórios financeiros. Impede completamente o trabalho.',
+    'departamento',
+    'sim',
+    4,
+    'Urgente'
+),
+(
+    'Internet lenta',
+    'Pedro Costa',
+    'pedro.costa@empresa.com',
+    'Rede',
+    'A conexão com a internet está muito lenta, dificultando o acesso aos sistemas online.',
+    'apenas eu',
+    'nao',
+    1,
+    'Aberto'
+);
+
+-- Exibe os chamados criados
+SELECT 
+    id_chamado as 'ID',
+    titulo as 'Título',
+    nome_solicitante as 'Solicitante',
+    categoria as 'Categoria',
+    prioridade as 'Prioridade',
+    status as 'Status',
+    dataChamados as 'Data'
+FROM Chamados
+ORDER BY dataChamados DESC;
+
+PRINT '✅ Tabela Chamados criada com sucesso!';
+PRINT '✅ ' + CAST(@@ROWCOUNT AS VARCHAR) + ' chamados de exemplo inseridos.';

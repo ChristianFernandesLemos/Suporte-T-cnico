@@ -33,6 +33,11 @@ body {
     min-height: 100vh;
 }
 
+.prioridade{
+    font-size: large;
+    font-weight: bold ;
+}
+
 /* Estilizando o cabeçalho superior */
 .top-bar {
     width: 100%;

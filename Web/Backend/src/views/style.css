@@ -214,6 +214,10 @@ button:hover {
             margin-top: auto;
         }
 
+        #bem-vindo{
+            color: var(--fifth-color-blue);
+        }
+
         .user-info p {
             font-size: 14px;
             margin-bottom: 5px;

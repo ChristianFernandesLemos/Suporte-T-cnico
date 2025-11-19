@@ -4,18 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registrar Chamado - Prioridade</title>
-    
-    <!-- Lincando o arquivo de estilos externo -->
     <link rel="stylesheet" href="/static/Forms.css">
-
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
 </head>
 <body>
 
     <header class="top-bar">
-        <!-- O link superior de navegação -->
         <a href="#" class="back-link">
             <span class="arrow-icon">←</span>
             Registrar Chamado
@@ -26,26 +21,26 @@
         <section class="card">
             <h2>Novo Chamado</h2>
             <form action="#" method="post">
-                <!-- Campo que corresponde à nova imagem: Prioridade -->
                 <div class="form-group">
                     <label for="prioridade">Prioridade</label>
-                    <select id="prioridade" name="prioridade">
+                    <select id="prioridade" name="prioridade" required>
                         <option value="baixa" selected>Baixa</option>
                         <option value="media">Média</option>
                         <option value="alta">Alta</option>
-                        <option value="urgente">Urgente</option>
+                        <option value="urgente">Crítica</option>
                     </select>
                 </div>
 
                 <div class="form-actions">
-                    <!-- Botão Voltar (Secundário) -->
                     <button type="button" class="back-button">Voltar</button>
-                    <!-- Botão Finalizar (Primário) -->
                     <button type="submit" class="submit-button">Finalizar</button>
                 </div>
             </form>
         </section>
     </main>
+
+    <!-- Script unificado do sistema multi-etapas -->
+    <script src="/static/RegistrarChamados.js"></script>
 
 </body>
 </html>

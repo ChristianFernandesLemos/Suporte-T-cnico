@@ -3,10 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registrar Chamado - Confirmação</title>
-    <link rel="stylesheet" href="/static/Forms.css">
+    <title>Registrar Chamado</title>
+    <link rel="shortcut icon" href="/static/img/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="Forms.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
@@ -16,17 +18,17 @@
             Registrar Chamado
         </a>
     </header>
-
+ 
     <main class="container">
-        <section class="card">
+        <section class="card"> 
             <h2>Novo Chamado</h2>
-            
-            <p class="confirmation-text">Deseja concluir o registro do chamado agora?</p>
-
             <form action="#" method="post">
-                <div class="form-actions two-buttons">
-                    <button type="button" class="back-button">Voltar</button>
-                    <button type="submit" class="submit-button">Confirmar e Enviar</button>
+                <div class="form-group">
+                    <label for="descricao">Contestação:</label>
+                    <textarea id="descricao" name="descricao" rows="4" placeholder="Não concordo com a prioridade porque..." required></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" id="avancar">Avançar</button>
                 </div>
             </form>
         </section>
