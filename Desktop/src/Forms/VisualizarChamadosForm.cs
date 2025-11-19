@@ -619,7 +619,7 @@ namespace SistemaChamados.Forms
 
                 if (chamado != null && chamado.Afetado == _funcionarioLogado.Id)
                 {
-                    var formContestacao = new ContestacaoForm(chamado, _chamadosController);
+                    var formContestacao = new ContestacaoForm(chamado, _funcionarioLogado);
                     if (formContestacao.ShowDialog() == DialogResult.OK)
                     {
                         CarregarChamados();

@@ -25,11 +25,13 @@ namespace SistemaChamados.Forms
         private Label lblSenha;
         private Label lblTitulo;
         private CheckBox chkMostrarSenha;
+        private LinkLabel lnkEsqueciSenha;
 
         public LoginForm()
         {
             InitializeComponent();
             InicializarControladores();
+            ConfigurarPlaceholders();
         }
 
         private void InicializarControladores()
@@ -47,6 +49,13 @@ namespace SistemaChamados.Forms
             }
         }
 
+        private void ConfigurarPlaceholders()
+        {
+            // Configurar placeholders usando a classe helper
+            txtEmail.SetPlaceholder("Digite seu email");
+            txtSenha.SetPlaceholder("Digite sua senha");
+        }
+
         private void InitializeComponent()
         {
             this.txtEmail = new System.Windows.Forms.TextBox();
@@ -56,6 +65,7 @@ namespace SistemaChamados.Forms
             this.lblSenha = new System.Windows.Forms.Label();
             this.lblTitulo = new System.Windows.Forms.Label();
             this.chkMostrarSenha = new System.Windows.Forms.CheckBox();
+            this.lnkEsqueciSenha = new System.Windows.Forms.LinkLabel();
             this.SuspendLayout();
             // 
             // txtEmail
@@ -64,7 +74,6 @@ namespace SistemaChamados.Forms
             this.txtEmail.Name = "txtEmail";
             this.txtEmail.Size = new System.Drawing.Size(300, 20);
             this.txtEmail.TabIndex = 2;
-            this.txtEmail.Text = "chriscamplopes@gmail.com";
             // 
             // txtSenha
             // 
@@ -73,7 +82,6 @@ namespace SistemaChamados.Forms
             this.txtSenha.PasswordChar = '*';
             this.txtSenha.Size = new System.Drawing.Size(300, 20);
             this.txtSenha.TabIndex = 4;
-            this.txtSenha.Text = "MinhaSenha";
             this.txtSenha.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtSenha_KeyPress);
             // 
             // btnLogin
@@ -81,7 +89,7 @@ namespace SistemaChamados.Forms
             this.btnLogin.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(123)))), ((int)(((byte)(255)))));
             this.btnLogin.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnLogin.ForeColor = System.Drawing.Color.White;
-            this.btnLogin.Location = new System.Drawing.Point(50, 230);
+            this.btnLogin.Location = new System.Drawing.Point(50, 240);
             this.btnLogin.Name = "btnLogin";
             this.btnLogin.Size = new System.Drawing.Size(300, 35);
             this.btnLogin.TabIndex = 6;
@@ -128,12 +136,24 @@ namespace SistemaChamados.Forms
             this.chkMostrarSenha.UseVisualStyleBackColor = true;
             this.chkMostrarSenha.CheckedChanged += new System.EventHandler(this.chkMostrarSenha_CheckedChanged);
             // 
+            // lnkEsqueciSenha
+            // 
+            this.lnkEsqueciSenha.AutoSize = true;
+            this.lnkEsqueciSenha.Location = new System.Drawing.Point(50, 215);
+            this.lnkEsqueciSenha.Name = "lnkEsqueciSenha";
+            this.lnkEsqueciSenha.Size = new System.Drawing.Size(105, 13);
+            this.lnkEsqueciSenha.TabIndex = 7;
+            this.lnkEsqueciSenha.TabStop = true;
+            this.lnkEsqueciSenha.Text = "Esqueceu sua senha?";
+            this.lnkEsqueciSenha.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.lnkEsqueciSenha_LinkClicked);
+            // 
             // LoginForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
-            this.ClientSize = new System.Drawing.Size(400, 300);
+            this.ClientSize = new System.Drawing.Size(400, 320);
+            this.Controls.Add(this.lnkEsqueciSenha);
             this.Controls.Add(this.btnLogin);
             this.Controls.Add(this.chkMostrarSenha);
             this.Controls.Add(this.txtSenha);
@@ -156,7 +176,11 @@ namespace SistemaChamados.Forms
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(txtEmail.Text))
+                // Usar GetText() para obter o valor real (sem placeholder)
+                string email = txtEmail.GetText();
+                string senha = txtSenha.GetText();
+
+                if (string.IsNullOrWhiteSpace(email))
                 {
                     MessageBox.Show("Por favor, informe o email.", "Campo Obrigatório",
                         MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -164,7 +188,7 @@ namespace SistemaChamados.Forms
                     return;
                 }
 
-                if (string.IsNullOrWhiteSpace(txtSenha.Text))
+                if (string.IsNullOrWhiteSpace(senha))
                 {
                     MessageBox.Show("Por favor, informe a senha.", "Campo Obrigatório",
                         MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -175,24 +199,25 @@ namespace SistemaChamados.Forms
                 btnLogin.Enabled = false;
                 btnLogin.Text = "Entrando...";
 
-                // MODIFICADO: Gerar hash da senha antes de enviar
-                string senhaHash = PasswordHasher.GerarHash(txtSenha.Text);
-                var funcionario = _funcionariosController.RealizarLogin(txtEmail.Text.Trim(), senhaHash);
+                // Gerar hash da senha antes de enviar
+                string senhaHash = PasswordHasher.GerarHash(senha);
+                var funcionario = _funcionariosController.RealizarLogin(email.Trim(), senhaHash);
 
                 if (funcionario != null)
                 {
-                    // Criar o menú principal
+                    // Criar o menu principal
                     var menuPrincipal = new MenuPrincipalForm(funcionario);
                     menuPrincipal.FormClosed += (s, args) => this.Close();
-                    // Esconder login e mostrar menú
+                    // Esconder login e mostrar menu
                     this.Hide();
-                    menuPrincipal.Show();  // ✅ Usa Show() en lugar de ShowDialog()
+                    menuPrincipal.Show();
                 }
                 else
                 {
                     MessageBox.Show("Email ou senha incorretos.", "Erro de Login",
                         MessageBoxButtons.OK, MessageBoxIcon.Error);
                     txtSenha.Clear();
+                    txtSenha.SetPlaceholder("Digite sua senha");
                     txtSenha.Focus();
                 }
             }
@@ -219,6 +244,12 @@ namespace SistemaChamados.Forms
         private void chkMostrarSenha_CheckedChanged(object sender, EventArgs e)
         {
             txtSenha.PasswordChar = chkMostrarSenha.Checked ? '\0' : '*';
+        }
+
+        private void lnkEsqueciSenha_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            var esqueciSenhaForm = new src.Forms.EsqueciSenhaForm();
+            esqueciSenhaForm.ShowDialog();
         }
     }
 }

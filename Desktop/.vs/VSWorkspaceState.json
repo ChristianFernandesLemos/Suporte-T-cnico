@@ -1,7 +1,9 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\src",
+    "\\src\\Models"
   ],
-  "SelectedNode": "\\sistema-chamados-csharp-windows-forms.sln",
+  "SelectedNode": "\\src\\Models\\Contestacao.cs",
   "PreviewInSolutionExplorer": false
 }

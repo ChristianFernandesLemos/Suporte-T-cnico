@@ -48,6 +48,20 @@ namespace SistemaChamados.Forms
         private RadioButton rbImpedeNao;
         private Panel pnlRadioImpede;
 
+        // Etapa 4 - Revisão e Contestação
+        private Panel pnlEtapa4;
+        private Label lblRevisaoChamado;
+        private Panel pnlResumo;
+        private Label lblPrioridadeCalculada;
+        private Label lblPrioridadeDestaque;  // NOVO: Label de destaque para prioridade
+        private Label lblPerguntaContestacao;
+        private RadioButton rbConcordoPrioridade;
+        private RadioButton rbContestoPrioridade;
+        private Panel pnlRadioContestacao;
+        private Panel pnlContestacaoTexto;
+        private Label lblJustificativaContestacao;
+        private RichTextBox rtbJustificativaContestacao;
+
         // Dados do chamado
         private int etapaAtual = 1;
         private string tituloChamado;
@@ -55,6 +69,9 @@ namespace SistemaChamados.Forms
         private string descricao;
         private string afetado;
         private bool impedeTrabalho;
+        private int prioridadeCalculada;
+        private bool contestaPrioridade = false;
+        private string justificativaContestacao = "";
 
         public CriarChamadoForm(Funcionarios funcionario, ChamadosController chamadosController)
         {
@@ -68,7 +85,8 @@ namespace SistemaChamados.Forms
         {
             this.SuspendLayout();
 
-            this.ClientSize = new Size(700, 550);
+            // Aumentada a altura para 650 para acomodar a etapa 4
+            this.ClientSize = new Size(700, 650);
             this.FormBorderStyle = FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
@@ -96,7 +114,7 @@ namespace SistemaChamados.Forms
 
             lblEtapa = new Label
             {
-                Text = "Etapa 1 de 3",
+                Text = "Etapa 1 de 4",
                 Font = new Font("Segoe UI", 10F),
                 ForeColor = Color.White,
                 AutoSize = true,
@@ -106,12 +124,13 @@ namespace SistemaChamados.Forms
             pnlHeader.Controls.Add(lblTitulo);
             pnlHeader.Controls.Add(lblEtapa);
 
-            // Painel de Conteúdo
+            // Painel de Conteúdo com AutoScroll
             pnlConteudo = new Panel
             {
                 Dock = DockStyle.Fill,
                 Padding = new Padding(30),
-                BackColor = Color.White
+                BackColor = Color.White,
+                AutoScroll = true
             };
 
             // Painel de Botões
@@ -182,6 +201,7 @@ namespace SistemaChamados.Forms
             CriarEtapa1();
             CriarEtapa2();
             CriarEtapa3();
+            CriarEtapa4();
             txtTitulo.SetPlaceholder("Ex: Computador não liga");
             MostrarEtapa(1);
         }
@@ -207,8 +227,7 @@ namespace SistemaChamados.Forms
             {
                 Location = new Point(20, 50),
                 Size = new Size(600, 30),
-                Font = new Font("Segoe UI", 11F),
-                //PlaceholderText = "Ex: Computador não liga"
+                Font = new Font("Segoe UI", 11F)
             };
 
             lblCategoriaEtapa1 = new Label
@@ -391,11 +410,184 @@ namespace SistemaChamados.Forms
             pnlEtapa3.Controls.Add(pnlRadioImpede);
         }
 
+        private void CriarEtapa4()
+        {
+            pnlEtapa4 = new Panel
+            {
+                Dock = DockStyle.Fill,
+                BackColor = Color.White,
+                Padding = new Padding(20),
+                Visible = false,
+                AutoScroll = true  // Habilitar scroll se necessário
+            };
+
+            lblRevisaoChamado = new Label
+            {
+                Text = "Revisão do Chamado",
+                Font = new Font("Segoe UI", 14F, FontStyle.Bold),
+                Location = new Point(20, 10),
+                Size = new Size(600, 30),
+                TextAlign = ContentAlignment.MiddleCenter
+            };
+
+            // Painel de resumo - ajustado para ficar dentro dos limites
+            pnlResumo = new Panel
+            {
+                Location = new Point(50, 50),
+                Size = new Size(600, 130),  // Aumentado para incluir o destaque
+                BackColor = Color.FromArgb(245, 245, 245),
+                BorderStyle = BorderStyle.FixedSingle
+            };
+
+            lblPrioridadeCalculada = new Label
+            {
+                Location = new Point(10, 10),
+                Size = new Size(580, 60),
+                Font = new Font("Segoe UI", 9.5F),
+                ForeColor = Color.FromArgb(33, 37, 41),
+                AutoSize = false,
+                TextAlign = ContentAlignment.TopLeft
+            };
+
+            // NOVO: Label de destaque para a prioridade
+            lblPrioridadeDestaque = new Label
+            {
+                Location = new Point(10, 75),
+                Size = new Size(580, 45),
+                Font = new Font("Segoe UI", 12F, FontStyle.Bold),
+                ForeColor = Color.White,
+                BackColor = Color.FromArgb(0, 123, 255),
+                TextAlign = ContentAlignment.MiddleCenter,
+                Text = "⚡ PRIORIDADE: MÉDIA"
+            };
+
+            pnlResumo.Controls.Add(lblPrioridadeCalculada);
+            pnlResumo.Controls.Add(lblPrioridadeDestaque);
+
+            // Pergunta sobre contestação - ajustada posição
+            lblPerguntaContestacao = new Label
+            {
+                Text = "Você concorda com a prioridade calculada?",
+                Font = new Font("Segoe UI", 11F, FontStyle.Bold),
+                Location = new Point(20, 195),  // Ajustado
+                Size = new Size(600, 25),
+                TextAlign = ContentAlignment.MiddleCenter
+            };
+
+            pnlRadioContestacao = new Panel
+            {
+                Location = new Point(150, 230),  // Ajustado
+                Size = new Size(400, 80),
+                BackColor = Color.White
+            };
+
+            rbConcordoPrioridade = new RadioButton
+            {
+                Text = "Sim, concordo com a prioridade",
+                Font = new Font("Segoe UI", 10F),
+                Location = new Point(50, 10),
+                Size = new Size(300, 30),
+                Checked = true,
+                Cursor = Cursors.Hand
+            };
+            rbConcordoPrioridade.CheckedChanged += RbContestacao_CheckedChanged;
+
+            rbContestoPrioridade = new RadioButton
+            {
+                Text = "Não, desejo contestar a prioridade",
+                Font = new Font("Segoe UI", 10F),
+                Location = new Point(50, 45),
+                Size = new Size(300, 30),
+                Cursor = Cursors.Hand,
+                ForeColor = Color.FromArgb(220, 53, 69)
+            };
+            rbContestoPrioridade.CheckedChanged += RbContestacao_CheckedChanged;
+
+            pnlRadioContestacao.Controls.Add(rbConcordoPrioridade);
+            pnlRadioContestacao.Controls.Add(rbContestoPrioridade);
+
+            // Painel de contestação - ajustado para caber
+            pnlContestacaoTexto = new Panel
+            {
+                Location = new Point(50, 325),  // Ajustado
+                Size = new Size(600, 140),
+                BackColor = Color.FromArgb(255, 243, 205),
+                BorderStyle = BorderStyle.FixedSingle,
+                Visible = false
+            };
+
+            lblJustificativaContestacao = new Label
+            {
+                Text = "⚠️ Justifique por que você contesta a prioridade:",
+                Font = new Font("Segoe UI", 9F, FontStyle.Bold),
+                Location = new Point(10, 10),
+                Size = new Size(580, 20),
+                ForeColor = Color.FromArgb(133, 100, 4)
+            };
+
+            rtbJustificativaContestacao = new RichTextBox
+            {
+                Location = new Point(10, 35),
+                Size = new Size(580, 95),
+                Font = new Font("Segoe UI", 9F),
+                ScrollBars = RichTextBoxScrollBars.Vertical
+            };
+
+            pnlContestacaoTexto.Controls.Add(lblJustificativaContestacao);
+            pnlContestacaoTexto.Controls.Add(rtbJustificativaContestacao);
+
+            pnlEtapa4.Controls.Add(lblRevisaoChamado);
+            pnlEtapa4.Controls.Add(pnlResumo);
+            pnlEtapa4.Controls.Add(lblPerguntaContestacao);
+            pnlEtapa4.Controls.Add(pnlRadioContestacao);
+            pnlEtapa4.Controls.Add(pnlContestacaoTexto);
+        }
+
+        private void RbContestacao_CheckedChanged(object sender, EventArgs e)
+        {
+            pnlContestacaoTexto.Visible = rbContestoPrioridade.Checked;
+
+            if (rbContestoPrioridade.Checked)
+            {
+                rtbJustificativaContestacao.Focus();
+            }
+        }
+
+        private void AtualizarRevisao()
+        {
+            string textoPrioridade = ObterTextoPrioridade(prioridadeCalculada);
+            Color corPrioridade = ObterCorPrioridade(prioridadeCalculada);
+
+            // Atualizar o resumo básico
+            lblPrioridadeCalculada.Text =
+                $"📋 Título: {tituloChamado}\n" +
+                $"📁 Categoria: {categoria}\n" +
+                $"👥 Afetados: {ObterTextoAfetado()}\n" +
+                $"🚨 Impede trabalho: {(impedeTrabalho ? "Sim" : "Não")}";
+
+            // Atualizar o destaque da prioridade
+            lblPrioridadeDestaque.Text = $"⚡ PRIORIDADE CALCULADA: {textoPrioridade.ToUpper()}";
+            lblPrioridadeDestaque.BackColor = corPrioridade;
+            lblPrioridadeDestaque.ForeColor = Color.White;
+        }
+
+        private Color ObterCorPrioridade(int prioridade)
+        {
+            switch (prioridade)
+            {
+                case 1: return Color.FromArgb(40, 167, 69);   // Verde
+                case 2: return Color.FromArgb(0, 123, 255);   // Azul
+                case 3: return Color.FromArgb(255, 193, 7);   // Amarelo
+                case 4: return Color.FromArgb(220, 53, 69);   // Vermelho
+                default: return Color.FromArgb(0, 123, 255);
+            }
+        }
+
         private void MostrarEtapa(int etapa)
         {
             etapaAtual = etapa;
             pnlConteudo.Controls.Clear();
-            lblEtapa.Text = $"Etapa {etapa} de 3";
+            lblEtapa.Text = $"Etapa {etapa} de 4";
 
             switch (etapa)
             {
@@ -421,8 +613,19 @@ namespace SistemaChamados.Forms
                     pnlConteudo.Controls.Add(pnlEtapa3);
                     pnlEtapa3.Visible = true;
                     btnVoltar.Visible = true;
-                    btnProximo.Text = "Concluir";
+                    btnProximo.Text = "Próximo →";
                     rbImpedeNao.Focus();
+                    break;
+
+                case 4:
+                    lblTitulo.Text = "Revisão e Confirmação";
+                    prioridadeCalculada = CalcularPrioridade();
+                    AtualizarRevisao();
+                    pnlConteudo.Controls.Add(pnlEtapa4);
+                    pnlEtapa4.Visible = true;
+                    btnVoltar.Visible = true;
+                    btnProximo.Text = "Concluir";
+                    rbConcordoPrioridade.Focus();
                     break;
             }
         }
@@ -443,6 +646,12 @@ namespace SistemaChamados.Forms
             else if (etapaAtual == 3)
             {
                 SalvarDadosEtapa3();
+                MostrarEtapa(4);
+            }
+            else if (etapaAtual == 4)
+            {
+                if (!ValidarEtapa4()) return;
+                SalvarDadosEtapa4();
                 MostrarConfirmacao();
             }
         }
@@ -496,7 +705,6 @@ namespace SistemaChamados.Forms
                 return false;
             }
 
-            // Validar se "Outros..." foi selecionado e o campo está preenchido
             if (cmbCategoria.Text == "Outros...")
             {
                 string outraCategoria = txtOutraCategoria.GetText();
@@ -536,11 +744,34 @@ namespace SistemaChamados.Forms
             return true;
         }
 
+        private bool ValidarEtapa4()
+        {
+            if (rbContestoPrioridade.Checked)
+            {
+                if (string.IsNullOrWhiteSpace(rtbJustificativaContestacao.Text))
+                {
+                    MessageBox.Show("Por favor, justifique sua contestação da prioridade.",
+                        "Campo Obrigatório", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    rtbJustificativaContestacao.Focus();
+                    return false;
+                }
+
+                if (rtbJustificativaContestacao.Text.Trim().Length < 20)
+                {
+                    MessageBox.Show("A justificativa deve ter pelo menos 20 caracteres.",
+                        "Justificativa Muito Curta", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    rtbJustificativaContestacao.Focus();
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
         private void SalvarDadosEtapa1()
         {
             tituloChamado = txtTitulo.Text.Trim();
-            
-            // Se "Outros..." foi selecionado, usar o texto digitado
+
             if (cmbCategoria.Text == "Outros...")
             {
                 categoria = txtOutraCategoria.GetText().Trim();
@@ -549,17 +780,16 @@ namespace SistemaChamados.Forms
             {
                 categoria = cmbCategoria.Text;
             }
-            
+
             descricao = rtbDescricao.Text.Trim();
         }
 
         private void CmbCategoria_SelectedIndexChanged(object sender, EventArgs e)
         {
-            // Mostrar/ocultar campo de texto personalizado
             bool isOutros = cmbCategoria.Text == "Outros...";
             lblOutraCategoria.Visible = isOutros;
             txtOutraCategoria.Visible = isOutros;
-            
+
             if (isOutros)
             {
                 txtOutraCategoria.Focus();
@@ -581,28 +811,42 @@ namespace SistemaChamados.Forms
             impedeTrabalho = rbImpedeSim.Checked;
         }
 
+        private void SalvarDadosEtapa4()
+        {
+            contestaPrioridade = rbContestoPrioridade.Checked;
+
+            if (contestaPrioridade)
+            {
+                justificativaContestacao = rtbJustificativaContestacao.Text.Trim();
+            }
+        }
+
         private void MostrarConfirmacao()
         {
-            int prioridade = CalcularPrioridade();
-            string textoPrioridade = ObterTextoPrioridade(prioridade);
+            string textoPrioridade = ObterTextoPrioridade(prioridadeCalculada);
 
             string mensagem = $"Deseja concluir a criação do chamado?\n\n" +
                             $"📋 Título: {tituloChamado}\n" +
                             $"📁 Categoria: {categoria}\n" +
                             $"👥 Afetados: {ObterTextoAfetado()}\n" +
                             $"🚨 Impede trabalho: {(impedeTrabalho ? "Sim" : "Não")}\n" +
-                            $"⚡ Prioridade Calculada: {textoPrioridade}";
+                            $"⚡ Prioridade: {textoPrioridade}";
+
+            if (contestaPrioridade)
+            {
+                mensagem += $"\n\n⚠️ CONTESTAÇÃO REGISTRADA\nO técnico revisará a prioridade.";
+            }
 
             var result = MessageBox.Show(mensagem, "Confirmar Criação do Chamado",
                 MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 
             if (result == DialogResult.Yes)
             {
-                CriarChamado(prioridade);
+                CriarChamado(prioridadeCalculada);
             }
             else
             {
-                MostrarEtapa(3);
+                MostrarEtapa(4);
             }
         }
 
@@ -662,15 +906,37 @@ namespace SistemaChamados.Forms
                     Status = StatusChamado.Aberto
                 };
 
+                // Se há contestação, adicionar ao chamado
+                if (contestaPrioridade)
+                {
+                    string contestacao = $"[CONTESTAÇÃO DE PRIORIDADE - {DateTime.Now:dd/MM/yyyy HH:mm}]\n" +
+                                       $"Funcionário: {_funcionarioLogado.Nome}\n" +
+                                       $"Prioridade Calculada: {ObterTextoPrioridade(prioridade)}\n" +
+                                       $"Justificativa:\n{justificativaContestacao}\n" +
+                                       $"---\n" +
+                                       $"Status: Aguardando revisão do técnico";
+
+                    chamado.Contestacoes = contestacao;
+                }
+
                 int idChamado = _chamadosController.CriarChamado(chamado);
 
                 if (idChamado > 0)
                 {
+                    string mensagemSucesso = $"✅ Chamado criado com sucesso!\n\n" +
+                                            $"Número do chamado: #{idChamado}\n" +
+                                            $"Prioridade: {ObterTextoPrioridade(prioridade)}\n\n";
+
+                    if (contestaPrioridade)
+                    {
+                        mensagemSucesso += "⚠️ Sua contestação foi registrada.\n" +
+                                         "Um técnico revisará a prioridade em breve.\n\n";
+                    }
+
+                    mensagemSucesso += "Você receberá atualizações sobre o andamento.";
+
                     MessageBox.Show(
-                        $"✅ Chamado criado com sucesso!\n\n" +
-                        $"Número do chamado: #{idChamado}\n" +
-                        $"Prioridade: {ObterTextoPrioridade(prioridade)}\n\n" +
-                        $"Você receberá atualizações sobre o andamento.",
+                        mensagemSucesso,
                         "Chamado Criado",
                         MessageBoxButtons.OK,
                         MessageBoxIcon.Information);
@@ -686,7 +952,7 @@ namespace SistemaChamados.Forms
                         MessageBoxButtons.OK,
                         MessageBoxIcon.Error);
 
-                    MostrarEtapa(3);
+                    MostrarEtapa(4);
                 }
             }
             catch (Exception ex)
@@ -697,7 +963,7 @@ namespace SistemaChamados.Forms
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Error);
 
-                MostrarEtapa(3);
+                MostrarEtapa(4);
             }
             finally
             {

@@ -31,6 +31,7 @@
     <BootstrapperEnabled>true</BootstrapperEnabled>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <LangVersion>8.0</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -145,7 +146,9 @@
       <DependentUpon>FormDiagnostico.cs</DependentUpon>
     </Compile>
     <Compile Include="src\Config\DataBaseConnectionManager.cs" />
+    <Compile Include="src\Config\EmailService.cs" />
     <Compile Include="src\Data\Repositories\ChamadosRepository.cs" />
+    <Compile Include="src\Data\Repositories\ContestacoesRepository.cs" />
     <Compile Include="src\Data\Repositories\FuncionariosRepository.cs" />
     <Compile Include="src\Data\Repositories\RelatoriosRepository.cs" />
     <Compile Include="src\Forms\AlterarPrioridadeForm.cs">
@@ -188,6 +191,12 @@
     <Compile Include="src\Forms\EditarUsuarioForm.Designer.cs">
       <DependentUpon>EditarUsuarioForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="src\Forms\EsqueciSenhaForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="src\Forms\EsqueciSenhaForm.Designer.cs">
+      <DependentUpon>EsqueciSenhaForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="src\Forms\GerenciarChamadosForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -219,6 +228,12 @@
     <Compile Include="src\Forms\RelatoriosForm.Designer.cs">
       <DependentUpon>RelatoriosForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="src\Forms\RevisarContestacaoForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="src\Forms\RevisarContestacaoForm.Designer.cs">
+      <DependentUpon>RevisarContestacaoForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="src\Forms\TecnicoItem.cs" />
     <Compile Include="src\Forms\TextBoxPlaceholder.cs" />
     <Compile Include="src\Forms\VisualizarChamadosForm.cs">
@@ -227,6 +242,7 @@
     <Compile Include="src\Forms\VisualizarChamadosForm.Designer.cs">
       <DependentUpon>VisualizarChamadosForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="src\Models\Contestacao.cs" />
     <Compile Include="src\Models\Funcionario.cs" />
     <Compile Include="src\Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
