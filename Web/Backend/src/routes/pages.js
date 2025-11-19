@@ -43,7 +43,7 @@ router.get('/Contestação', (req,res) => {
 
 // Página de visualizar chamados
 router.get('/chamados', (req, res) => {
-  res.sendFile(path.join(viewsPath, 'Afeta-Chamados.html'));
+  res.sendFile(path.join(viewsPath, 'lista-chamados (1).html'));
 });
 
 // Página de editar chamado

@@ -12,6 +12,7 @@ const { testConnection } = require('./db');
 // Importa as rotas
 const authRoutes = require('./src/routes/auth');
 const userRoutes = require('./src/routes/users');
+const chamadosRoutes = require('./src/routes/chamados');
 
 const pagesRoutes = require('./src/routes/pages');
 

@@ -95,7 +95,6 @@ function setupNavigation() {
             const routes = {
                 'Registrar Chamado': '/registrar-chamado',
                 'Visualizar Chamados': '/chamados',
-                'Gerenciar Acessos': '/adicionar-usuario',
                 'Ver Relatórios': '/relatorios',
                 'Documentação': '/documentacao'
             };
