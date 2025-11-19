@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lista de Chamados - Sistema de Gerenciamento</title>
-    <link rel="stylesheet" href="styles.css">
-    <script src="VizualizarChamados.js"></script>
+  
+    <link rel="stylesheet" href="/static/styles.css">
 </head>
 <body>
     <header class="header">
         <nav class="navigation">
-            <a href="#" class="back-link">
+            <a href="/menu" class="back-link">
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M12.5 15L7.5 10L12.5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
@@ -36,105 +36,11 @@
                         </tr>
                     </thead>
                     <tbody>
+                        <!--Os dados serão carregados aqui pelo JavaScript -->
                         <tr>
-                            <td class="actions-cell">
-                                <button class="action-btn" aria-label="Visualizar chamado 16">
-                                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M10 4C5 4 1.73 7.11 1 10c.73 2.89 4 6 9 6s8.27-3.11 9-6c-.73-2.89-4-6-9-6z" stroke="currentColor" stroke-width="2"/>
-                                        <circle cx="10" cy="10" r="3" stroke="currentColor" stroke-width="2"/>
-                                    </svg>
-                                </button>
-                                <button class="action-btn" aria-label="Editar chamado 16">
-                                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M14.5 2.5a2.121 2.121 0 113 3L6 17H3v-3L14.5 2.5z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                    </svg>
-                                </button>
+                            <td colspan="6" style="text-align: center; padding: 40px;">
+                                ⏳ Carregando chamados...
                             </td>
-                            <td>16</td>
-                            <td>notebook não liga</td>
-                            <td>17/08/2025</td>
-                            <td><span class="priority-badge priority-low">Baixa</span></td>
-                            <td>Aberto</td>
-                        </tr>
-                        <tr>
-                            <td class="actions-cell">
-                                <button class="action-btn" aria-label="Visualizar chamado 15">
-                                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M10 4C5 4 1.73 7.11 1 10c.73 2.89 4 6 9 6s8.27-3.11 9-6c-.73-2.89-4-6-9-6z" stroke="currentColor" stroke-width="2"/>
-                                        <circle cx="10" cy="10" r="3" stroke="currentColor" stroke-width="2"/>
-                                    </svg>
-                                </button>
-                                <button class="action-btn" aria-label="Editar chamado 15">
-                                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M14.5 2.5a2.121 2.121 0 113 3L6 17H3v-3L14.5 2.5z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                    </svg>
-                                </button>
-                            </td>
-                            <td>15</td>
-                            <td>tesre</td>
-                            <td>12/08/2025</td>
-                            <td><span class="priority-badge priority-medium">Média</span></td>
-                            <td>Aberto</td>
-                        </tr>
-                        <tr>
-                            <td class="actions-cell">
-                                <button class="action-btn" aria-label="Visualizar chamado 14">
-                                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M10 4C5 4 1.73 7.11 1 10c.73 2.89 4 6 9 6s8.27-3.11 9-6c-.73-2.89-4-6-9-6z" stroke="currentColor" stroke-width="2"/>
-                                        <circle cx="10" cy="10" r="3" stroke="currentColor" stroke-width="2"/>
-                                    </svg>
-                                </button>
-                                <button class="action-btn" aria-label="Editar chamado 14">
-                                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M14.5 2.5a2.121 2.121 0 113 3L6 17H3v-3L14.5 2.5z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                    </svg>
-                                </button>
-                            </td>
-                            <td>14</td>
-                            <td>Tablet com tela bugada</td>
-                            <td>07/08/2025</td>
-                            <td><span class="priority-badge priority-low">Baixa</span></td>
-                            <td>Aberto</td>
-                        </tr>
-                        <tr>
-                            <td class="actions-cell">
-                                <button class="action-btn" aria-label="Visualizar chamado 11">
-                                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M10 4C5 4 1.73 7.11 1 10c.73 2.89 4 6 9 6s8.27-3.11 9-6c-.73-2.89-4-6-9-6z" stroke="currentColor" stroke-width="2"/>
-                                        <circle cx="10" cy="10" r="3" stroke="currentColor" stroke-width="2"/>
-                                    </svg>
-                                </button>
-                                <button class="action-btn" aria-label="Editar chamado 11">
-                                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M14.5 2.5a2.121 2.121 0 113 3L6 17H3v-3L14.5 2.5z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                    </svg>
-                                </button>
-                            </td>
-                            <td>11</td>
-                            <td>testando negoico</td>
-                            <td>07/08/2025</td>
-                            <td><span class="priority-badge priority-low">Baixa</span></td>
-                            <td>Aberto</td>
-                        </tr>
-                        <tr>
-                            <td class="actions-cell">
-                                <button class="action-btn" aria-label="Visualizar chamado 10">
-                                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M10 4C5 4 1.73 7.11 1 10c.73 2.89 4 6 9 6s8.27-3.11 9-6c-.73-2.89-4-6-9-6z" stroke="currentColor" stroke-width="2"/>
-                                        <circle cx="10" cy="10" r="3" stroke="currentColor" stroke-width="2"/>
-                                    </svg>
-                                </button>
-                                <button class="action-btn" aria-label="Editar chamado 10">
-                                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M14.5 2.5a2.121 2.121 0 113 3L6 17H3v-3L14.5 2.5z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                    </svg>
-                                </button>
-                            </td>
-                            <td>10</td>
-                            <td>Celular não liga</td>
-                            <td>29/07/2025</td>
-                            <td><span class="priority-badge priority-low">Baixa</span></td>
-                            <td>Aberto</td>
                         </tr>
                     </tbody>
                 </table>
@@ -149,6 +55,8 @@
             </nav>
         </section>
     </main>
+
+    <!-- CAMINHO CORRIGIDO - adiciona /static/ -->
+    <script src="/static/VizualizarChamados.js"></script>
 </body>
 </html>
-

@@ -76,25 +76,28 @@ function formatarData(dataStr) {
 // ========================================
 async function buscarChamados() {
   try {
-    console.log('📡 Buscando chamados do banco de dados...');
+    console.log('📡 Buscando chamados do banco de dados...', API_URL);
     
     const response = await fetch(API_URL);
+    console.log('📊 Response status:', response.status);
     
     if (!response.ok) {
       throw new Error(`Erro HTTP: ${response.status}`);
     }
 
     const data = await response.json();
+    console.log('📦 Dados recebidos:', data);
     
     if (data.success) {
-      console.log(`✅ ${data.total} chamados encontrados`);
+      console.log(`✅ ${data.total} chamados encontrados:`, data.chamados);
       return data.chamados;
     } else {
+      console.error('❌ Erro no formato da resposta:', data);
       throw new Error(data.message || 'Erro ao buscar chamados');
     }
   } catch (error) {
-    console.error('❌ Erro ao buscar chamados:', error);
-    mostrarErro('Não foi possível conectar ao servidor. Verifique se o servidor está rodando.');
+    console.error('❌ Erro completo ao buscar chamados:', error);
+    mostrarErro(`Erro: ${error.message}`);
     return [];
   }
 }
