@@ -24,8 +24,8 @@
     --color-text: var(--primary-color-dark);
     --color-background-body: var(--fifth-color-blue); /* Fundo claro principal */
     --color-background-element: #fff; /* Fundo do container do formulário */
-    --color-action: var(--sixth-color-blue); /* Botão principal (Salvar) - PADRÃO DE BOTÃO */
-    --color-action-hover: var(--tenth-color-blue); /* Hover do botão - PADRÃO DE BOTÃO */
+    --color-action: var(--sixth-color-blue); /* Botão principal (Salvar) */
+    --color-action-hover: var(--tenth-color-blue); /* Hover do botão */
     --color-border: var(--fourth-color-blue); /* Bordas dos inputs */
     --color-title: var(--primary-color-blue);
     
@@ -59,7 +59,6 @@ body {
 */
 .header {
     background-color: var(--color-background-element);
-    /* Ajuste para usar a cor escura da paleta na sombra */
     box-shadow: 0 2px 4px color-mix(in srgb, var(--primary-color-dark) 10%, transparent); 
     padding: var(--spacing-default) 0;
 }
@@ -71,7 +70,7 @@ body {
 }
 
 .back-link {
-    /* Mantendo a cor de baixo contraste para o link de 'voltar' */
+    /* Cor de baixo contraste para o link de 'voltar' */
     color: var(--third-color-blue); 
     display: inline-flex;
     align-items: center;
@@ -107,11 +106,11 @@ body {
 .form-section {
     background-color: var(--color-background-element);
     border-radius: 8px;
-    /* Ajuste para usar a cor escura da paleta na sombra */
+    /* Sombra suave com a cor escura da paleta */
     box-shadow: 0 4px 12px color-mix(in srgb, var(--primary-color-dark) 15%, transparent);
     padding: var(--spacing-large);
     width: 100%;
-    max-width: 800px;
+    max-width: 900px; /* Largura ideal para um layout de 3 colunas */
 }
 
 .form-title {
@@ -123,17 +122,18 @@ body {
 
 /*
 |--------------------------------------------------------------------------
-| Formulário de Chamado (Ticket)
+| Formulário de Chamado (Layout Grid)
 |--------------------------------------------------------------------------
 */
 .ticket-form {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+    /* 3 colunas em telas grandes, com mínimo de 250px por coluna */
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
     gap: var(--spacing-default) var(--spacing-large);
 }
 
-/* Garante que o textarea e o botão ocupem a largura total */
-.form-group.full-width,
+/* Garante que o textarea e o botão ocupem a largura total (todas as colunas) */
+.form-group:has(textarea),
 .submit-button {
     grid-column: 1 / -1; 
 }
@@ -192,7 +192,7 @@ body {
     font-size: 1.1rem;
     font-weight: 700;
     margin-top: var(--spacing-default);
-    transition: background-color 0.2s ease-in-out;
+    transition: background-color 0.2s ease-in-out, opacity 0.1s;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -218,11 +218,11 @@ body {
 */
 @media (max-width: 768px) {
     .form-section {
-        max-width: 100%;
+        padding: var(--spacing-default);
     }
 
     .ticket-form {
-        /* Garante que em telas pequenas, ele volte para layout de coluna única */
+        /* Layout de coluna única em telas pequenas */
         grid-template-columns: 1fr; 
         gap: var(--spacing-default);
     }
