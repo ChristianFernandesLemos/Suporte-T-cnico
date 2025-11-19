@@ -1,0 +1,251 @@
+@charset "UTF-8";
+
+/*
+|--------------------------------------------------------------------------
+| Variáveis Globais (Paleta de Cores Fornecida) 🎨
+|--------------------------------------------------------------------------
+*/
+:root {
+    /* Cores da sua paleta */
+    --primary-color-blue: #0d1b2a;
+    --second-color-blue: #1b263b;
+    --third-color-blue: #415a77;
+    --fourth-color-blue: #778da9;
+    --fifth-color-blue: #e0e1dd;
+    --sixth-color-blue: #49a09d; /* Ação/Sucesso */
+    --seventh-color-blue: #004258;
+    --eighth-color-blue: #026687;
+    --ninth-color-blue: #021c33;
+    --tenth-color-blue: #1aa4e5;
+    --primary-color-dark: #050505;
+
+    /* Mapeamento Semântico */
+    --color-text: var(--primary-color-dark);
+    --color-background-body: var(--fifth-color-blue);
+    --color-background-element: #fff; /* Fundo do container de detalhes */
+    --color-border-subtle: var(--fourth-color-blue);
+    --color-title: var(--primary-color-blue);
+    --color-label: var(--third-color-blue); /* Cor para os rótulos DT */
+    
+    --spacing-default: 1rem;
+    --spacing-large: 2rem;
+    --font-family-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/*
+|--------------------------------------------------------------------------
+| Estilos Base / Reset Básico
+|--------------------------------------------------------------------------
+*/
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--font-family-sans);
+    background-color: var(--color-background-body);
+    color: var(--color-text);
+    line-height: 1.6;
+}
+
+/*
+|--------------------------------------------------------------------------
+| Header e Navegação
+|--------------------------------------------------------------------------
+*/
+.header {
+    background-color: var(--color-background-element);
+    box-shadow: 0 0 4px color-mix(in srgb, var(--primary-color-dark) 15%, transparent); 
+    padding: var(--spacing-default) 0;
+}
+
+.navigation {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0 var(--spacing-default);
+}
+
+.back-link {
+    color: var(--third-color-blue); 
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s ease-in-out;
+}
+
+.back-link:hover {
+    color: var(--eighth-color-blue); 
+    text-decoration: underline;
+}
+
+.back-link svg {
+    stroke: currentColor; 
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+/*
+|--------------------------------------------------------------------------
+| Conteúdo Principal e Detalhes do Chamado (Cartão)
+|--------------------------------------------------------------------------
+*/
+.main-content {
+    padding: var(--spacing-large) var(--spacing-default);
+    display: flex;
+    justify-content: center;
+}
+
+.ticket-details {
+    background-color: var(--color-background-element);
+    border-radius: 8px;
+    box-shadow: 0 6px 15px color-mix(in srgb, var(--primary-color-dark) 10%, transparent);
+    padding: var(--spacing-large);
+    width: 100%;
+    max-width: 1000px; 
+}
+
+.ticket-title {
+    font-size: 2rem;
+    margin-bottom: var(--spacing-large);
+    color: var(--color-title); 
+    border-bottom: 2px solid var(--fourth-color-blue);
+    padding-bottom: 0.5rem;
+}
+
+/*
+|--------------------------------------------------------------------------
+| Lista de Detalhes (<dl>) - Layout Grid
+|--------------------------------------------------------------------------
+*/
+.details-list {
+    display: grid;
+    /* Duas colunas em desktop: Rótulo (25%) e Valor (75%) */
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--spacing-default) var(--spacing-large);
+    margin-bottom: var(--spacing-large);
+}
+
+.detail-item {
+    padding: 0.75rem 0;
+    border-bottom: 1px dashed color-mix(in srgb, var(--fourth-color-blue) 50%, transparent); 
+}
+
+/* Rótulo (dt) e Valor (dd) dentro de cada item */
+.detail-label, 
+.detail-value {
+    display: inline-block;
+}
+
+.detail-item:not(:has(.detail-description)) {
+    /* Layout para itens padrão (ao lado, em duas colunas) */
+    display: grid;
+    grid-template-columns: 120px 1fr; /* Largura fixa para o rótulo */
+}
+
+.detail-label {
+    font-weight: 600;
+    color: var(--color-label); /* Cor cinza-azulado para rótulo */
+    margin-right: 0.5rem;
+}
+
+.detail-value {
+    font-weight: 400;
+    word-break: break-word; /* Previne estouro de texto */
+}
+
+/* Estilo específico para a Descrição (deve ocupar a largura total) */
+.detail-item:has(.detail-description) {
+    grid-column: 1 / -1;
+    border-bottom: none;
+    padding-top: var(--spacing-default);
+}
+
+.detail-item:has(.detail-description) .detail-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+    color: var(--primary-color-blue);
+}
+
+.detail-description {
+    background-color: var(--fifth-color-blue); /* Fundo sutil para o bloco de descrição */
+    border-left: 4px solid var(--sixth-color-blue); /* Linha de destaque */
+    padding: var(--spacing-default);
+    border-radius: 4px;
+    white-space: pre-wrap; /* Mantém quebras de linha/espaços da descrição */
+}
+
+/*
+|--------------------------------------------------------------------------
+| Tags de Status e Prioridade (Reutilizando estilos)
+|--------------------------------------------------------------------------
+*/
+.priority-tag,
+.status-tag {
+    display: inline-block;
+    padding: 0.3rem 0.6rem;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+/* Cores de Prioridade */
+.priority-alta, .priority-urgente {
+    background-color: var(--third-color-blue);
+    color: var(--color-background-element);
+}
+.priority-media {
+    background-color: var(--sixth-color-blue);
+    color: var(--ninth-color-blue);
+}
+.priority-baixa {
+    background-color: var(--fourth-color-blue);
+    color: var(--ninth-color-blue);
+}
+
+/* Cores de Status */
+.status-aberto {
+    background-color: #fca5a5; /* Vermelho suave - Aberto */
+    color: var(--primary-color-dark);
+}
+.status-andamento {
+    background-color: #a5d8f6; /* Azul suave - Em progresso */
+    color: var(--primary-color-dark);
+}
+.status-concluido {
+    background-color: var(--sixth-color-blue); /* Verde/Ação - Concluído */
+    color: var(--ninth-color-blue);
+}
+
+/*
+|--------------------------------------------------------------------------
+| Responsividade (Ajuste para telas pequenas)
+|--------------------------------------------------------------------------
+*/
+@media (max-width: 600px) {
+    .ticket-details {
+        padding: var(--spacing-default);
+    }
+    
+    .detail-item:not(:has(.detail-description)) {
+        /* Em mobile, forçamos os rótulos e valores a ficarem em linha única */
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .detail-label {
+        margin-bottom: 0.2rem;
+        font-size: 1rem;
+        color: var(--primary-color-blue);
+    }
+    
+    .detail-item:has(.detail-description) .detail-label {
+         margin-top: 0.5rem;
+    }
+}
