@@ -56,6 +56,7 @@ namespace SistemaChamados.Forms
             txtSenha.SetPlaceholder("Digite sua senha");
         }
 
+
         private void InitializeComponent()
         {
             this.txtEmail = new System.Windows.Forms.TextBox();
@@ -178,7 +179,7 @@ namespace SistemaChamados.Forms
             {
                 // Usar GetText() para obter o valor real (sem placeholder)
                 string email = txtEmail.GetText();
-                string senha = txtSenha.GetText();
+                string senha = txtSenha.GetText();            
 
                 if (string.IsNullOrWhiteSpace(email))
                 {

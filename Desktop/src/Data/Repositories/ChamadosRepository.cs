@@ -9,16 +9,12 @@ namespace SistemaChamados.Data.Repositories
 {
     /// <summary>
     /// 📦 REPOSITÓRIO: Operações CRUD para Chamados
-    /// - Separado da lógica de conexão
-    /// - Responsável APENAS por operações de dados
+    /// ATUALIZADO: Sem usar tabela Contestacoes (agora usa Historial_Contestacoes)
     /// </summary>
     public class ChamadosRepository
     {
         #region 🔍 CONSULTAR / BUSCAR
 
-        /// <summary>
-        /// Busca um chamado por ID
-        /// </summary>
         public Chamados BuscarPorId(int idChamado)
         {
             try
@@ -51,9 +47,6 @@ namespace SistemaChamados.Data.Repositories
             }
         }
 
-        /// <summary>
-        /// Lista todos os chamados
-        /// </summary>
         public List<Chamados> ListarTodos()
         {
             var chamados = new List<Chamados>();
@@ -82,9 +75,6 @@ namespace SistemaChamados.Data.Repositories
             return chamados;
         }
 
-        /// <summary>
-        /// Lista chamados de um funcionário específico
-        /// </summary>
         public List<Chamados> ListarPorFuncionario(int funcionarioId)
         {
             var chamados = new List<Chamados>();
@@ -118,9 +108,6 @@ namespace SistemaChamados.Data.Repositories
             return chamados;
         }
 
-        /// <summary>
-        /// Lista chamados atribuídos a um técnico
-        /// </summary>
         public List<Chamados> ListarPorTecnico(int tecnicoId)
         {
             var chamados = new List<Chamados>();
@@ -154,9 +141,6 @@ namespace SistemaChamados.Data.Repositories
             return chamados;
         }
 
-        /// <summary>
-        /// Lista chamados por status
-        /// </summary>
         public List<Chamados> ListarPorStatus(StatusChamado status)
         {
             var chamados = new List<Chamados>();
@@ -190,9 +174,6 @@ namespace SistemaChamados.Data.Repositories
             return chamados;
         }
 
-        /// <summary>
-        /// Lista chamados por prioridade
-        /// </summary>
         public List<Chamados> ListarPorPrioridade(int prioridade)
         {
             var chamados = new List<Chamados>();
@@ -232,6 +213,8 @@ namespace SistemaChamados.Data.Repositories
 
         /// <summary>
         /// Insere um novo chamado
+        /// ATUALIZADO: Não usa mais a tabela Contestacoes
+        /// Contestações agora vão direto para Historial_Contestacoes (via ContestacoesRepository)
         /// </summary>
         public int Inserir(Chamados chamado)
         {
@@ -239,74 +222,43 @@ namespace SistemaChamados.Data.Repositories
             {
                 return DatabaseConnectionManager.ExecuteWithConnection(connection =>
                 {
-                    using (var transaction = connection.BeginTransaction())
+                    // Inserir apenas o chamado - SEM contestações na mesma transação
+                    string sql = @"
+                        INSERT INTO chamados (categoria, descricao, prioridade, Afetado, 
+                                            Data_Registro, Status, Tecnico_Atribuido)
+                        VALUES (@Categoria, @Descricao, @Prioridade, @Afetado, 
+                                @DataRegistro, @Status, @TecnicoAtribuido);
+                        SELECT CAST(SCOPE_IDENTITY() AS INT);";
+
+                    int novoId;
+                    using (var command = new SqlCommand(sql, connection))
                     {
-                        try
-                        {
-                            // 1. Inserir chamado
-                            string sql = @"
-                                INSERT INTO chamados (categoria, descricao, prioridade, Afetado, 
-                                                    Data_Registro, Status, Tecnico_Atribuido)
-                                VALUES (@Categoria, @Descricao, @Prioridade, @Afetado, 
-                                        @DataRegistro, @Status, @TecnicoAtribuido);
-                                SELECT CAST(SCOPE_IDENTITY() AS INT);";
+                        command.Parameters.AddWithValue("@Categoria", chamado.Categoria);
+                        command.Parameters.AddWithValue("@Descricao", chamado.Descricao);
+                        command.Parameters.AddWithValue("@Prioridade", chamado.Prioridade);
+                        command.Parameters.AddWithValue("@Afetado", chamado.Afetado);
+                        command.Parameters.AddWithValue("@DataRegistro", chamado.DataChamado);
+                        command.Parameters.AddWithValue("@Status", (int)chamado.Status);
+                        command.Parameters.AddWithValue("@TecnicoAtribuido",
+                            chamado.TecnicoResponsavel.HasValue ? (object)chamado.TecnicoResponsavel.Value : DBNull.Value);
 
-                            int novoId;
-                            using (var command = new SqlCommand(sql, connection, transaction))
-                            {
-                                command.Parameters.AddWithValue("@Categoria", chamado.Categoria);
-                                command.Parameters.AddWithValue("@Descricao", chamado.Descricao);
-                                command.Parameters.AddWithValue("@Prioridade", chamado.Prioridade);
-                                command.Parameters.AddWithValue("@Afetado", chamado.Afetado);
-                                command.Parameters.AddWithValue("@DataRegistro", chamado.DataChamado);
-                                command.Parameters.AddWithValue("@Status", (int)chamado.Status);
-                                command.Parameters.AddWithValue("@TecnicoAtribuido",
-                                    chamado.TecnicoResponsavel.HasValue ? (object)chamado.TecnicoResponsavel.Value : DBNull.Value);
-
-                                novoId = (int)command.ExecuteScalar();
-                            }
-
-                            // 2. Inserir contestação se existe
-                            if (!string.IsNullOrEmpty(chamado.Contestacoes))
-                            {
-                                string sqlCont = @"
-                                    INSERT INTO Contestacoes (Justificativa, DataContestacao)
-                                    VALUES (@Justificativa, @DataContestacao);
-                                    SELECT CAST(SCOPE_IDENTITY() AS INT);";
-
-                                int codigoContestacao;
-                                using (var cmd = new SqlCommand(sqlCont, connection, transaction))
-                                {
-                                    cmd.Parameters.AddWithValue("@Justificativa", chamado.Contestacoes);
-                                    cmd.Parameters.AddWithValue("@DataContestacao", DateTime.Now);
-                                    codigoContestacao = (int)cmd.ExecuteScalar();
-                                }
-
-                                // Atualizar chamado com o código da contestação
-                                string sqlUpdate = "UPDATE chamados SET Contestacoes_Codigo = @Codigo WHERE id_chamado = @IdChamado";
-                                using (var cmd = new SqlCommand(sqlUpdate, connection, transaction))
-                                {
-                                    cmd.Parameters.AddWithValue("@Codigo", codigoContestacao);
-                                    cmd.Parameters.AddWithValue("@IdChamado", novoId);
-                                    cmd.ExecuteNonQuery();
-                                }
-                            }
-
-                            transaction.Commit();
-                            chamado.IdChamado = novoId;
-                            return novoId;
-                        }
-                        catch
-                        {
-                            transaction.Rollback();
-                            throw;
-                        }
+                        novoId = (int)command.ExecuteScalar();
                     }
+
+                    // Se tem contestação, inserir no Historial_Contestacoes usando o repository apropriado
+                    // NOTA: Isso será feito separadamente pelo ChamadosController
+                    // Apenas armazenamos no campo Contestacoes como texto temporário
+
+                    chamado.IdChamado = novoId;
+                    Console.WriteLine($"✅ Chamado {novoId} inserido com sucesso");
+
+                    return novoId;
                 });
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Erro ao inserir chamado: {ex.Message}");
+                Console.WriteLine($"StackTrace: {ex.StackTrace}");
                 return 0;
             }
         }
@@ -317,6 +269,7 @@ namespace SistemaChamados.Data.Repositories
 
         /// <summary>
         /// Atualiza um chamado existente
+        /// ATUALIZADO: Não toca mais na tabela Contestacoes
         /// </summary>
         public bool Atualizar(Chamados chamado)
         {
@@ -324,48 +277,32 @@ namespace SistemaChamados.Data.Repositories
             {
                 return DatabaseConnectionManager.ExecuteWithConnection(connection =>
                 {
-                    using (var transaction = connection.BeginTransaction())
+                    // Atualizar apenas o chamado
+                    string sql = @"
+                        UPDATE chamados 
+                        SET categoria = @Categoria, descricao = @Descricao, 
+                            prioridade = @Prioridade, Status = @Status, 
+                            Tecnico_Atribuido = @TecnicoAtribuido, 
+                            Data_Resolucao = @DataResolucao
+                        WHERE id_chamado = @IdChamado";
+
+                    using (var command = new SqlCommand(sql, connection))
                     {
-                        try
-                        {
-                            // 1. Atualizar chamado
-                            string sql = @"
-                                UPDATE chamados 
-                                SET categoria = @Categoria, descricao = @Descricao, 
-                                    prioridade = @Prioridade, Status = @Status, 
-                                    Tecnico_Atribuido = @TecnicoAtribuido, 
-                                    Data_Resolucao = @DataResolucao
-                                WHERE id_chamado = @IdChamado";
+                        command.Parameters.AddWithValue("@IdChamado", chamado.IdChamado);
+                        command.Parameters.AddWithValue("@Categoria", chamado.Categoria);
+                        command.Parameters.AddWithValue("@Descricao", chamado.Descricao);
+                        command.Parameters.AddWithValue("@Prioridade", chamado.Prioridade);
+                        command.Parameters.AddWithValue("@Status", (int)chamado.Status);
+                        command.Parameters.AddWithValue("@TecnicoAtribuido",
+                            chamado.TecnicoResponsavel.HasValue ? (object)chamado.TecnicoResponsavel.Value : DBNull.Value);
+                        command.Parameters.AddWithValue("@DataResolucao",
+                            chamado.DataResolucao.HasValue ? (object)chamado.DataResolucao.Value : DBNull.Value);
 
-                            using (var command = new SqlCommand(sql, connection, transaction))
-                            {
-                                command.Parameters.AddWithValue("@IdChamado", chamado.IdChamado);
-                                command.Parameters.AddWithValue("@Categoria", chamado.Categoria);
-                                command.Parameters.AddWithValue("@Descricao", chamado.Descricao);
-                                command.Parameters.AddWithValue("@Prioridade", chamado.Prioridade);
-                                command.Parameters.AddWithValue("@Status", (int)chamado.Status);
-                                command.Parameters.AddWithValue("@TecnicoAtribuido",
-                                    chamado.TecnicoResponsavel.HasValue ? (object)chamado.TecnicoResponsavel.Value : DBNull.Value);
-                                command.Parameters.AddWithValue("@DataResolucao",
-                                    chamado.DataResolucao.HasValue ? (object)chamado.DataResolucao.Value : DBNull.Value);
+                        int rows = command.ExecuteNonQuery();
 
-                                command.ExecuteNonQuery();
-                            }
+                        Console.WriteLine($"✅ Chamado {chamado.IdChamado} atualizado ({rows} row(s) affected)");
 
-                            // 2. Atualizar contestação si existe
-                            if (!string.IsNullOrEmpty(chamado.Contestacoes))
-                            {
-                                AtualizarContestacao(connection, transaction, chamado);
-                            }
-
-                            transaction.Commit();
-                            return true;
-                        }
-                        catch
-                        {
-                            transaction.Rollback();
-                            throw;
-                        }
+                        return rows > 0;
                     }
                 });
             }
@@ -382,6 +319,7 @@ namespace SistemaChamados.Data.Repositories
 
         /// <summary>
         /// Remove um chamado
+        /// ATUALIZADO: Não precisa mais remover de Contestacoes (CASCADE cuida do Historial)
         /// </summary>
         public bool Remover(int idChamado)
         {
@@ -389,49 +327,17 @@ namespace SistemaChamados.Data.Repositories
             {
                 return DatabaseConnectionManager.ExecuteWithConnection(connection =>
                 {
-                    using (var transaction = connection.BeginTransaction())
+                    // Remover chamado (CASCADE remove do Historial_Contestacoes automaticamente)
+                    string sql = "DELETE FROM chamados WHERE id_chamado = @IdChamado";
+
+                    using (var command = new SqlCommand(sql, connection))
                     {
-                        try
-                        {
-                            // 1. Obter código da contestação
-                            int? codigoCont = null;
-                            string sqlGetCodigo = "SELECT Contestacoes_Codigo FROM chamados WHERE id_chamado = @IdChamado";
+                        command.Parameters.AddWithValue("@IdChamado", idChamado);
+                        int rows = command.ExecuteNonQuery();
 
-                            using (var cmd = new SqlCommand(sqlGetCodigo, connection, transaction))
-                            {
-                                cmd.Parameters.AddWithValue("@IdChamado", idChamado);
-                                var result = cmd.ExecuteScalar();
-                                if (result != null && result != DBNull.Value)
-                                    codigoCont = (int)result;
-                            }
+                        Console.WriteLine($"✅ Chamado {idChamado} removido ({rows} row(s) affected)");
 
-                            // 2. Remover chamado
-                            string sql = "DELETE FROM chamados WHERE id_chamado = @IdChamado";
-                            using (var command = new SqlCommand(sql, connection, transaction))
-                            {
-                                command.Parameters.AddWithValue("@IdChamado", idChamado);
-                                command.ExecuteNonQuery();
-                            }
-
-                            // 3. Remover contestação se existe
-                            if (codigoCont.HasValue)
-                            {
-                                string sqlDelCont = "DELETE FROM Contestacoes WHERE Codigo = @Codigo";
-                                using (var cmd = new SqlCommand(sqlDelCont, connection, transaction))
-                                {
-                                    cmd.Parameters.AddWithValue("@Codigo", codigoCont.Value);
-                                    cmd.ExecuteNonQuery();
-                                }
-                            }
-
-                            transaction.Commit();
-                            return true;
-                        }
-                        catch
-                        {
-                            transaction.Rollback();
-                            throw;
-                        }
+                        return rows > 0;
                     }
                 });
             }
@@ -466,26 +372,26 @@ namespace SistemaChamados.Data.Repositories
                     (DateTime?)null : (DateTime)reader["Data_Resolucao"]
             };
 
-            // Buscar contestação
-            chamado.Contestacoes = BuscarContestacao(chamado.IdChamado);
+            // Buscar contestações do Historial_Contestacoes
+            chamado.Contestacoes = BuscarContestacaoTexto(chamado.IdChamado);
 
             return chamado;
         }
 
         /// <summary>
-        /// Busca contestação de um chamado
+        /// Busca contestações do Historial_Contestacoes como texto concatenado
         /// </summary>
-        private string BuscarContestacao(int idChamado)
+        private string BuscarContestacaoTexto(int idChamado)
         {
             try
             {
                 return DatabaseConnectionManager.ExecuteWithConnection(connection =>
                 {
                     string sql = @"
-                        SELECT c.Justificativa 
-                        FROM chamados ch
-                        INNER JOIN Contestacoes c ON ch.Contestacoes_Codigo = c.Codigo
-                        WHERE ch.id_chamado = @IdChamado";
+                        SELECT TOP 1 Justificativa 
+                        FROM Historial_Contestacoes
+                        WHERE id_chamado = @IdChamado
+                        ORDER BY DataContestacao DESC";
 
                     using (var command = new SqlCommand(sql, connection))
                     {
@@ -495,69 +401,10 @@ namespace SistemaChamados.Data.Repositories
                     }
                 });
             }
-            catch
+            catch (Exception ex)
             {
+                Console.WriteLine($"Erro ao buscar contestações: {ex.Message}");
                 return null;
-            }
-        }
-
-        /// <summary>
-        /// Atualiza ou cria contestação
-        /// </summary>
-        private void AtualizarContestacao(SqlConnection connection, SqlTransaction transaction, Chamados chamado)
-        {
-            // Verificar se já tem contestação
-            string sqlGetCodigo = "SELECT Contestacoes_Codigo FROM chamados WHERE id_chamado = @IdChamado";
-            int? codigoExistente = null;
-
-            using (var cmd = new SqlCommand(sqlGetCodigo, connection, transaction))
-            {
-                cmd.Parameters.AddWithValue("@IdChamado", chamado.IdChamado);
-                var result = cmd.ExecuteScalar();
-                if (result != null && result != DBNull.Value)
-                    codigoExistente = (int)result;
-            }
-
-            if (codigoExistente.HasValue)
-            {
-                // Atualizar contestação existente
-                string sqlUpdate = @"
-                    UPDATE Contestacoes 
-                    SET Justificativa = @Justificativa, DataContestacao = @DataContestacao
-                    WHERE Codigo = @Codigo";
-
-                using (var cmd = new SqlCommand(sqlUpdate, connection, transaction))
-                {
-                    cmd.Parameters.AddWithValue("@Codigo", codigoExistente.Value);
-                    cmd.Parameters.AddWithValue("@Justificativa", chamado.Contestacoes);
-                    cmd.Parameters.AddWithValue("@DataContestacao", DateTime.Now);
-                    cmd.ExecuteNonQuery();
-                }
-            }
-            else
-            {
-                // Criar nova contestação
-                string sqlInsert = @"
-                    INSERT INTO Contestacoes (Justificativa, DataContestacao)
-                    VALUES (@Justificativa, @DataContestacao);
-                    SELECT CAST(SCOPE_IDENTITY() AS INT);";
-
-                int nuevoCodigo;
-                using (var cmd = new SqlCommand(sqlInsert, connection, transaction))
-                {
-                    cmd.Parameters.AddWithValue("@Justificativa", chamado.Contestacoes);
-                    cmd.Parameters.AddWithValue("@DataContestacao", DateTime.Now);
-                    nuevoCodigo = (int)cmd.ExecuteScalar();
-                }
-
-                // Vincular ao chamado
-                string sqlUpdateChamado = "UPDATE chamados SET Contestacoes_Codigo = @Codigo WHERE id_chamado = @IdChamado";
-                using (var cmd = new SqlCommand(sqlUpdateChamado, connection, transaction))
-                {
-                    cmd.Parameters.AddWithValue("@Codigo", nuevoCodigo);
-                    cmd.Parameters.AddWithValue("@IdChamado", chamado.IdChamado);
-                    cmd.ExecuteNonQuery();
-                }
             }
         }
 

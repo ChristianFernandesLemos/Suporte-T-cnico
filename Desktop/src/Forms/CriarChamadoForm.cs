@@ -442,7 +442,7 @@ namespace SistemaChamados.Forms
             lblPrioridadeCalculada = new Label
             {
                 Location = new Point(10, 10),
-                Size = new Size(580, 60),
+                Size = new Size(580, 80),
                 Font = new Font("Segoe UI", 9.5F),
                 ForeColor = Color.FromArgb(33, 37, 41),
                 AutoSize = false,
@@ -453,7 +453,7 @@ namespace SistemaChamados.Forms
             lblPrioridadeDestaque = new Label
             {
                 Location = new Point(10, 75),
-                Size = new Size(580, 45),
+                Size = new Size(580, 50),
                 Font = new Font("Segoe UI", 12F, FontStyle.Bold),
                 ForeColor = Color.White,
                 BackColor = Color.FromArgb(0, 123, 255),

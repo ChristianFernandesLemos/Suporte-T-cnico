@@ -233,8 +233,7 @@ namespace SistemaChamados.Forms
                 cmbFiltroCategoria.Items.Add("Todas");
                 cmbFiltroCategoria.Items.AddRange(new string[]
                 {
-                    "Hardware", "Software", "Rede", "Impressora",
-                    "Email", "Sistema", "Telefonia", "Acesso", "Backup", "Outro"
+                    "Hardware", "Software", "Rede", "Outro"
                 });
                 cmbFiltroCategoria.SelectedIndex = 0;
 
