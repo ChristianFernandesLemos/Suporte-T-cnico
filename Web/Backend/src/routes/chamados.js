@@ -1,5 +1,5 @@
 // src/routes/chamados.js - Rotas para gerenciamento de chamados
-// ADAPTADO PARA A ESTRUTURA REAL DO BANCO DE DADOS
+// CORRIGIDO para mapear corretamente as colunas do banco
 const express = require('express');
 const router = express.Router();
 const { getConnection, sql } = require('../../db');
@@ -27,8 +27,11 @@ const PRIORIDADE = {
 // ========================================
 router.get('/', async (req, res) => {
   try {
+    console.log('📡 Buscando todos os chamados do banco...');
+    
     const pool = await getConnection();
     
+    // ⭐ QUERY CORRIGIDA - Mapeia os nomes corretos das colunas
     const result = await pool.request().query(`
       SELECT 
         c.id_chamado as id,
@@ -40,13 +43,20 @@ router.get('/', async (req, res) => {
         c.Data_Registro as dataAbertura,
         c.Data_Resolucao as dataResolucao,
         c.Afetado as afetadoId,
-        c.Contestacoes_Codigo as contestacaoId,
         c.Tecnico_Atribuido as tecnicoId,
-        r.id_usuario as usuarioId
+        r.id_usuario as usuarioId,
+        c.titulo
       FROM dbo.chamados c
       LEFT JOIN dbo.registra r ON c.id_chamado = r.id_chamado
       ORDER BY c.Data_Registro DESC
     `);
+
+    console.log(`✅ ${result.recordset.length} chamados encontrados no banco`);
+    
+    // Log dos dados para debug
+    if (result.recordset.length > 0) {
+      console.log('📊 Exemplo do primeiro chamado:', result.recordset[0]);
+    }
 
     res.json({
       success: true,
@@ -70,6 +80,8 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
   try {
     const { id } = req.params;
+    console.log(`📡 Buscando chamado ID: ${id}`);
+    
     const pool = await getConnection();
     
     const result = await pool.request()
@@ -85,10 +97,10 @@ router.get('/:id', async (req, res) => {
           c.Data_Registro as dataAbertura,
           c.Data_Resolucao as dataResolucao,
           c.Afetado as afetadoId,
-          c.Contestacoes_Codigo as contestacaoId,
           c.Tecnico_Atribuido as tecnicoId,
           r.id_usuario as usuarioId,
-          r.DataRegistro as dataRegistroUsuario
+          r.DataRegistro as dataRegistroUsuario,
+          c.titulo
         FROM dbo.chamados c
         LEFT JOIN dbo.registra r ON c.id_chamado = r.id_chamado
         WHERE c.id_chamado = @id
@@ -177,6 +189,8 @@ router.post('/', async (req, res) => {
 
       await transaction.commit();
 
+      console.log(`✅ Chamado ${novoChamadoId} criado com sucesso`);
+
       res.status(201).json({
         success: true,
         message: 'Chamado criado com sucesso',
@@ -239,6 +253,8 @@ router.patch('/:id/status', async (req, res) => {
 
     await request.query(query);
 
+    console.log(`✅ Status do chamado ${id} atualizado`);
+
     res.json({
       success: true,
       message: 'Status atualizado com sucesso'
@@ -274,7 +290,8 @@ router.get('/filtrar/status/:status', async (req, res) => {
           c.Data_Registro as dataAbertura,
           c.Afetado as afetadoId,
           c.Tecnico_Atribuido as tecnicoId,
-          r.id_usuario as usuarioId
+          r.id_usuario as usuarioId,
+          c.titulo
         FROM dbo.chamados c
         LEFT JOIN dbo.registra r ON c.id_chamado = r.id_chamado
         WHERE c.Status = @status
@@ -292,88 +309,6 @@ router.get('/filtrar/status/:status', async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erro ao filtrar chamados',
-      error: error.message
-    });
-  }
-});
-
-// ========================================
-// FILTRAR CHAMADOS POR PRIORIDADE
-// ========================================
-router.get('/filtrar/prioridade/:prioridade', async (req, res) => {
-  try {
-    const { prioridade } = req.params;
-    const pool = await getConnection();
-    
-    const result = await pool.request()
-      .input('prioridade', sql.Int, parseInt(prioridade))
-      .query(`
-        SELECT 
-          c.id_chamado as id,
-          c.categoria,
-          c.prioridade,
-          c.descricao,
-          c.Status as status,
-          c.Data_Registro as dataAbertura,
-          r.id_usuario as usuarioId
-        FROM dbo.chamados c
-        LEFT JOIN dbo.registra r ON c.id_chamado = r.id_chamado
-        WHERE c.prioridade = @prioridade
-        ORDER BY c.Data_Registro DESC
-      `);
-
-    res.json({
-      success: true,
-      total: result.recordset.length,
-      chamados: result.recordset
-    });
-
-  } catch (error) {
-    console.error('❌ Erro ao filtrar chamados:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Erro ao filtrar chamados',
-      error: error.message
-    });
-  }
-});
-
-// ========================================
-// BUSCAR CHAMADOS POR USUÁRIO
-// ========================================
-router.get('/usuario/:usuarioId', async (req, res) => {
-  try {
-    const { usuarioId } = req.params;
-    const pool = await getConnection();
-    
-    const result = await pool.request()
-      .input('usuarioId', sql.Int, usuarioId)
-      .query(`
-        SELECT 
-          c.id_chamado as id,
-          c.categoria,
-          c.prioridade,
-          c.descricao,
-          c.Status as status,
-          c.Data_Registro as dataAbertura,
-          r.DataRegistro as dataRegistroUsuario
-        FROM dbo.chamados c
-        INNER JOIN dbo.registra r ON c.id_chamado = r.id_chamado
-        WHERE r.id_usuario = @usuarioId
-        ORDER BY c.Data_Registro DESC
-      `);
-
-    res.json({
-      success: true,
-      total: result.recordset.length,
-      chamados: result.recordset
-    });
-
-  } catch (error) {
-    console.error('❌ Erro ao buscar chamados do usuário:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Erro ao buscar chamados do usuário',
       error: error.message
     });
   }
@@ -416,7 +351,7 @@ router.get('/stats/resumo', async (req, res) => {
   }
 });
 
-// Exporta constantes também para uso em outros módulos
+// Exporta constantes também
 module.exports = router;
 module.exports.STATUS = STATUS;
 module.exports.PRIORIDADE = PRIORIDADE;

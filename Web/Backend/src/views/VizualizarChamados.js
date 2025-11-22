@@ -137,7 +137,7 @@ function renderizarTabela(chamados) {
     const dataFormatada = formatarData(chamado.dataAbertura);
     
     // Cria a célula de categoria como "título" já que não temos titulo na tabela
-    const titulo = chamado.categoria || 'Sem categoria';
+    const titulo = chamado.titulo || 'Sem categoria';
     
     tr.innerHTML = `
       <td class="actions-cell">
@@ -165,19 +165,16 @@ function renderizarTabela(chamados) {
 }
 
 // ========================================
-// AÇÕES
+// AÇÕES - REDIRECIONAMENTO PARA PÁGINAS
 // ========================================
 function verDetalhes(id) {
-  console.log('👁️ Ver detalhes do chamado:', id);
-  // Você pode criar uma página de detalhes ou abrir um modal
-  alert(`Ver detalhes do chamado #${id}`);
-  // window.location.href = `/chamado/${id}`;
+  console.log('👁️ Redirecionando para detalhes do chamado:', id);
+  window.location.href = `/detalhes-chamado?id=${id}`;
 }
 
 function editarChamado(id) {
-  console.log('✏️ Editar chamado:', id);
-  alert(`Editar chamado #${id}`);
-  // window.location.href = `/editar-chamado?id=${id}`;
+  console.log('✏️ Redirecionando para edição do chamado:', id);
+  window.location.href = `/editar-chamado?id=${id}`;
 }
 
 // ========================================
