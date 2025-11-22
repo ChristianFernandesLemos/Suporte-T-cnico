@@ -11,9 +11,9 @@ namespace SistemaChamados.Forms
         private Chamados _chamado;
         private Funcionarios _funcionarioLogado;
         private ChamadosController _controller;
-        private bool _permiteEdicao; // ← NUEVO
-        private TextBox txtDescricao;
-        private TextBox txtContestacoes;
+        private bool _permiteEdicao;
+        private RichTextBox txtDescricao;
+        private RichTextBox txtContestacoes;
         private Label lblId, lblCategoria, lblStatus, lblPrioridade, lblData, lblSolicitante, lblTecnico;
         private Button btnFechar;
         private Button btnAlterar;
@@ -22,22 +22,19 @@ namespace SistemaChamados.Forms
         private GroupBox gbDescricao;
         private GroupBox gbContestacoes;
 
-        // Construtor com parámetro adicional para controlar edicao
         public DetalhesChamadoForm(Chamados chamado, Funcionarios funcionarioLogado, ChamadosController controller, bool permiteEdicao = false)
         {
             _chamado = chamado;
             _funcionarioLogado = funcionarioLogado;
             _controller = controller;
-            _permiteEdicao = permiteEdicao; 
+            _permiteEdicao = permiteEdicao;
             InitializeComponent();
             PreencherDados();
         }
 
         private void InitializeComponent()
         {
-            // ===========================================
             // PAINEL DE CABEÇALHO
-            // ===========================================
             this.panelHeader = new Panel
             {
                 Location = new Point(0, 0),
@@ -57,9 +54,7 @@ namespace SistemaChamados.Forms
 
             this.panelHeader.Controls.Add(lblTitulo);
 
-            // ===========================================
             // PAINEL DE INFORMAÇÕES BÁSICAS
-            // ===========================================
             this.panelInfo = new Panel
             {
                 Location = new Point(12, 70),
@@ -125,71 +120,72 @@ namespace SistemaChamados.Forms
                 this.lblStatus, this.lblSolicitante, this.lblTecnico, this.lblData
             });
 
-            // ===========================================
-            // GROUPBOX DESCRIÇÃO
-            // ===========================================
+            // GROUPBOX DESCRIÇÃO 
             this.gbDescricao = new GroupBox
             {
-                Text = "📝 DESCRIÇÃO DO PROBLEMA",
+                Text = "📋 DESCRIÇÃO DO PROBLEMA",
                 Font = new Font("Segoe UI", 10F, FontStyle.Bold),
                 Location = new Point(12, 180),
-                Size = new Size(660, 180),
+                Size = new Size(660, 220), // ← Era 180, ahora 220
                 ForeColor = Color.FromArgb(0, 123, 255)
             };
 
-            this.txtDescricao = new TextBox
+            // ⚠️ CONFIGURACIÓN CRÍTICA DEL TEXTBOX
+            this.txtDescricao = new RichTextBox
             {
                 Location = new Point(15, 25),
-                Size = new Size(630, 140),
+                Size = new Size(630, 180), // ← Era 140, ahora 180
                 Multiline = true,
-                ScrollBars = ScrollBars.Vertical,
+                ScrollBars = RichTextBoxScrollBars.Vertical,
                 ReadOnly = true,
                 BackColor = Color.White,
                 Font = new Font("Segoe UI", 9F),
-                BorderStyle = BorderStyle.FixedSingle
+                BorderStyle = BorderStyle.FixedSingle,
+                WordWrap = true, // ← IMPORTANTE: Wrap de palabras
+                AcceptsTab = false,
+                //AcceptsReturn = true 
             };
 
             this.gbDescricao.Controls.Add(this.txtDescricao);
 
-            // ===========================================
             // GROUPBOX CONTESTAÇÕES
-            // ===========================================
             this.gbContestacoes = new GroupBox
             {
                 Text = "⚠️ CONTESTAÇÕES",
                 Font = new Font("Segoe UI", 10F, FontStyle.Bold),
-                Location = new Point(12, 370),
+                Location = new Point(12, 410), // ← Ajustado (era 370)
                 Size = new Size(660, 140),
                 ForeColor = Color.FromArgb(220, 53, 69)
             };
 
-            this.txtContestacoes = new TextBox
+            this.txtContestacoes = new RichTextBox
             {
                 Location = new Point(15, 25),
                 Size = new Size(630, 100),
                 Multiline = true,
-                ScrollBars = ScrollBars.Vertical,
+                ScrollBars = RichTextBoxScrollBars.Vertical,
                 ReadOnly = true,
                 BackColor = Color.White,
                 Font = new Font("Segoe UI", 9F),
-                BorderStyle = BorderStyle.FixedSingle
+                BorderStyle = BorderStyle.FixedSingle,
+                WordWrap = true,
+                AcceptsTab = false,
+                //AcceptsReturn = true
             };
 
             this.gbContestacoes.Controls.Add(this.txtContestacoes);
 
-            // ===========================================
-            // BOTÕES
-            // ===========================================
+            // BOTÕES 
             this.btnAlterar = new Button
             {
                 Text = "Alterar Status",
-                Location = new Point(487, 525),
+                Location = new Point(487, 565), // ← Ajustado (era 525)
                 Size = new Size(90, 35),
                 BackColor = Color.FromArgb(40, 167, 69),
                 ForeColor = Color.White,
                 FlatStyle = FlatStyle.Flat,
                 Font = new Font("Segoe UI", 9F, FontStyle.Bold),
-                Visible = _permiteEdicao && _funcionarioLogado.NivelAcesso >= 2  // ← MODIFICADO
+                Visible = _permiteEdicao && _funcionarioLogado.NivelAcesso >= 2
             };
             this.btnAlterar.FlatAppearance.BorderSize = 0;
             this.btnAlterar.Click += BtnAlterar_Click;
@@ -197,7 +193,7 @@ namespace SistemaChamados.Forms
             this.btnFechar = new Button
             {
                 Text = "Fechar",
-                Location = new Point(582, 525),
+                Location = new Point(582, 565), // ← Ajustado (era 525)
                 Size = new Size(90, 35),
                 BackColor = Color.FromArgb(108, 117, 125),
                 ForeColor = Color.White,
@@ -207,11 +203,9 @@ namespace SistemaChamados.Forms
             this.btnFechar.FlatAppearance.BorderSize = 0;
             this.btnFechar.Click += BtnFechar_Click;
 
-            // ===========================================
-            // CONFIGURAÇÃO DO FORM
-            // ===========================================
+            // CONFIGURAÇÃO DO FORM 
             this.Text = _permiteEdicao ? "Detalhes do Chamado - Gerenciamento" : "Detalhes do Chamado - Visualização";
-            this.ClientSize = new Size(684, 575);
+            this.ClientSize = new Size(684, 620); 
             this.StartPosition = FormStartPosition.CenterParent;
             this.FormBorderStyle = FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
@@ -228,90 +222,147 @@ namespace SistemaChamados.Forms
             });
         }
 
+        /// <summary>
+        /// Formata a descrição para melhor legibilidade
+        /// </summary>
         private string FormatarDescricao(string descricao)
         {
             if (string.IsNullOrEmpty(descricao))
                 return descricao;
 
-            // Lista de palavras-chave que queremos separar em linhas
-            string[] chavesComuns = new[] {
-            "TÍTULO:", "TITULO:",
-            "DESCRIÇÃO:", "DESCRICAO:",
-            "AFETADOS:", "AFETADO:",
-            "IMPEDE TRABALHO:", "IMPEDE:",
-            "PRIORIDADE:",
-            "URGENTE:",
-            "OBSERVAÇÃO:", "OBSERVACAO:",
-            "DETALHES:",
-            "PROBLEMA:",
-            "SOLICITAÇÃO:", "SOLICITACAO:"
-            };
-
-            string descricaoFormatada = descricao;
-
-            // Adicionar quebra de linha antes de cada palavra-chave
-            foreach (var chave in chavesComuns)
+            try
             {
-                // Buscar a palavra-chave (case insensitive)
-                int index = descricaoFormatada.IndexOf(chave, StringComparison.OrdinalIgnoreCase);
+                // Debug: Ver texto original
+                System.Diagnostics.Debug.WriteLine("=== TEXTO ORIGINAL ===");
+                System.Diagnostics.Debug.WriteLine(descricao);
+                System.Diagnostics.Debug.WriteLine("======================");
 
-                while (index > 0) // Se encontrou e não está no início
+                // Lista de palabras chave SIN espacios
+                string[] chavesComuns = new[] {
+                    "TÍTULO:",
+                    "TITULO:",
+                    "DESCRIÇÃO:",
+                    "DESCRICAO:",
+                    "AFETADOS:",
+                    "AFETADO:",
+                    "IMPEDE TRABALHO:",
+                    "IMPEDE:",
+                    "PRIORIDADE:",
+                    "URGENTE:",
+                    "OBSERVAÇÃO:",
+                    "OBSERVACAO:",
+                    "DETALHES:",
+                    "PROBLEMA:",
+                    "SOLICITAÇÃO:",
+                    "SOLICITACAO:"
+                };
+
+                string resultado = descricao;
+
+                // Procesar cada palabra clave
+                foreach (var chave in chavesComuns)
                 {
-                    // Inserir quebra de linha antes da palavra-chave se não houver já
-                    if (descricaoFormatada[index - 1] != '\n')
+                    // Buscar todas las ocurrencias
+                    int index = 0;
+                    while ((index = resultado.IndexOf(chave, index, StringComparison.OrdinalIgnoreCase)) >= 0)
                     {
-                        descricaoFormatada = descricaoFormatada.Insert(index, "\n\n");
-                        index += 2; // Ajustar o índice pelos caracteres inseridos
+                        // Agregar salto ANTES (si no está al inicio)
+                        if (index > 0 && resultado[index - 1] != '\n')
+                        {
+                            resultado = resultado.Insert(index, "\r\n\r\n");
+                            index += 4; // 4 caracteres: \r\n\r\n
+                        }
+
+                        // Buscar fin de la clave
+                        int finChave = index + chave.Length;
+
+                        // Si hay texto inmediato después (sin espacio)
+                        if (finChave < resultado.Length)
+                        {
+                            char siguienteChar = resultado[finChave];
+
+                            // Si no hay espacio ni salto, agregar salto
+                            if (siguienteChar != ' ' && siguienteChar != '\r' && siguienteChar != '\n')
+                            {
+                                resultado = resultado.Insert(finChave, "\r\n");
+                                finChave += 2;
+                            }
+                            // Si hay espacio, convertir a salto
+                            else if (siguienteChar == ' ')
+                            {
+                                resultado = resultado.Remove(finChave, 1);
+                                resultado = resultado.Insert(finChave, "\r\n");
+                                finChave += 2;
+                            }
+                        }
+
+                        index = finChave;
                     }
-
-                    // Buscar próxima ocorrência
-                    index = descricaoFormatada.IndexOf(chave, index + chave.Length, StringComparison.OrdinalIgnoreCase);
                 }
-            }
 
-            // Remover múltiplas quebras de linha consecutivas (mais de 2)
-            while (descricaoFormatada.Contains("\n\n\n"))
+                // Limpiar múltiples saltos
+                while (resultado.Contains("\r\n\r\n\r\n"))
+                {
+                    resultado = resultado.Replace("\r\n\r\n\r\n", "\r\n\r\n");
+                }
+
+                // Debug: Ver texto formateado
+                System.Diagnostics.Debug.WriteLine("=== TEXTO FORMATEADO ===");
+                System.Diagnostics.Debug.WriteLine(resultado);
+                System.Diagnostics.Debug.WriteLine("========================");
+
+                return resultado.Trim();
+            }
+            catch (Exception ex)
             {
-                descricaoFormatada = descricaoFormatada.Replace("\n\n\n", "\n\n");
+                System.Diagnostics.Debug.WriteLine($"❌ Erro ao formatar: {ex.Message}");
+                return descricao;
             }
-
-            return descricaoFormatada.Trim();
         }
 
         private void PreencherDados()
         {
-            // Informações básicas
-            lblId.Text = $"Chamado #{_chamado.IdChamado}";
-            lblCategoria.Text = $"Categoria: {_chamado.Categoria}";
-            lblPrioridade.Text = $"Prioridade: {ObterTextoPrioridade(_chamado.Prioridade)}";
-            lblPrioridade.ForeColor = ObterCorPrioridade(_chamado.Prioridade);
-            lblData.Text = $"Aberto em: {_chamado.DataChamado:dd/MM/yyyy HH:mm}";
-
-            lblStatus.Text = $"Status: {ObterTextoStatus((int)_chamado.Status)}";
-            lblStatus.ForeColor = ObterCorStatus((int)_chamado.Status);
-            lblSolicitante.Text = $"Solicitante: ID {_chamado.Afetado}";
-            lblTecnico.Text = _chamado.TecnicoResponsavel.HasValue
-                ? $"Técnico: ID {_chamado.TecnicoResponsavel}"
-                : "Técnico: Não atribuído";
-
-            // Descrição FORMATADA ← MODIFICADO
-            txtDescricao.Text = FormatarDescricao(_chamado.Descricao);
-
-            // Contestações
-            if (!string.IsNullOrEmpty(_chamado.Contestacoes))
+            try
             {
-                txtContestacoes.Text = _chamado.Contestacoes;
-                gbContestacoes.ForeColor = Color.FromArgb(220, 53, 69);
+                // Informações básicas
+                lblId.Text = $"Chamado #{_chamado.IdChamado}";
+                lblCategoria.Text = $"Categoria: {_chamado.Categoria}";
+                lblPrioridade.Text = $"Prioridade: {ObterTextoPrioridade(_chamado.Prioridade)}";
+                lblPrioridade.ForeColor = ObterCorPrioridade(_chamado.Prioridade);
+                lblData.Text = $"Aberto em: {_chamado.DataChamado:dd/MM/yyyy HH:mm}";
+
+                lblStatus.Text = $"Status: {ObterTextoStatus((int)_chamado.Status)}";
+                lblStatus.ForeColor = ObterCorStatus((int)_chamado.Status);
+                lblSolicitante.Text = $"Solicitante: ID {_chamado.Afetado}";
+                lblTecnico.Text = _chamado.TecnicoResponsavel.HasValue
+                    ? $"Técnico: ID {_chamado.TecnicoResponsavel}"
+                    : "Técnico: Não atribuído";
+
+                // ⚠️ APLICAR FORMATAÇÃO
+                string descricaoFormatada = FormatarDescricao(_chamado.Descricao);
+                txtDescricao.Text = descricaoFormatada;
+
+                // Contestações
+                if (!string.IsNullOrEmpty(_chamado.Contestacoes))
+                {
+                    txtContestacoes.Text = _chamado.Contestacoes;
+                    gbContestacoes.ForeColor = Color.FromArgb(220, 53, 69);
+                }
+                else
+                {
+                    txtContestacoes.Text = "Nenhuma contestação registrada.";
+                    txtContestacoes.ForeColor = Color.Gray;
+                    gbContestacoes.ForeColor = Color.Gray;
+                }
             }
-            else
+            catch (Exception ex)
             {
-                txtContestacoes.Text = "Nenhuma contestação registrada.";
-                txtContestacoes.ForeColor = Color.Gray;
-                gbContestacoes.ForeColor = Color.Gray;
+                MessageBox.Show($"Erro ao preencher dados: {ex.Message}\n\n{ex.StackTrace}", "Erro",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                System.Diagnostics.Debug.WriteLine($"Erro em PreencherDados: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"StackTrace: {ex.StackTrace}");
             }
         }
-
-
 
         private string ObterTextoStatus(int status)
         {

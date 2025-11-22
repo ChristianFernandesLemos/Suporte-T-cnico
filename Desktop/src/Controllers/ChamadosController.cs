@@ -2,17 +2,19 @@ using System;
 using System.Collections.Generic;
 using SistemaChamados.Interfaces;
 using SistemaChamados.Models;
+using SistemaChamados.Data.Repositories;
 
 namespace SistemaChamados.Controllers
 {
     public class ChamadosController
     {
         private readonly IDatabaseConnection _database;
+        private readonly ContestacoesRepository _contestacoesRepository;
 
-        
         public ChamadosController(IDatabaseConnection database)
         {
             _database = database ?? throw new ArgumentNullException(nameof(database));
+            _contestacoesRepository = new ContestacoesRepository();
         }
 
         public int CriarChamado(Chamados chamado)
@@ -33,12 +35,48 @@ namespace SistemaChamados.Controllers
                 chamado.DataChamado = DateTime.Now;
                 chamado.Status = StatusChamado.Aberto;
 
+                // Guardar contestação temporariamente
+                string contestacaoTexto = chamado.Contestacoes;
+
+                // Limpar contestação do objeto antes de inserir
+                // (O repositório não toca mais na tabela Contestacoes)
+                chamado.Contestacoes = null;
+
                 // Inserir no banco e retornar ID
-                return _database.InserirChamado(chamado);
+                int idChamado = _database.InserirChamado(chamado);
+
+                // Se havia contestação, inserir no Historial_Contestacoes
+                if (idChamado > 0 && !string.IsNullOrEmpty(contestacaoTexto))
+                {
+                    try
+                    {
+                        var contestacao = new Contestacao(
+                            idChamado,
+                            chamado.Afetado,  // ID do funcionário que criou o chamado
+                            contestacaoTexto,
+                            TipoContestacao.Contestacao
+                        );
+
+                        int contestacaoId = _contestacoesRepository.Inserir(contestacao);
+
+                        if (contestacaoId > 0)
+                        {
+                            Console.WriteLine($"✅ Contestação {contestacaoId} adicionada ao chamado {idChamado}");
+                        }
+                    }
+                    catch (Exception exCont)
+                    {
+                        Console.WriteLine($"⚠️ Erro ao adicionar contestação: {exCont.Message}");
+                        // Não falhar a criação do chamado por causa da contestação
+                    }
+                }
+
+                return idChamado;
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Erro ao criar chamado: {ex.Message}");
+                Console.WriteLine($"StackTrace: {ex.StackTrace}");
                 throw;
             }
         }
@@ -191,6 +229,9 @@ namespace SistemaChamados.Controllers
             }
         }
 
+        /// <summary>
+        /// Adiciona uma contestação usando o novo sistema de Historial
+        /// </summary>
         public bool AdicionarContestacao(int idChamado, string contestacao)
         {
             try
@@ -202,8 +243,17 @@ namespace SistemaChamados.Controllers
                 if (chamado == null)
                     throw new Exception("Chamado não encontrado");
 
-                chamado.AdicionarContestacao(contestacao);
-                return _database.AtualizarChamado(chamado);
+                // Adicionar no Historial_Contestacoes
+                var novaContestacao = new Contestacao(
+                    idChamado,
+                    chamado.TecnicoResponsavel ?? chamado.Afetado,  // ID do usuário
+                    contestacao,
+                    TipoContestacao.Resposta
+                );
+
+                int contestacaoId = _contestacoesRepository.Inserir(novaContestacao);
+
+                return contestacaoId > 0;
             }
             catch (Exception ex)
             {
