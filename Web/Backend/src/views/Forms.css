@@ -46,12 +46,23 @@ body {
     background-color: transparent;
 }
 
+/* Estilo do link Voltar (Botão 1) */
 .back-link {
     color: var(--fifth-color-blue);
     text-decoration: none;
     font-size: 1.2rem;
     display: flex;
     align-items: center;
+    transition: color 0.2s ease, transform 0.2s; /* Adicionado transição para interação */
+}
+
+/* INTERAÇÃO: Link Voltar */
+.back-link:hover {
+    color: var(--tenth-color-blue); /* Cor de interação principal */
+    transform: translateX(-2px);
+}
+.back-link:active {
+    color: var(--eighth-color-blue); /* Cor de clique */
 }
 
 .arrow-icon {
@@ -123,6 +134,7 @@ body {
     color: var(--primary-color-dark); /* Texto escuro */
     outline: none;
     resize: none; /* Desativa o redimensionamento do textarea */
+    transition: all 0.2s ease;
 }
 
 /* Garantindo que o SELECT tenha um fundo correto e remova a aparência nativa */
@@ -195,7 +207,7 @@ body {
     font-size: 1.1rem;
     font-weight: 700;
     cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s, color 0.3s;
+    transition: background-color 0.3s ease, transform 0.2s, color 0.3s, box-shadow 0.3s;
 }
 
 /* Ajuste de largura para botões lado a lado */
@@ -203,18 +215,25 @@ body {
     width: 48%;
 }
 
-/* Botão Primário/Avançar (Azul Vibrante) */
+/* Botão Primário/Avançar (Azul Vibrante) - Botão 2 */
 .form-actions .submit-button {
     background-color: var(--tenth-color-blue);
     color: var(--primary-color-dark);
 }
 
+/* INTERAÇÃO: Botão Primário */
 .form-actions .submit-button:hover {
-    background-color: #0d8fd1;
+    background-color: var(--eighth-color-blue); /* Cor de hover ligeiramente mais escura */
+    color: var(--fifth-color-blue);
     transform: translateY(-1px);
+    box-shadow: 0 4px 8px color-mix(in srgb, var(--ninth-color-blue) 30%, transparent);
+}
+.form-actions .submit-button:active {
+    background-color: var(--seventh-color-blue); /* Cor de clique */
+    transform: translateY(0);
 }
 
-/* Botão Secundário/Voltar (Fundo claro) */
+/* Botão Secundário/Voltar (Fundo claro) - Botão 3 */
 .form-actions .back-button {
     background-color: var(--fifth-color-blue);
     color: var(--primary-color-dark);
@@ -222,9 +241,16 @@ body {
     border: 1px solid var(--fourth-color-blue);
 }
 
+/* INTERAÇÃO: Botão Secundário */
 .form-actions .back-button:hover {
     text-decoration: none;
     background-color: var(--fourth-color-blue);
-    color: var(--fifth-color-blue);
+    color: var(--ninth-color-blue);
     transform: translateY(-1px);
+    border-color: var(--third-color-blue);
+}
+.form-actions .back-button:active {
+    background-color: var(--third-color-blue); /* Cor de clique */
+    color: var(--fifth-color-blue);
+    transform: translateY(0);
 }
