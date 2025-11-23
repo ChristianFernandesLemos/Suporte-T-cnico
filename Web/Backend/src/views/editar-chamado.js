@@ -101,9 +101,10 @@ async function salvarAlteracoes(event) {
 
   // Coleta dados do formulário
   const dadosAtualizados = {
-    categoria: document.getElementById('titulo').value,
+    titulo: document.getElementById('titulo').value,
     usuarioNome: document.getElementById('nome').value,
     usuarioEmail: document.getElementById('email').value,
+    categoria: document.getElementById('categoria').value,
     impacto: document.getElementById('impacto').value,
     bloqueioTotal: document.getElementById('bloqueio').value.toLowerCase() === 'sim',
     descricao: document.getElementById('descricao').value,
@@ -167,7 +168,7 @@ function mostrarErro(mensagem) {
 // NAVEGAÇÃO
 // ========================================
 function voltarParaLista() {
-  window.location.href = '/lista-chamados';
+  window.location.href = '/chamados';
 }
 
 function configurarBotaoVoltar() {
@@ -175,7 +176,7 @@ function configurarBotaoVoltar() {
   if (backLink) {
     backLink.addEventListener('click', (e) => {
       e.preventDefault();
-      voltarParaLista();
+      voltarParaLista('/chamados');
     });
   }
 }
