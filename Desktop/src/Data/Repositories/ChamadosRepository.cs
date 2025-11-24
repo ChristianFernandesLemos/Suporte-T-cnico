@@ -21,11 +21,12 @@ namespace SistemaChamados.Data.Repositories
             {
                 return DatabaseConnectionManager.ExecuteWithConnection(connection =>
                 {
+                    // ⭐ AGREGAR 'titulo' en SELECT
                     string sql = @"
-                        SELECT id_chamado, categoria, prioridade, descricao, Afetado,
-                               Data_Registro, Status, Tecnico_Atribuido, Data_Resolucao
-                        FROM chamados 
-                        WHERE id_chamado = @IdChamado";
+                SELECT id_chamado, titulo, categoria, prioridade, descricao, Afetado,
+                       Data_Registro, Status, Tecnico_Atribuido, Data_Resolucao
+                FROM chamados 
+                WHERE id_chamado = @IdChamado";
 
                     using (var command = new SqlCommand(sql, connection))
                     {
@@ -34,15 +35,27 @@ namespace SistemaChamados.Data.Repositories
                         using (var reader = command.ExecuteReader())
                         {
                             if (reader.Read())
-                                return CriarChamadoFromReader(reader);
+                            {
+                                var chamado = CriarChamadoFromReader(reader);
+
+                                // Debug
+                                Console.WriteLine($"✅ Chamado {idChamado} carregado:");
+                                Console.WriteLine($"   Título: {chamado.Titulo ?? "(null)"}");
+                                Console.WriteLine($"   Descrição length: {chamado.Descricao?.Length ?? 0}");
+
+                                return chamado;
+                            }
                         }
                     }
+
+                    Console.WriteLine($"⚠️ Chamado {idChamado} não encontrado!");
                     return null;
                 });
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Erro ao buscar chamado: {ex.Message}");
+                Console.WriteLine($"❌ Erro ao buscar chamado: {ex.Message}");
+                Console.WriteLine($"StackTrace: {ex.StackTrace}");
                 return null;
             }
         }
@@ -54,23 +67,28 @@ namespace SistemaChamados.Data.Repositories
             {
                 DatabaseConnectionManager.ExecuteWithConnection(connection =>
                 {
+                    // ⭐ AGREGAR 'titulo' en SELECT
                     string sql = @"
-                        SELECT id_chamado, categoria, prioridade, descricao, Afetado,
-                               Data_Registro, Status, Tecnico_Atribuido, Data_Resolucao
-                        FROM chamados 
-                        ORDER BY Data_Registro DESC";
+                SELECT id_chamado, titulo, categoria, prioridade, descricao, Afetado,
+                       Data_Registro, Status, Tecnico_Atribuido, Data_Resolucao
+                FROM chamados 
+                ORDER BY Data_Registro DESC";
 
                     using (var command = new SqlCommand(sql, connection))
                     using (var reader = command.ExecuteReader())
                     {
                         while (reader.Read())
+                        {
                             chamados.Add(CriarChamadoFromReader(reader));
+                        }
                     }
+
+                    Console.WriteLine($"✅ {chamados.Count} chamados carregados");
                 });
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Erro ao listar chamados: {ex.Message}");
+                Console.WriteLine($"❌ Erro ao listar chamados: {ex.Message}");
             }
             return chamados;
         }
@@ -82,12 +100,13 @@ namespace SistemaChamados.Data.Repositories
             {
                 DatabaseConnectionManager.ExecuteWithConnection(connection =>
                 {
+                    // ⭐ AGREGAR 'titulo' en SELECT
                     string sql = @"
-                        SELECT id_chamado, categoria, prioridade, descricao, Afetado,
-                               Data_Registro, Status, Tecnico_Atribuido, Data_Resolucao
-                        FROM chamados 
-                        WHERE Afetado = @FuncionarioId
-                        ORDER BY Data_Registro DESC";
+                SELECT id_chamado, titulo, categoria, prioridade, descricao, Afetado,
+                       Data_Registro, Status, Tecnico_Atribuido, Data_Resolucao
+                FROM chamados 
+                WHERE Afetado = @FuncionarioId
+                ORDER BY Data_Registro DESC";
 
                     using (var command = new SqlCommand(sql, connection))
                     {
@@ -96,14 +115,18 @@ namespace SistemaChamados.Data.Repositories
                         using (var reader = command.ExecuteReader())
                         {
                             while (reader.Read())
+                            {
                                 chamados.Add(CriarChamadoFromReader(reader));
+                            }
                         }
                     }
+
+                    Console.WriteLine($"✅ {chamados.Count} chamados do funcionário {funcionarioId}");
                 });
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Erro ao listar chamados por funcionário: {ex.Message}");
+                Console.WriteLine($"❌ Erro ao listar chamados por funcionário: {ex.Message}");
             }
             return chamados;
         }
@@ -115,12 +138,13 @@ namespace SistemaChamados.Data.Repositories
             {
                 DatabaseConnectionManager.ExecuteWithConnection(connection =>
                 {
+                    // ⭐ AGREGAR 'titulo' en SELECT
                     string sql = @"
-                        SELECT id_chamado, categoria, prioridade, descricao, Afetado,
-                               Data_Registro, Status, Tecnico_Atribuido, Data_Resolucao
-                        FROM chamados 
-                        WHERE Tecnico_Atribuido = @TecnicoId
-                        ORDER BY prioridade DESC, Data_Registro ASC";
+                SELECT id_chamado, titulo, categoria, prioridade, descricao, Afetado,
+                       Data_Registro, Status, Tecnico_Atribuido, Data_Resolucao
+                FROM chamados 
+                WHERE Tecnico_Atribuido = @TecnicoId
+                ORDER BY prioridade DESC, Data_Registro ASC";
 
                     using (var command = new SqlCommand(sql, connection))
                     {
@@ -129,50 +153,22 @@ namespace SistemaChamados.Data.Repositories
                         using (var reader = command.ExecuteReader())
                         {
                             while (reader.Read())
+                            {
                                 chamados.Add(CriarChamadoFromReader(reader));
+                            }
                         }
                     }
+
+                    Console.WriteLine($"✅ {chamados.Count} chamados do técnico {tecnicoId}");
                 });
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Erro ao listar chamados por técnico: {ex.Message}");
+                Console.WriteLine($"❌ Erro ao listar chamados por técnico: {ex.Message}");
             }
             return chamados;
         }
 
-        public List<Chamados> ListarPorStatus(StatusChamado status)
-        {
-            var chamados = new List<Chamados>();
-            try
-            {
-                DatabaseConnectionManager.ExecuteWithConnection(connection =>
-                {
-                    string sql = @"
-                        SELECT id_chamado, categoria, prioridade, descricao, Afetado,
-                               Data_Registro, Status, Tecnico_Atribuido, Data_Resolucao
-                        FROM chamados 
-                        WHERE Status = @Status
-                        ORDER BY Data_Registro DESC";
-
-                    using (var command = new SqlCommand(sql, connection))
-                    {
-                        command.Parameters.AddWithValue("@Status", (int)status);
-
-                        using (var reader = command.ExecuteReader())
-                        {
-                            while (reader.Read())
-                                chamados.Add(CriarChamadoFromReader(reader));
-                        }
-                    }
-                });
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Erro ao listar chamados por status: {ex.Message}");
-            }
-            return chamados;
-        }
 
         public List<Chamados> ListarPorPrioridade(int prioridade)
         {
@@ -222,17 +218,20 @@ namespace SistemaChamados.Data.Repositories
             {
                 return DatabaseConnectionManager.ExecuteWithConnection(connection =>
                 {
-                    // Inserir apenas o chamado - SEM contestações na mesma transação
+                    // ⭐ AGREGAR 'titulo' en INSERT
                     string sql = @"
-                        INSERT INTO chamados (categoria, descricao, prioridade, Afetado, 
-                                            Data_Registro, Status, Tecnico_Atribuido)
-                        VALUES (@Categoria, @Descricao, @Prioridade, @Afetado, 
-                                @DataRegistro, @Status, @TecnicoAtribuido);
-                        SELECT CAST(SCOPE_IDENTITY() AS INT);";
+                INSERT INTO chamados (titulo, categoria, descricao, prioridade, Afetado, 
+                                    Data_Registro, Status, Tecnico_Atribuido)
+                VALUES (@Titulo, @Categoria, @Descricao, @Prioridade, @Afetado, 
+                        @DataRegistro, @Status, @TecnicoAtribuido);
+                SELECT CAST(SCOPE_IDENTITY() AS INT);";
 
                     int novoId;
                     using (var command = new SqlCommand(sql, connection))
                     {
+                        // ⭐ AGREGAR PARÁMETRO @Titulo
+                        command.Parameters.AddWithValue("@Titulo",
+                            string.IsNullOrWhiteSpace(chamado.Titulo) ? "Sem título" : chamado.Titulo);
                         command.Parameters.AddWithValue("@Categoria", chamado.Categoria);
                         command.Parameters.AddWithValue("@Descricao", chamado.Descricao);
                         command.Parameters.AddWithValue("@Prioridade", chamado.Prioridade);
@@ -244,10 +243,6 @@ namespace SistemaChamados.Data.Repositories
 
                         novoId = (int)command.ExecuteScalar();
                     }
-
-                    // Se tem contestação, inserir no Historial_Contestacoes usando o repository apropriado
-                    // NOTA: Isso será feito separadamente pelo ChamadosController
-                    // Apenas armazenamos no campo Contestacoes como texto temporário
 
                     chamado.IdChamado = novoId;
                     Console.WriteLine($"✅ Chamado {novoId} inserido com sucesso");
@@ -263,6 +258,7 @@ namespace SistemaChamados.Data.Repositories
             }
         }
 
+
         #endregion
 
         #region 🔄 ATUALIZAR
@@ -277,18 +273,21 @@ namespace SistemaChamados.Data.Repositories
             {
                 return DatabaseConnectionManager.ExecuteWithConnection(connection =>
                 {
-                    // Atualizar apenas o chamado
+                    // ⭐ AGREGAR 'titulo' en UPDATE
                     string sql = @"
-                        UPDATE chamados 
-                        SET categoria = @Categoria, descricao = @Descricao, 
-                            prioridade = @Prioridade, Status = @Status, 
-                            Tecnico_Atribuido = @TecnicoAtribuido, 
-                            Data_Resolucao = @DataResolucao
-                        WHERE id_chamado = @IdChamado";
+                UPDATE chamados 
+                SET titulo = @Titulo, categoria = @Categoria, descricao = @Descricao, 
+                    prioridade = @Prioridade, Status = @Status, 
+                    Tecnico_Atribuido = @TecnicoAtribuido, 
+                    Data_Resolucao = @DataResolucao
+                WHERE id_chamado = @IdChamado";
 
                     using (var command = new SqlCommand(sql, connection))
                     {
                         command.Parameters.AddWithValue("@IdChamado", chamado.IdChamado);
+                        // ⭐ AGREGAR PARÁMETRO @Titulo
+                        command.Parameters.AddWithValue("@Titulo",
+                            string.IsNullOrWhiteSpace(chamado.Titulo) ? "Sem título" : chamado.Titulo);
                         command.Parameters.AddWithValue("@Categoria", chamado.Categoria);
                         command.Parameters.AddWithValue("@Descricao", chamado.Descricao);
                         command.Parameters.AddWithValue("@Prioridade", chamado.Prioridade);
@@ -312,6 +311,7 @@ namespace SistemaChamados.Data.Repositories
                 return false;
             }
         }
+
 
         #endregion
 
@@ -357,25 +357,90 @@ namespace SistemaChamados.Data.Repositories
         /// </summary>
         private Chamados CriarChamadoFromReader(SqlDataReader reader)
         {
-            var chamado = new Chamados
+            try
             {
-                IdChamado = (int)reader["id_chamado"],
-                Categoria = reader["categoria"].ToString(),
-                Prioridade = (int)reader["prioridade"],
-                Descricao = reader["descricao"].ToString(),
-                Afetado = (int)reader["Afetado"],
-                DataChamado = (DateTime)reader["Data_Registro"],
-                Status = (StatusChamado)(int)reader["Status"],
-                TecnicoResponsavel = reader.IsDBNull(reader.GetOrdinal("Tecnico_Atribuido")) ?
-                    (int?)null : (int)reader["Tecnico_Atribuido"],
-                DataResolucao = reader.IsDBNull(reader.GetOrdinal("Data_Resolucao")) ?
-                    (DateTime?)null : (DateTime)reader["Data_Resolucao"]
-            };
+                // Leer título con limpieza adicional
+                string tituloRaw = reader["titulo"] != DBNull.Value
+                    ? reader["titulo"].ToString().Trim()
+                    : "";
 
-            // Buscar contestações do Historial_Contestacoes
-            chamado.Contestacoes = BuscarContestacaoTexto(chamado.IdChamado);
+                // Limpar título si tiene residuos
+                string titulo = LimparTexto(tituloRaw);
+                if (string.IsNullOrWhiteSpace(titulo))
+                    titulo = "Sem título";
 
-            return chamado;
+                // Leer descripción con limpieza
+                string descricaoRaw = reader["descricao"] != DBNull.Value
+                    ? reader["descricao"].ToString().Trim()
+                    : "";
+
+                string descricao = LimparTexto(descricaoRaw);
+
+                var chamado = new Chamados
+                {
+                    IdChamado = (int)reader["id_chamado"],
+                    Titulo = titulo,
+                    Categoria = reader["categoria"].ToString(),
+                    Prioridade = (int)reader["prioridade"],
+                    Descricao = descricao,
+                    Afetado = (int)reader["Afetado"],
+                    DataChamado = (DateTime)reader["Data_Registro"],
+                    Status = (StatusChamado)(int)reader["Status"],
+
+                    TecnicoResponsavel = reader.IsDBNull(reader.GetOrdinal("Tecnico_Atribuido"))
+                        ? (int?)null
+                        : (int)reader["Tecnico_Atribuido"],
+
+                    DataResolucao = reader.IsDBNull(reader.GetOrdinal("Data_Resolucao"))
+                        ? (DateTime?)null
+                        : (DateTime)reader["Data_Resolucao"]
+                };
+
+                // Buscar contestações
+                chamado.Contestacoes = BuscarContestacaoTexto(chamado.IdChamado);
+
+                // Debug detalhado
+                Console.WriteLine($"📦 Chamado {chamado.IdChamado} carregado:");
+                Console.WriteLine($"   Título: '{chamado.Titulo}' ({chamado.Titulo.Length} chars)");
+                Console.WriteLine($"   Descrição: {chamado.Descricao.Length} chars");
+                Console.WriteLine($"   Preview: {(chamado.Descricao.Length > 50 ? chamado.Descricao.Substring(0, 50) + "..." : chamado.Descricao)}");
+
+                return chamado;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Erro em CriarChamadoFromReader: {ex.Message}");
+                Console.WriteLine($"StackTrace: {ex.StackTrace}");
+                throw;
+            }
+        }
+
+        private string LimparTexto(string texto)
+        {
+            if (string.IsNullOrWhiteSpace(texto))
+                return "";
+
+            // Remover prefijos comunes
+            string[] prefixos = new[] {
+        "TÍTULO:", "TITULO:", "TÍTULO :", "TITULO :",
+        "DESCRIÇÃO:", "DESCRICAO:", "DESCRIÇÃO :", "DESCRICAO :"
+    };
+
+            string limpo = texto.Trim();
+
+            foreach (var prefixo in prefixos)
+            {
+                if (limpo.StartsWith(prefixo, StringComparison.OrdinalIgnoreCase))
+                {
+                    limpo = limpo.Substring(prefixo.Length).Trim();
+                    break;
+                }
+            }
+
+            // Remover saltos de línea extras del inicio
+            limpo = limpo.TrimStart('\r', '\n', ' ', '\t');
+
+            return limpo;
         }
 
         /// <summary>

@@ -2,7 +2,6 @@ using System;
 
 namespace SistemaChamados.Models
 {
-    // Enumeração para status do chamado
     public enum StatusChamado
     {
         Aberto = 1,
@@ -12,181 +11,169 @@ namespace SistemaChamados.Models
         Cancelado = 5
     }
 
-    // Enumeração para prioridade do chamado
-    public enum PrioridadeChamado
-    {
-        Baixa = 1,
-        Media = 2,
-        Alta = 3,
-        Critica = 4
-    }
-
-    // Classe Chamados
     public class Chamados
     {
-        // Atributos
+        // Propriedades principais
         public int IdChamado { get; set; }
-        public string Categoria { get; set; }
-        public string Contestacoes { get; set; }
-        public int Prioridade { get; set; }
+
+        // ⭐ NOVO: Título separado
+        public string Titulo { get; set; }
+
         public string Descricao { get; set; }
-        public int Afetado { get; set; } // ID do funcionário afetado
+        public string Categoria { get; set; }
+        public int Prioridade { get; set; }
+        public int Afetado { get; set; }
         public DateTime DataChamado { get; set; }
         public StatusChamado Status { get; set; }
-        public int? TecnicoResponsavel { get; set; } // ID do técnico responsável
-        public DateTime? DataResolucao { get; set; }
         public string Solucao { get; set; }
+        public string Contestacoes { get; set; }
+        public int? TecnicoResponsavel { get; set; }
+        public DateTime? DataResolucao { get; set; }
 
-        // Construtor
+        // Construtor padrão
         public Chamados()
         {
             DataChamado = DateTime.Now;
             Status = StatusChamado.Aberto;
-            Prioridade = (int)PrioridadeChamado.Media; // Prioridade padrão
+            Prioridade = 2; // Média por padrão
         }
 
-        // Construtor com parâmetros
-        public Chamados(int idChamado, string categoria, string descricao, int afetado, int prioridade = (int)PrioridadeChamado.Media)
+        // Construtor com parâmetros (ATUALIZADO)
+        public Chamados(string titulo, string descricao, string categoria, int prioridade, int afetado)
         {
-            IdChamado = idChamado;
-            Categoria = categoria;
+            Titulo = titulo;
             Descricao = descricao;
-            Afetado = afetado;
+            Categoria = categoria;
             Prioridade = prioridade;
+            Afetado = afetado;
             DataChamado = DateTime.Now;
             Status = StatusChamado.Aberto;
         }
 
-        // Método para criar chamado
-        public int CriarChamado()
-        {
-            try
-            {
-                // Lógica para criar um novo chamado
-                // Aqui seria feita a inserção no banco de dados
-                this.DataChamado = DateTime.Now;
-                this.Status = StatusChamado.Aberto;
-                this.IdChamado = new Random().Next(1000, 9999);
-
-                Console.WriteLine($"Chamado {IdChamado} criado com sucesso em {DataChamado}");
-                return this.IdChamado;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Erro ao criar chamado: {ex.Message}");
-            }
-        }
-
-        // Método para alterar prioridade
-        public void AlterarPrioridade(int novaPrioridade)
-        {
-            try
-            {
-                // Validar se a prioridade está dentro dos valores válidos
-                if (novaPrioridade < 1 || novaPrioridade > 4)
-                {
-                    throw new ArgumentException("Prioridade deve estar entre 1 (Baixa) e 4 (Crítica)");
-                }
-
-                int prioridadeAnterior = this.Prioridade;
-                this.Prioridade = novaPrioridade;
-                
-                Console.WriteLine($"Prioridade do chamado {IdChamado} alterada de {prioridadeAnterior} para {novaPrioridade}");
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Erro ao alterar prioridade: {ex.Message}");
-            }
-        }
-
-        // Método para alterar status
+        // Métodos de negócio
         public void AlterarStatus(StatusChamado novoStatus)
         {
-            try
-            {
-                StatusChamado statusAnterior = this.Status;
-                this.Status = novoStatus;
+            Status = novoStatus;
 
-                // Se o status for alterado para Resolvido, definir data de resolução
-                if (novoStatus == StatusChamado.Resolvido)
-                {
-                    this.DataResolucao = DateTime.Now;
-                }
-
-                Console.WriteLine($"Status do chamado {IdChamado} alterado de {statusAnterior} para {novoStatus}");
-            }
-            catch (Exception ex)
+            if (novoStatus == StatusChamado.Resolvido || novoStatus == StatusChamado.Fechado)
             {
-                throw new Exception($"Erro ao alterar status: {ex.Message}");
+                DataResolucao = DateTime.Now;
             }
         }
 
-        // Método para alterar status (sobrecarga com int)
-        public void AlterarStatus(int novoStatus)
-        {
-            try
-            {
-                if (!Enum.IsDefined(typeof(StatusChamado), novoStatus))
-                {
-                    throw new ArgumentException("Status inválido");
-                }
-
-                AlterarStatus((StatusChamado)novoStatus);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Erro ao alterar status: {ex.Message}");
-            }
-        }
-
-        // Método para atribuir técnico responsável
         public void AtribuirTecnico(int idTecnico)
         {
-            try
+            TecnicoResponsavel = idTecnico;
+
+            if (Status == StatusChamado.Aberto)
             {
-                this.TecnicoResponsavel = idTecnico;
-                this.Status = StatusChamado.EmAndamento;
-                
-                Console.WriteLine($"Técnico {idTecnico} atribuído ao chamado {IdChamado}");
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Erro ao atribuir técnico: {ex.Message}");
+                Status = StatusChamado.EmAndamento;
             }
         }
 
-        // Método para adicionar contestação
-        public void AdicionarContestacao(string contestacao)
+        public void AlterarPrioridade(int novaPrioridade)
         {
-            try
+            if (novaPrioridade < 1 || novaPrioridade > 4)
+                throw new ArgumentException("Prioridade deve estar entre 1 (Baixa) e 4 (Crítica)");
+
+            Prioridade = novaPrioridade;
+        }
+
+        public void DefinirSolucao(string solucao)
+        {
+            Solucao = solucao;
+            AlterarStatus(StatusChamado.Resolvido);
+        }
+
+        // Validações
+        public bool ValidarChamado()
+        {
+            if (string.IsNullOrWhiteSpace(Titulo))
+                throw new ArgumentException("Título é obrigatório");
+
+            if (string.IsNullOrWhiteSpace(Descricao))
+                throw new ArgumentException("Descrição é obrigatória");
+
+            if (string.IsNullOrWhiteSpace(Categoria))
+                throw new ArgumentException("Categoria é obrigatória");
+
+            if (Prioridade < 1 || Prioridade > 4)
+                throw new ArgumentException("Prioridade inválida");
+
+            if (Afetado <= 0)
+                throw new ArgumentException("Funcionário afetado é obrigatório");
+
+            return true;
+        }
+
+        // Propriedades calculadas
+        public string StatusTexto
+        {
+            get
             {
-                if (string.IsNullOrEmpty(this.Contestacoes))
+                return Status switch
                 {
-                    this.Contestacoes = contestacao;
-                }
+                    StatusChamado.Aberto => "Aberto",
+                    StatusChamado.EmAndamento => "Em Andamento",
+                    StatusChamado.Resolvido => "Resolvido",
+                    StatusChamado.Fechado => "Fechado",
+                    StatusChamado.Cancelado => "Cancelado",
+                    _ => "Desconhecido"
+                };
+            }
+        }
+
+        public string PrioridadeTexto
+        {
+            get
+            {
+                return Prioridade switch
+                {
+                    1 => "Baixa",
+                    2 => "Média",
+                    3 => "Alta",
+                    4 => "Crítica",
+                    _ => "Desconhecida"
+                };
+            }
+        }
+
+        public TimeSpan TempoAberto
+        {
+            get
+            {
+                if (DataResolucao.HasValue)
+                    return DataResolucao.Value - DataChamado;
                 else
-                {
-                    this.Contestacoes += $"\n--- {DateTime.Now} ---\n{contestacao}";
-                }
-                
-                Console.WriteLine($"Contestação adicionada ao chamado {IdChamado}");
+                    return DateTime.Now - DataChamado;
             }
-            catch (Exception ex)
+        }
+
+        public bool EstaAtrasado
+        {
+            get
             {
-                throw new Exception($"Erro ao adicionar contestação: {ex.Message}");
+                if (Status == StatusChamado.Resolvido || Status == StatusChamado.Fechado)
+                    return false;
+
+                // Definir SLA baseado na prioridade
+                var slaHoras = Prioridade switch
+                {
+                    4 => 4,   // Crítica: 4 horas
+                    3 => 24,  // Alta: 24 horas
+                    2 => 72,  // Média: 72 horas
+                    1 => 168, // Baixa: 7 dias
+                    _ => 72
+                };
+
+                return TempoAberto.TotalHours > slaHoras;
             }
         }
 
-        // Método para obter descrição da prioridade
-        public string ObterDescricaoPrioridade()
+        // Override ToString para debug
+        public override string ToString()
         {
-            return ((PrioridadeChamado)this.Prioridade).ToString();
-        }
-
-        // Método para obter descrição do status
-        public string ObterDescricaoStatus()
-        {
-            return this.Status.ToString();
+            return $"#{IdChamado} - {Titulo} [{StatusTexto}] - {PrioridadeTexto}";
         }
     }
 }

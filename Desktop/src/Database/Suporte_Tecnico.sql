@@ -1,396 +1,227 @@
--- =====================================================
---  Historial de Contestações
--- =====================================================
--- Este script migra o sistema de contestações
--- para suportar múltiplas contestações por chamado
--- =====================================================
+-- ============================================
+-- AGREGAR COLUNA 'titulo' À TABELA chamados
+-- E MIGRAR DADOS EXISTENTES
+-- ============================================
 
 USE Suporte_Tecnico;
 GO
 
-PRINT '============================================================';
-PRINT '  INICIANDO MIGRAÇÃO: HISTORIAL DE CONTESTAÇÕES';
-PRINT '============================================================';
+PRINT '============================================';
+PRINT 'ADICIONANDO COLUNA titulo';
+PRINT '============================================';
 PRINT '';
 
--- =====================================================
--- PASSO 1: CRIAR BACKUP ANTES DA MIGRAÇÃO
--- =====================================================
-PRINT '1. Criando backup de segurança...';
+-- ============================================
+-- PASSO 1: ADICIONAR COLUNA
+-- ============================================
+PRINT '1. Adicionando coluna titulo...';
 
--- Tabela temporária para backup das contestações atuais
-IF OBJECT_ID('tempdb..#BackupContestacoes') IS NOT NULL
-    DROP TABLE #BackupContestacoes;
-
-SELECT 
-    c.id_chamado,
-    c.Contestacoes_Codigo,
-    c.Afetado AS Id_usuario_criador,
-    cont.Justificativa,
-    cont.DataContestacao
-INTO #BackupContestacoes
-FROM chamados c
-INNER JOIN Contestacoes cont ON c.Contestacoes_Codigo = cont.Codigo
-WHERE c.Contestacoes_Codigo IS NOT NULL;
-
-DECLARE @TotalBackup INT = (SELECT COUNT(*) FROM #BackupContestacoes);
-PRINT CONCAT('   ✅ Backup criado: ', @TotalBackup, ' contestações salvas');
-PRINT '';
-
--- =====================================================
--- PASSO 2: CRIAR NOVA TABELA DE HISTORIAL
--- =====================================================
-PRINT '2. Criando tabela Historial_Contestacoes...';
-
-IF OBJECT_ID('Historial_Contestacoes', 'U') IS NOT NULL
+IF NOT EXISTS (
+    SELECT * FROM INFORMATION_SCHEMA.COLUMNS 
+    WHERE TABLE_NAME = 'chamados' 
+    AND COLUMN_NAME = 'titulo'
+)
 BEGIN
-    PRINT '   ⚠️  Tabela já existe. Excluindo...';
-    DROP TABLE Historial_Contestacoes;
+    ALTER TABLE chamados
+    ADD titulo VARCHAR(200) NULL;
+    
+    PRINT '   ✅ Coluna titulo adicionada';
+END
+ELSE
+BEGIN
+    PRINT '   ⚠️  Coluna titulo já existe';
 END
 
-CREATE TABLE Historial_Contestacoes (
-    Id INT NOT NULL IDENTITY(1,1) PRIMARY KEY,
-    id_chamado INT NOT NULL,
-    Id_usuario INT NOT NULL,
-    Justificativa VARCHAR(1000) NOT NULL,
-    DataContestacao DATETIME NOT NULL DEFAULT GETDATE(),
-    Tipo VARCHAR(20) NOT NULL DEFAULT 'Contestacao',  -- 'Contestacao', 'Resposta', 'Observacao'
-    
-    CONSTRAINT FK_HistCont_Chamado 
-        FOREIGN KEY (id_chamado) 
-        REFERENCES chamados(id_chamado) 
-        ON DELETE CASCADE,
-    
-    CONSTRAINT FK_HistCont_Usuario 
-        FOREIGN KEY (Id_usuario) 
-        REFERENCES Usuario(Id_usuario),
-    
-    CONSTRAINT CK_Tipo_Valido 
-        CHECK (Tipo IN ('Contestacao', 'Resposta', 'Observacao'))
-);
-
--- Índices para melhor performance
-CREATE INDEX IX_HistCont_Chamado ON Historial_Contestacoes(id_chamado);
-CREATE INDEX IX_HistCont_Usuario ON Historial_Contestacoes(Id_usuario);
-CREATE INDEX IX_HistCont_Data ON Historial_Contestacoes(DataContestacao);
-
-PRINT '   ✅ Tabela Historial_Contestacoes criada';
 PRINT '';
 
--- =====================================================
--- PASSO 3: MIGRAR DADOS EXISTENTES
--- =====================================================
-PRINT '3. Migrando contestações existentes...';
+-- ============================================
+-- PASSO 2: MIGRAR DADOS EXISTENTES
+-- ============================================
+PRINT '2. Migrando dados existentes...';
+PRINT '';
 
--- Inserir contestações antigas no novo historial
-INSERT INTO Historial_Contestacoes (id_chamado, Id_usuario, Justificativa, DataContestacao, Tipo)
+-- Ver dados ANTES da migração
+PRINT 'ANTES DA MIGRAÇÃO:';
 SELECT 
     id_chamado,
-    Id_usuario_criador,
-    Justificativa,
-    ISNULL(DataContestacao, GETDATE()),
-    'Contestacao'
-FROM #BackupContestacoes;
-
-DECLARE @TotalMigradas INT = @@ROWCOUNT;
-PRINT CONCAT('   ✅ ', @TotalMigradas, ' contestações migradas para novo sistema');
-PRINT '';
-
--- =====================================================
--- PASSO 4: REMOVER COLUNA ANTIGA (OPCIONAL)
--- =====================================================
-PRINT '4. Limpando estrutura antiga...';
-
--- OPÇÃO A: Manter compatibilidade (recomendado durante transição)
-PRINT '   ⚠️  Mantendo coluna Contestacoes_Codigo para compatibilidade';
-PRINT '   💡 Execute o PASSO 5 quando tiver certeza que tudo funciona';
-
--- OPÇÃO B: Remover completamente (descomente quando pronto)
-
-PRINT '   🔧 Removendo estrutura antiga...';
-
--- Remover foreign key
-IF EXISTS (SELECT * FROM sys.foreign_keys WHERE name = 'FK_Chamados_Contestacoes')
-BEGIN
-    ALTER TABLE chamados DROP CONSTRAINT FK_Chamados_Contestacoes;
-    PRINT '   ✅ Foreign Key removida';
-END
-
--- Remover coluna
-IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS 
-           WHERE TABLE_NAME = 'chamados' AND COLUMN_NAME = 'Contestacoes_Codigo')
-BEGIN
-    ALTER TABLE chamados DROP COLUMN Contestacoes_Codigo;
-    PRINT '   ✅ Coluna Contestacoes_Codigo removida';
-END
-
--- Remover tabela antiga
-IF OBJECT_ID('Contestacoes', 'U') IS NOT NULL
-BEGIN
-    DROP TABLE Contestacoes;
-    PRINT '   ✅ Tabela Contestacoes antiga removida';
-END
-
+    titulo,
+    LEFT(descricao, 50) + '...' AS descricao_resumida
+FROM chamados;
 
 PRINT '';
 
--- =====================================================
--- PASSO 5: CRIAR VIEWS ÚTEIS
--- =====================================================
-PRINT '5. Criando views...';
+-- Migrar títulos existentes
+UPDATE chamados
+SET titulo = CASE
+    -- Se tem "TÍTULO:" ou "TITULO:" na descrição
+    WHEN descricao LIKE '%TÍTULO:%' OR descricao LIKE '%TITULO:%' THEN
+        LTRIM(RTRIM(
+            SUBSTRING(
+                descricao,
+                CASE 
+                    WHEN descricao LIKE '%TÍTULO:%' THEN CHARINDEX('TÍTULO:', descricao) + 8
+                    ELSE CHARINDEX('TITULO:', descricao) + 8
+                END,
+                CASE
+                    -- Encontrar o fim do título (até DESCRIÇÃO: ou DESCRICAO:)
+                    WHEN descricao LIKE '%DESCRIÇÃO:%' THEN 
+                        CHARINDEX('DESCRIÇÃO:', descricao) - 
+                        CASE 
+                            WHEN descricao LIKE '%TÍTULO:%' THEN CHARINDEX('TÍTULO:', descricao) + 8
+                            ELSE CHARINDEX('TITULO:', descricao) + 8
+                        END
+                    WHEN descricao LIKE '%DESCRICAO:%' THEN 
+                        CHARINDEX('DESCRICAO:', descricao) - 
+                        CASE 
+                            WHEN descricao LIKE '%TÍTULO:%' THEN CHARINDEX('TÍTULO:', descricao) + 8
+                            ELSE CHARINDEX('TITULO:', descricao) + 8
+                        END
+                    -- Se não tem DESCRIÇÃO, pegar até o fim ou até 200 chars
+                    ELSE 200
+                END
+            )
+        ))
+    -- Se NÃO tem "TÍTULO:", usar os primeiros 50 caracteres da descrição
+    ELSE LEFT(descricao, 50)
+END
+WHERE titulo IS NULL;
 
--- View: Contestações com informações completas
-IF EXISTS (SELECT * FROM sys.views WHERE name = 'vw_HistorialContestacoes')
-    DROP VIEW vw_HistorialContestacoes;
-GO
+DECLARE @RowsAffected INT = @@ROWCOUNT;
+PRINT CONCAT('   ✅ ', @RowsAffected, ' títulos migrados');
+PRINT '';
 
-CREATE VIEW vw_HistorialContestacoes AS
+-- Ver dados DEPOIS da migração
+PRINT 'DEPOIS DA MIGRAÇÃO:';
 SELECT 
-    hc.Id,
-    hc.id_chamado,
-    c.categoria AS CategoriaChamado,
-    c.descricao AS DescricaoChamado,
-    hc.Id_usuario,
-    u.nome AS NomeUsuario,
-    e.E_mail AS EmailUsuario,
-    n.Nivel_acesso AS TipoUsuario,
-    hc.Justificativa,
-    hc.DataContestacao,
-    hc.Tipo,
-    c.Status AS StatusChamado
-FROM Historial_Contestacoes hc
-INNER JOIN chamados c ON hc.id_chamado = c.id_chamado
-INNER JOIN Usuario u ON hc.Id_usuario = u.Id_usuario
-LEFT JOIN E_mail e ON u.Id_usuario = e.Id_usuario
-LEFT JOIN Nivel_de_acesso n ON u.Acess_codigo = n.codigo;
-GO
+    id_chamado,
+    titulo,
+    LEFT(descricao, 50) + '...' AS descricao_resumida
+FROM chamados;
 
-PRINT '   ✅ View vw_HistorialContestacoes criada';
-
--- View: Última contestação por chamado
-IF EXISTS (SELECT * FROM sys.views WHERE name = 'vw_UltimaContestacao')
-    DROP VIEW vw_UltimaContestacao;
-GO
-
-CREATE VIEW vw_UltimaContestacao AS
-SELECT 
-    hc.id_chamado,
-    hc.Id_usuario,
-    u.nome AS NomeUsuario,
-    hc.Justificativa,
-    hc.DataContestacao,
-    hc.Tipo
-FROM Historial_Contestacoes hc
-INNER JOIN Usuario u ON hc.Id_usuario = u.Id_usuario
-WHERE hc.Id = (
-    SELECT TOP 1 Id 
-    FROM Historial_Contestacoes 
-    WHERE id_chamado = hc.id_chamado 
-    ORDER BY DataContestacao DESC
-);
-GO
-
-PRINT '   ✅ View vw_UltimaContestacao criada';
 PRINT '';
 
--- =====================================================
--- PASSO 6: CRIAR STORED PROCEDURES
--- =====================================================
-PRINT '6. Criando stored procedures...';
-
--- SP: Adicionar contestação
-IF EXISTS (SELECT * FROM sys.procedures WHERE name = 'sp_AdicionarContestacao')
-    DROP PROCEDURE sp_AdicionarContestacao;
-GO
-
-CREATE PROCEDURE sp_AdicionarContestacao
-    @IdChamado INT,
-    @IdUsuario INT,
-    @Justificativa VARCHAR(1000),
-    @Tipo VARCHAR(20) = 'Contestacao'
-AS
-BEGIN
-    SET NOCOUNT ON;
-    
-    -- Validar que o chamado existe
-    IF NOT EXISTS (SELECT 1 FROM chamados WHERE id_chamado = @IdChamado)
-    BEGIN
-        RAISERROR('Chamado não encontrado', 16, 1);
-        RETURN;
-    END
-    
-    -- Validar que o usuário existe
-    IF NOT EXISTS (SELECT 1 FROM Usuario WHERE Id_usuario = @IdUsuario)
-    BEGIN
-        RAISERROR('Usuário não encontrado', 16, 1);
-        RETURN;
-    END
-    
-    -- Inserir contestação
-    INSERT INTO Historial_Contestacoes (id_chamado, Id_usuario, Justificativa, DataContestacao, Tipo)
-    VALUES (@IdChamado, @IdUsuario, @Justificativa, GETDATE(), @Tipo);
-    
-    -- Retornar ID da contestação criada
-    SELECT CAST(SCOPE_IDENTITY() AS INT) AS IdContestacao;
-END;
-GO
-
-PRINT '   ✅ SP sp_AdicionarContestacao criada';
-
--- SP: Listar contestações de um chamado
-IF EXISTS (SELECT * FROM sys.procedures WHERE name = 'sp_ListarContestacoesChamado')
-    DROP PROCEDURE sp_ListarContestacoesChamado;
-GO
-
-CREATE PROCEDURE sp_ListarContestacoesChamado
-    @IdChamado INT
-AS
-BEGIN
-    SET NOCOUNT ON;
-    
-    SELECT 
-        hc.Id,
-        hc.Id_usuario,
-        u.nome AS NomeUsuario,
-        n.Nivel_acesso AS TipoUsuario,
-        hc.Justificativa,
-        hc.DataContestacao,
-        hc.Tipo
-    FROM Historial_Contestacoes hc
-    INNER JOIN Usuario u ON hc.Id_usuario = u.Id_usuario
-    INNER JOIN Nivel_de_acesso n ON u.Acess_codigo = n.codigo
-    WHERE hc.id_chamado = @IdChamado
-    ORDER BY hc.DataContestacao DESC;
-END;
-GO
-
-PRINT '   ✅ SP sp_ListarContestacoesChamado criada';
-
--- SP: Obter estatísticas de contestações
-IF EXISTS (SELECT * FROM sys.procedures WHERE name = 'sp_EstatisticasContestacoes')
-    DROP PROCEDURE sp_EstatisticasContestacoes;
-GO
-
-CREATE PROCEDURE sp_EstatisticasContestacoes
-AS
-BEGIN
-    SET NOCOUNT ON;
-    
-    SELECT 
-        COUNT(*) AS TotalContestacoes,
-        COUNT(DISTINCT id_chamado) AS ChamadosComContestacao,
-        COUNT(DISTINCT Id_usuario) AS UsuariosQueContestaram,
-        SUM(CASE WHEN Tipo = 'Contestacao' THEN 1 ELSE 0 END) AS TotalContestacoes_Tipo,
-        SUM(CASE WHEN Tipo = 'Resposta' THEN 1 ELSE 0 END) AS TotalRespostas,
-        SUM(CASE WHEN Tipo = 'Observacao' THEN 1 ELSE 0 END) AS TotalObservacoes
-    FROM Historial_Contestacoes;
-END;
-GO
-
-PRINT '   ✅ SP sp_EstatisticasContestacoes criada';
+-- ============================================
+-- PASSO 3: LIMPAR DESCRIÇÕES (OPCIONAL)
+-- ============================================
+PRINT '3. Deseja limpar as descrições?';
+PRINT '   (remover TÍTULO: e DESCRIÇÃO: do texto)';
+PRINT '';
+PRINT '   Execute a seção OPCIONAL abaixo se desejar';
 PRINT '';
 
--- =====================================================
--- PASSO 7: VERIFICAÇÃO E TESTES
--- =====================================================
-PRINT '============================================================';
-PRINT '  VERIFICAÇÃO DOS RESULTADOS';
-PRINT '============================================================';
+/*
+-- ============================================
+-- OPCIONAL: LIMPAR DESCRIÇÕES
+-- ============================================
+-- Descomente este bloco se quiser remover
+-- "TÍTULO: xxx" da coluna descricao
+
+UPDATE chamados
+SET descricao = CASE
+    -- Se tem TÍTULO: seguido de DESCRIÇÃO:
+    WHEN descricao LIKE '%TÍTULO:%DESCRIÇÃO:%' OR descricao LIKE '%TITULO:%DESCRICAO:%' THEN
+        LTRIM(RTRIM(
+            SUBSTRING(
+                descricao,
+                CASE 
+                    WHEN descricao LIKE '%DESCRIÇÃO:%' THEN CHARINDEX('DESCRIÇÃO:', descricao) + 11
+                    ELSE CHARINDEX('DESCRICAO:', descricao) + 11
+                END,
+                LEN(descricao)
+            )
+        ))
+    -- Se só tem DESCRIÇÃO: (sem TÍTULO:)
+    WHEN descricao LIKE '%DESCRIÇÃO:%' OR descricao LIKE '%DESCRICAO:%' THEN
+        LTRIM(RTRIM(
+            SUBSTRING(
+                descricao,
+                CASE 
+                    WHEN descricao LIKE '%DESCRIÇÃO:%' THEN CHARINDEX('DESCRIÇÃO:', descricao) + 11
+                    ELSE CHARINDEX('DESCRICAO:', descricao) + 11
+                END,
+                LEN(descricao)
+            )
+        ))
+    -- Se não tem marcadores, manter como está
+    ELSE descricao
+END
+WHERE descricao LIKE '%TÍTULO:%' 
+   OR descricao LIKE '%TITULO:%'
+   OR descricao LIKE '%DESCRIÇÃO:%'
+   OR descricao LIKE '%DESCRICAO:%';
+
+PRINT '   ✅ Descrições limpas';
+*/
+
+-- ============================================
+-- PASSO 4: CRIAR ÍNDICE (OPCIONAL)
+-- ============================================
+PRINT '4. Criando índice para busca por título...';
+
+IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'IX_Chamados_Titulo')
+BEGIN
+    CREATE INDEX IX_Chamados_Titulo ON chamados(titulo);
+    PRINT '   ✅ Índice criado';
+END
+ELSE
+BEGIN
+    PRINT '   ⚠️  Índice já existe';
+END
+
+PRINT '';
+
+-- ============================================
+-- PASSO 5: VERIFICAÇÃO FINAL
+-- ============================================
+PRINT '============================================';
+PRINT 'VERIFICAÇÃO FINAL';
+PRINT '============================================';
 PRINT '';
 
 -- Estatísticas
-PRINT 'ESTATÍSTICAS:';
 SELECT 
-    'Total de Contestações Migradas' AS Info,
-    COUNT(*) AS Total
-FROM Historial_Contestacoes
+    'Total de Chamados' AS Info,
+    COUNT(*) AS Quantidade
+FROM chamados
 UNION ALL
 SELECT 
-    'Chamados com Contestação',
-    COUNT(DISTINCT id_chamado)
-FROM Historial_Contestacoes;
+    'Com Título Preenchido',
+    COUNT(*)
+FROM chamados
+WHERE titulo IS NOT NULL AND titulo != ''
+UNION ALL
+SELECT 
+    'Sem Título',
+    COUNT(*)
+FROM chamados
+WHERE titulo IS NULL OR titulo = '';
 
 PRINT '';
-PRINT 'EXEMPLO DE DADOS:';
+
+-- Exemplo de chamados
+PRINT 'EXEMPLO DE CHAMADOS:';
 SELECT TOP 5
-    hc.Id,
-    hc.id_chamado,
-    u.nome AS Usuario,
-    hc.Justificativa,
-    hc.DataContestacao,
-    hc.Tipo
-FROM Historial_Contestacoes hc
-INNER JOIN Usuario u ON hc.Id_usuario = u.Id_usuario
-ORDER BY hc.DataContestacao DESC;
+    id_chamado,
+    titulo,
+    LEFT(descricao, 80) AS descricao_resumida,
+    categoria,
+    prioridade,
+    Status
+FROM chamados
+ORDER BY id_chamado;
 
 PRINT '';
-PRINT 'TESTE DE VIEW:';
-SELECT TOP 3 * FROM vw_HistorialContestacoes;
-
-PRINT '';
-PRINT 'TESTE DE STORED PROCEDURE:';
--- Inserir contestação de teste
-DECLARE @TestIdChamado INT = (SELECT TOP 1 id_chamado FROM chamados ORDER BY id_chamado);
-DECLARE @TestIdUsuario INT = (SELECT TOP 1 Id_usuario FROM Usuario WHERE Acess_codigo = 2);
-
-IF @TestIdChamado IS NOT NULL AND @TestIdUsuario IS NOT NULL
-BEGIN
-    EXEC sp_AdicionarContestacao 
-        @IdChamado = @TestIdChamado,
-        @IdUsuario = @TestIdUsuario,
-        @Justificativa = 'Teste de contestação após migração',
-        @Tipo = 'Observacao';
-    
-    PRINT '   ✅ Teste de inserção concluído';
-END
-
-PRINT '';
-
--- =====================================================
--- PASSO 8: LIMPAR TEMPORÁRIOS
--- =====================================================
-PRINT '8. Limpando temporários...';
-
-DROP TABLE #BackupContestacoes;
-
-PRINT '   ✅ Tabelas temporárias removidas';
-PRINT '';
-
--- =====================================================
--- RESUMO FINAL
--- =====================================================
-PRINT '============================================================';
-PRINT '  ✅ MIGRAÇÃO CONCLUÍDA COM SUCESSO!';
-PRINT '============================================================';
-PRINT '';
-PRINT 'ALTERAÇÕES REALIZADAS:';
-PRINT '  ✅ Tabela Historial_Contestacoes criada';
-PRINT '  ✅ Contestações existentes migradas';
-PRINT '  ✅ 2 Views criadas (vw_HistorialContestacoes, vw_UltimaContestacao)';
-PRINT '  ✅ 3 Stored Procedures criados';
+PRINT '============================================';
+PRINT '✅ MIGRAÇÃO CONCLUÍDA COM SUCESSO!';
+PRINT '============================================';
 PRINT '';
 PRINT 'PRÓXIMOS PASSOS:';
-PRINT '  1. Atualizar código C# (Repository e Models)';
-PRINT '  2. Atualizar formulários para usar novo sistema';
-PRINT '  3. Testar criação de contestações';
-PRINT '  4. Após validação, executar PASSO 5 para remover estrutura antiga';
+PRINT '1. Atualizar Model Chamados.cs (adicionar propriedade Titulo)';
+PRINT '2. Atualizar ChamadosRepository.cs (incluir titulo em queries)';
+PRINT '3. Atualizar Forms para capturar título separado';
+PRINT '4. Opcional: Executar bloco de limpeza de descrições';
 PRINT '';
-PRINT 'QUERIES ÚTEIS:';
-PRINT '  -- Ver todas contestações:';
-PRINT '  SELECT * FROM vw_HistorialContestacoes;';
-PRINT '';
-PRINT '  -- Ver contestações de um chamado:';
-PRINT '  EXEC sp_ListarContestacoesChamado @IdChamado = 1;';
-PRINT '';
-PRINT '  -- Adicionar contestação:';
-PRINT '  EXEC sp_AdicionarContestacao @IdChamado=1, @IdUsuario=2, @Justificativa=''Texto'';';
-PRINT '';
-PRINT '============================================================';
 GO
-
-
-
-
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 -- ============================================
@@ -2002,4 +1833,5 @@ PRINT '';
 PRINT '⚠️ IMPORTANTE: As senhas acima são as ORIGINAIS!';
 PRINT 'O sistema agora usa os HASHES internamente.';
 PRINT '';
+
 

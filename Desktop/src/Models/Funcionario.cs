@@ -74,31 +74,16 @@ namespace SistemaChamados.Models
             }
         }
 
-        /// <summary>
-        /// Adiciona uma contestação a um chamado próprio
-        /// </summary>
-        /// <param name="idChamado">ID do chamado</param>
-        /// <param name="contestacao">Texto da contestação</param>
-        public void AdicionarContestacao(int idChamado, string contestacao)
+        public void ValidarContestacao(string contestacao)
         {
-            try
-            {
-                // Verificar se o chamado pertence a este funcionário
-                // Adicionar contestação ao chamado
-                var chamado = new Chamados(); // Buscar do banco
-                if (chamado.Afetado == this.Id)
-                {
-                    chamado.AdicionarContestacao(contestacao);
-                }
-                else
-                {
-                    throw new UnauthorizedAccessException("Você só pode contestar seus próprios chamados.");
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Erro ao adicionar contestação: {ex.Message}");
-            }
+            if (string.IsNullOrWhiteSpace(contestacao))
+                throw new ArgumentException("Contestação não pode ser vazia");
+
+            if (contestacao.Length < 10)
+                throw new ArgumentException("Contestação muito curta (mínimo 10 caracteres)");
+
+            if (contestacao.Length > 1000)
+                throw new ArgumentException("Contestação muito longa (máximo 1000 caracteres)");
         }
 
         /// <summary>

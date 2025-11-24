@@ -15,6 +15,7 @@ namespace SistemaChamados.Forms
         private RichTextBox txtDescricao;
         private RichTextBox txtContestacoes;
         private Label lblId, lblCategoria, lblStatus, lblPrioridade, lblData, lblSolicitante, lblTecnico;
+        private Label lblTituloChamado; 
         private Button btnFechar;
         private Button btnAlterar;
         private Panel panelHeader;
@@ -28,6 +29,11 @@ namespace SistemaChamados.Forms
             _funcionarioLogado = funcionarioLogado;
             _controller = controller;
             _permiteEdicao = permiteEdicao;
+            System.Diagnostics.Debug.WriteLine("=== CONSTRUCTOR DetalhesChamadoForm ===");
+            System.Diagnostics.Debug.WriteLine($"ID: {chamado?.IdChamado}");
+            System.Diagnostics.Debug.WriteLine($"Título: '{chamado?.Titulo ?? "(null)"}'");
+            System.Diagnostics.Debug.WriteLine($"Descrição: {chamado?.Descricao?.Length ?? 0} chars");
+            System.Diagnostics.Debug.WriteLine($"Primeira linha desc: {chamado?.Descricao?.Substring(0, Math.Min(50, chamado.Descricao?.Length ?? 0))}");
             InitializeComponent();
             PreencherDados();
         }
@@ -42,6 +48,7 @@ namespace SistemaChamados.Forms
                 BackColor = Color.FromArgb(0, 123, 255),
                 Dock = DockStyle.Top
             };
+
 
             var lblTitulo = new Label
             {
@@ -68,20 +75,29 @@ namespace SistemaChamados.Forms
             {
                 Font = new Font("Segoe UI", 9F, FontStyle.Bold),
                 Location = new Point(15, 15),
-                Size = new Size(200, 20)
+                Size = new Size(620, 20),
+            };
+
+            this.lblTituloChamado = new Label
+            {
+                Font = new Font("Segoe UI", 11F, FontStyle.Bold),
+                Location = new Point(15, 40),
+                Size = new Size(620, 25),
+                ForeColor = Color.FromArgb(0, 123, 255)
             };
 
             this.lblCategoria = new Label
             {
                 Font = new Font("Segoe UI", 9F),
-                Location = new Point(15, 40),
+                Location = new Point(15, 70), 
                 Size = new Size(200, 20)
             };
+
 
             this.lblPrioridade = new Label
             {
                 Font = new Font("Segoe UI", 9F),
-                Location = new Point(15, 65),
+                Location = new Point(15, 70),
                 Size = new Size(200, 20)
             };
 
@@ -111,10 +127,11 @@ namespace SistemaChamados.Forms
             {
                 Font = new Font("Segoe UI", 8F, FontStyle.Italic),
                 ForeColor = Color.Gray,
-                Location = new Point(15, 82),
-                Size = new Size(630, 15)
+                Location = new Point(340, 50),
+                Size = new Size(300, 20)
             };
 
+            this.panelInfo.Controls.Add(this.lblTituloChamado);
             this.panelInfo.Controls.AddRange(new Control[] {
                 this.lblId, this.lblCategoria, this.lblPrioridade,
                 this.lblStatus, this.lblSolicitante, this.lblTecnico, this.lblData
@@ -126,15 +143,14 @@ namespace SistemaChamados.Forms
                 Text = "📋 DESCRIÇÃO DO PROBLEMA",
                 Font = new Font("Segoe UI", 10F, FontStyle.Bold),
                 Location = new Point(12, 180),
-                Size = new Size(660, 220), // ← Era 180, ahora 220
+                Size = new Size(660, 220), 
                 ForeColor = Color.FromArgb(0, 123, 255)
             };
 
-            // ⚠️ CONFIGURACIÓN CRÍTICA DEL TEXTBOX
             this.txtDescricao = new RichTextBox
             {
                 Location = new Point(15, 25),
-                Size = new Size(630, 180), // ← Era 140, ahora 180
+                Size = new Size(630, 180), 
                 Multiline = true,
                 ScrollBars = RichTextBoxScrollBars.Vertical,
                 ReadOnly = true,
@@ -242,11 +258,11 @@ namespace SistemaChamados.Forms
                     "TÍTULO:",
                     "TITULO:",
                     "DESCRIÇÃO:",
-                    "DESCRICAO:",
-                    "AFETADOS:",
-                    "AFETADO:",
-                    "IMPEDE TRABALHO:",
-                    "IMPEDE:",
+                    "DESCRICAO: ",
+                    "AFETADOS: ",
+                    "AFETADO: ",
+                    "IMPEDE TRABALHO: ",
+                    "IMPEDE: ",
                     "PRIORIDADE:",
                     "URGENTE:",
                     "OBSERVAÇÃO:",
@@ -324,43 +340,119 @@ namespace SistemaChamados.Forms
         {
             try
             {
-                // Informações básicas
+                // ========================================
+                // INFORMAÇÕES BÁSICAS
+                // ========================================
                 lblId.Text = $"Chamado #{_chamado.IdChamado}";
-                lblCategoria.Text = $"Categoria: {_chamado.Categoria}";
-                lblPrioridade.Text = $"Prioridade: {ObterTextoPrioridade(_chamado.Prioridade)}";
-                lblPrioridade.ForeColor = ObterCorPrioridade(_chamado.Prioridade);
-                lblData.Text = $"Aberto em: {_chamado.DataChamado:dd/MM/yyyy HH:mm}";
 
-                lblStatus.Text = $"Status: {ObterTextoStatus((int)_chamado.Status)}";
-                lblStatus.ForeColor = ObterCorStatus((int)_chamado.Status);
-                lblSolicitante.Text = $"Solicitante: ID {_chamado.Afetado}";
-                lblTecnico.Text = _chamado.TecnicoResponsavel.HasValue
-                    ? $"Técnico: ID {_chamado.TecnicoResponsavel}"
-                    : "Técnico: Não atribuído";
-
-                // ⚠️ APLICAR FORMATAÇÃO
-                string descricaoFormatada = FormatarDescricao(_chamado.Descricao);
-                txtDescricao.Text = descricaoFormatada;
-
-                // Contestações
-                if (!string.IsNullOrEmpty(_chamado.Contestacoes))
+                // ⭐ TÍTULO (Mostrar "Sem título" si está vacío)
+                if (!string.IsNullOrWhiteSpace(_chamado.Titulo))
                 {
-                    txtContestacoes.Text = _chamado.Contestacoes;
-                    gbContestacoes.ForeColor = Color.FromArgb(220, 53, 69);
+                    lblTituloChamado.Text = $"📋 {_chamado.Titulo}";
+                    lblTituloChamado.Visible = true;
                 }
                 else
                 {
-                    txtContestacoes.Text = "Nenhuma contestação registrada.";
-                    txtContestacoes.ForeColor = Color.Gray;
-                    gbContestacoes.ForeColor = Color.Gray;
+                    lblTituloChamado.Text = "📋 Sem título";
+                    lblTituloChamado.Visible = true;
                 }
+
+                // CATEGORIA E PRIORIDADE
+                lblCategoria.Text = $"Categoria: {_chamado.Categoria}";
+                lblPrioridade.Text = $"Prioridade: {ObterTextoPrioridade(_chamado.Prioridade)}";
+                lblPrioridade.ForeColor = ObterCorPrioridade(_chamado.Prioridade);
+
+                // STATUS
+                lblStatus.Text = $"Status: {ObterTextoStatus((int)_chamado.Status)}";
+                lblStatus.ForeColor = ObterCorStatus((int)_chamado.Status);
+
+                // SOLICITANTE
+                lblSolicitante.Text = $"Solicitante: ID {_chamado.Afetado}";
+
+                // TÉCNICO RESPONSÁVEL
+                if (_chamado.TecnicoResponsavel.HasValue)
+                {
+                    lblTecnico.Text = $"Técnico: ID {_chamado.TecnicoResponsavel.Value}";
+                }
+                else
+                {
+                    lblTecnico.Text = "Técnico: Não atribuído";
+                    lblTecnico.ForeColor = Color.Gray;
+                }
+
+                // DATA
+                lblData.Text = $"Registrado em: {_chamado.DataChamado:dd/MM/yyyy HH:mm}";
+                if (_chamado.DataResolucao.HasValue)
+                {
+                    lblData.Text += $" | Resolvido em: {_chamado.DataResolucao:dd/MM/yyyy HH:mm}";
+                }
+
+                // ========================================
+                // DESCRIÇÃO (COM FORMATAÇÃO)
+                // ========================================
+                if (!string.IsNullOrWhiteSpace(_chamado.Descricao))
+                {
+                    string descricaoFormatada = FormatarDescricao(_chamado.Descricao);
+                    txtDescricao.Text = descricaoFormatada;
+
+                    // Debug
+                    System.Diagnostics.Debug.WriteLine($"=== DESCRIÇÃO CARREGADA ===");
+                    System.Diagnostics.Debug.WriteLine($"Original: {_chamado.Descricao.Substring(0, Math.Min(100, _chamado.Descricao.Length))}");
+                    System.Diagnostics.Debug.WriteLine($"Formatada: {descricaoFormatada.Substring(0, Math.Min(100, descricaoFormatada.Length))}");
+                }
+                else
+                {
+                    txtDescricao.Text = "Sem descrição disponível.";
+                    System.Diagnostics.Debug.WriteLine("⚠️ DESCRIÇÃO VAZIA!");
+                }
+
+                // ========================================
+                // CONTESTAÇÕES
+                // ========================================
+                if (!string.IsNullOrWhiteSpace(_chamado.Contestacoes))
+                {
+                    txtContestacoes.Text = _chamado.Contestacoes;
+                    gbContestacoes.Visible = true;
+
+                    System.Diagnostics.Debug.WriteLine($"=== CONTESTAÇÕES CARREGADAS ===");
+                    System.Diagnostics.Debug.WriteLine(_chamado.Contestacoes);
+                }
+                else
+                {
+                    txtContestacoes.Text = "Sem contestações registradas.";
+                    gbContestacoes.Visible = true;
+                    txtContestacoes.ForeColor = Color.Gray;
+
+                    System.Diagnostics.Debug.WriteLine("ℹ️ Sem contestações");
+                }
+
+                // ========================================
+                // LOGS DE DEBUG
+                // ========================================
+                System.Diagnostics.Debug.WriteLine("");
+                System.Diagnostics.Debug.WriteLine("=== RESUMO DO CHAMADO ===");
+                System.Diagnostics.Debug.WriteLine($"ID: {_chamado.IdChamado}");
+                System.Diagnostics.Debug.WriteLine($"Título: {_chamado.Titulo ?? "(vazio)"}");
+                System.Diagnostics.Debug.WriteLine($"Descrição length: {_chamado.Descricao?.Length ?? 0}");
+                System.Diagnostics.Debug.WriteLine($"Categoria: {_chamado.Categoria}");
+                System.Diagnostics.Debug.WriteLine($"Status: {_chamado.Status}");
+                System.Diagnostics.Debug.WriteLine($"Prioridade: {_chamado.Prioridade}");
+                System.Diagnostics.Debug.WriteLine("========================");
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Erro ao preencher dados: {ex.Message}\n\n{ex.StackTrace}", "Erro",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
-                System.Diagnostics.Debug.WriteLine($"Erro em PreencherDados: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"❌ ERRO em PreencherDados: {ex.Message}");
                 System.Diagnostics.Debug.WriteLine($"StackTrace: {ex.StackTrace}");
+
+                MessageBox.Show(
+                    $"Erro ao preencher dados do chamado:\n\n{ex.Message}\n\n" +
+                    $"ID do Chamado: {_chamado?.IdChamado}\n" +
+                    $"Título: {_chamado?.Titulo ?? "(null)"}\n" +
+                    $"Descrição length: {_chamado?.Descricao?.Length ?? 0}",
+                    "Erro",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error
+                );
             }
         }
 

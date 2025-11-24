@@ -62,7 +62,7 @@ namespace SistemaChamados.Forms
             this.txtPesquisa.Location = new Point(15, 25);
             this.txtPesquisa.Size = new Size(200, 20);
             this.txtPesquisa.ForeColor = Color.Gray;
-            this.txtPesquisa.Text = "Pesquisar por descrição...";
+            this.txtPesquisa.Text = "Pesquisar por título ou descrição...";
             this.txtPesquisa.GotFocus += TxtPesquisa_GotFocus;
             this.txtPesquisa.LostFocus += TxtPesquisa_LostFocus;
 
@@ -254,7 +254,7 @@ namespace SistemaChamados.Forms
         {
             dgvChamados.Columns.Clear();
 
-            // Configurar colunas
+            // ID
             dgvChamados.Columns.Add(new DataGridViewTextBoxColumn
             {
                 Name = "IdChamado",
@@ -263,6 +263,7 @@ namespace SistemaChamados.Forms
                 ReadOnly = true
             });
 
+            // Data
             dgvChamados.Columns.Add(new DataGridViewTextBoxColumn
             {
                 Name = "DataChamado",
@@ -272,6 +273,16 @@ namespace SistemaChamados.Forms
                 DefaultCellStyle = new DataGridViewCellStyle { Format = "dd/MM/yyyy HH:mm" }
             });
 
+            // ⭐ NUEVO: Coluna Título
+            dgvChamados.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                Name = "Titulo",
+                HeaderText = "Título",
+                Width = 180,
+                ReadOnly = true
+            });
+
+            // Categoria
             dgvChamados.Columns.Add(new DataGridViewTextBoxColumn
             {
                 Name = "Categoria",
@@ -280,14 +291,16 @@ namespace SistemaChamados.Forms
                 ReadOnly = true
             });
 
+            // Descrição (reducida porque tenemos título)
             dgvChamados.Columns.Add(new DataGridViewTextBoxColumn
             {
                 Name = "Descricao",
                 HeaderText = "Descrição",
-                Width = 300,
+                Width = 220, // ⭐ Reducido de 300 a 220
                 ReadOnly = true
             });
 
+            // Prioridade
             dgvChamados.Columns.Add(new DataGridViewTextBoxColumn
             {
                 Name = "Prioridade",
@@ -296,6 +309,7 @@ namespace SistemaChamados.Forms
                 ReadOnly = true
             });
 
+            // Status
             dgvChamados.Columns.Add(new DataGridViewTextBoxColumn
             {
                 Name = "Status",
@@ -331,6 +345,7 @@ namespace SistemaChamados.Forms
             dgvChamados.DefaultCellStyle.SelectionBackColor = Color.DodgerBlue;
             dgvChamados.DefaultCellStyle.SelectionForeColor = Color.White;
         }
+
 
         private void ConfigurarPermissoes()
         {
@@ -399,17 +414,31 @@ namespace SistemaChamados.Forms
             {
                 var row = new DataGridViewRow();
 
+                // ID
                 row.Cells.Add(new DataGridViewTextBoxCell { Value = chamado.IdChamado });
+
+                // Data
                 row.Cells.Add(new DataGridViewTextBoxCell { Value = chamado.DataChamado });
+
+                // ⭐ NUEVO: Título
+                string tituloMostrar = !string.IsNullOrWhiteSpace(chamado.Titulo)
+                    ? chamado.Titulo
+                    : "Sem título";
+                row.Cells.Add(new DataGridViewTextBoxCell { Value = tituloMostrar });
+
+                // Categoria
                 row.Cells.Add(new DataGridViewTextBoxCell { Value = chamado.Categoria });
 
-                // Limitar descrição a 50 caracteres
-                string descricaoResumida = chamado.Descricao.Length > 50
-                    ? chamado.Descricao.Substring(0, 50) + "..."
+                // Descrição (resumida y más corta)
+                string descricaoResumida = chamado.Descricao.Length > 40
+                    ? chamado.Descricao.Substring(0, 40) + "..."
                     : chamado.Descricao;
                 row.Cells.Add(new DataGridViewTextBoxCell { Value = descricaoResumida });
 
+                // Prioridade
                 row.Cells.Add(new DataGridViewTextBoxCell { Value = ObterTextoPrioridade(chamado.Prioridade) });
+
+                // Status
                 row.Cells.Add(new DataGridViewTextBoxCell { Value = ObterTextoStatus((int)chamado.Status) });
 
                 if (_funcionarioLogado.NivelAcesso >= 2)
@@ -428,6 +457,7 @@ namespace SistemaChamados.Forms
                 dgvChamados.Rows.Add(row);
             }
         }
+
 
         private void ColorirLinhaPorPrioridade(DataGridViewRow row, int prioridade)
         {
@@ -511,13 +541,14 @@ namespace SistemaChamados.Forms
             {
                 var chamadosFiltrados = _chamadosCarregados.AsEnumerable();
 
-                // Filtro por texto
+                // Filtro por texto (ahora también busca en título)
                 if (!string.IsNullOrWhiteSpace(txtPesquisa.Text))
                 {
                     string termo = txtPesquisa.Text.ToLower();
                     chamadosFiltrados = chamadosFiltrados.Where(c =>
                         c.Descricao.ToLower().Contains(termo) ||
-                        c.Categoria.ToLower().Contains(termo));
+                        c.Categoria.ToLower().Contains(termo) ||
+                        (!string.IsNullOrWhiteSpace(c.Titulo) && c.Titulo.ToLower().Contains(termo))); // ⭐ NUEVO
                 }
 
                 // Filtro por status

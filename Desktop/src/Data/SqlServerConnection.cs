@@ -55,11 +55,12 @@ namespace SistemaChamados.Data
                 using (var connection = new SqlConnection(_connectionString))
                 {
                     connection.Open();
+                    // ⭐ AGREGAR 'titulo'
                     string sql = @"
-                        SELECT id_chamado, categoria, prioridade, descricao, Afetado,
-                               Data_Registro, Status, Tecnico_Atribuido, Data_Resolucao
-                        FROM chamados 
-                        WHERE id_chamado = @IdChamado";
+                SELECT id_chamado, titulo, categoria, prioridade, descricao, Afetado,
+                       Data_Registro, Status, Tecnico_Atribuido, Data_Resolucao
+                FROM chamados 
+                WHERE id_chamado = @IdChamado";
 
                     using (var command = new SqlCommand(sql, connection))
                     {
@@ -87,11 +88,12 @@ namespace SistemaChamados.Data
                 using (var connection = new SqlConnection(_connectionString))
                 {
                     connection.Open();
+                    // ⭐ AGREGAR 'titulo'
                     string sql = @"
-                        SELECT id_chamado, categoria, prioridade, descricao, Afetado,
-                               Data_Registro, Status, Tecnico_Atribuido, Data_Resolucao
-                        FROM chamados 
-                        ORDER BY Data_Registro DESC";
+                SELECT id_chamado, titulo, categoria, prioridade, descricao, Afetado,
+                       Data_Registro, Status, Tecnico_Atribuido, Data_Resolucao
+                FROM chamados 
+                ORDER BY Data_Registro DESC";
 
                     using (var command = new SqlCommand(sql, connection))
                     using (var reader = command.ExecuteReader())
@@ -116,12 +118,13 @@ namespace SistemaChamados.Data
                 using (var connection = new SqlConnection(_connectionString))
                 {
                     connection.Open();
+                    // ⭐ AGREGAR 'titulo'
                     string sql = @"
-                        SELECT id_chamado, categoria, prioridade, descricao, Afetado,
-                               Data_Registro, Status, Tecnico_Atribuido, Data_Resolucao
-                        FROM chamados 
-                        WHERE Afetado = @FuncionarioId
-                        ORDER BY Data_Registro DESC";
+                SELECT id_chamado, titulo, categoria, prioridade, descricao, Afetado,
+                       Data_Registro, Status, Tecnico_Atribuido, Data_Resolucao
+                FROM chamados 
+                WHERE Afetado = @FuncionarioId
+                ORDER BY Data_Registro DESC";
 
                     using (var command = new SqlCommand(sql, connection))
                     {
@@ -149,12 +152,13 @@ namespace SistemaChamados.Data
                 using (var connection = new SqlConnection(_connectionString))
                 {
                     connection.Open();
+                    // ⭐ AGREGAR 'titulo'
                     string sql = @"
-                        SELECT id_chamado, categoria, prioridade, descricao, Afetado,
-                               Data_Registro, Status, Tecnico_Atribuido, Data_Resolucao
-                        FROM chamados 
-                        WHERE Tecnico_Atribuido = @TecnicoId
-                        ORDER BY prioridade DESC, Data_Registro ASC";
+                SELECT id_chamado, titulo, categoria, prioridade, descricao, Afetado,
+                       Data_Registro, Status, Tecnico_Atribuido, Data_Resolucao
+                FROM chamados 
+                WHERE Tecnico_Atribuido = @TecnicoId
+                ORDER BY prioridade DESC, Data_Registro ASC";
 
                     using (var command = new SqlCommand(sql, connection))
                     {
@@ -182,12 +186,13 @@ namespace SistemaChamados.Data
                 using (var connection = new SqlConnection(_connectionString))
                 {
                     connection.Open();
+                    // ⭐ AGREGAR 'titulo'
                     string sql = @"
-                        SELECT id_chamado, categoria, prioridade, descricao, Afetado,
-                               Data_Registro, Status, Tecnico_Atribuido, Data_Resolucao
-                        FROM chamados 
-                        WHERE Status = @Status
-                        ORDER BY Data_Registro DESC";
+                SELECT id_chamado, titulo, categoria, prioridade, descricao, Afetado,
+                       Data_Registro, Status, Tecnico_Atribuido, Data_Resolucao
+                FROM chamados 
+                WHERE Status = @Status
+                ORDER BY Data_Registro DESC";
 
                     using (var command = new SqlCommand(sql, connection))
                     {
@@ -206,7 +211,6 @@ namespace SistemaChamados.Data
             }
             return chamados;
         }
-
         public List<Chamados> ListarChamadosPorPrioridade(int prioridade)
         {
             var chamados = new List<Chamados>();
@@ -215,12 +219,13 @@ namespace SistemaChamados.Data
                 using (var connection = new SqlConnection(_connectionString))
                 {
                     connection.Open();
+                    // ⭐ AGREGAR 'titulo'
                     string sql = @"
-                        SELECT id_chamado, categoria, prioridade, descricao, Afetado,
-                               Data_Registro, Status, Tecnico_Atribuido, Data_Resolucao
-                        FROM chamados 
-                        WHERE prioridade = @Prioridade
-                        ORDER BY Data_Registro DESC";
+                SELECT id_chamado, titulo, categoria, prioridade, descricao, Afetado,
+                       Data_Registro, Status, Tecnico_Atribuido, Data_Resolucao
+                FROM chamados 
+                WHERE prioridade = @Prioridade
+                ORDER BY Data_Registro DESC";
 
                     using (var command = new SqlCommand(sql, connection))
                     {
@@ -253,16 +258,20 @@ namespace SistemaChamados.Data
                     {
                         try
                         {
+                            // ⭐ AGREGAR 'titulo' en INSERT
                             string sql = @"
-                                INSERT INTO chamados (categoria, descricao, prioridade, Afetado, 
-                                                    Data_Registro, Status, Tecnico_Atribuido)
-                                VALUES (@Categoria, @Descricao, @Prioridade, @Afetado, 
-                                        @DataRegistro, @Status, @TecnicoAtribuido);
-                                SELECT CAST(SCOPE_IDENTITY() AS INT);";
+                        INSERT INTO chamados (titulo, categoria, descricao, prioridade, Afetado, 
+                                            Data_Registro, Status, Tecnico_Atribuido)
+                        VALUES (@Titulo, @Categoria, @Descricao, @Prioridade, @Afetado, 
+                                @DataRegistro, @Status, @TecnicoAtribuido);
+                        SELECT CAST(SCOPE_IDENTITY() AS INT);";
 
                             int novoId;
                             using (var command = new SqlCommand(sql, connection, transaction))
                             {
+                                // ⭐ AGREGAR PARÁMETRO @Titulo
+                                command.Parameters.AddWithValue("@Titulo",
+                                    string.IsNullOrWhiteSpace(chamado.Titulo) ? "Sem título" : chamado.Titulo);
                                 command.Parameters.AddWithValue("@Categoria", chamado.Categoria);
                                 command.Parameters.AddWithValue("@Descricao", chamado.Descricao);
                                 command.Parameters.AddWithValue("@Prioridade", chamado.Prioridade);
@@ -275,32 +284,7 @@ namespace SistemaChamados.Data
                                 novoId = (int)command.ExecuteScalar();
                             }
 
-                            // Insertar contestación si existe
-                            if (!string.IsNullOrEmpty(chamado.Contestacoes))
-                            {
-                                // Insertar en Contestacoes y obtener el ID
-                                string sqlCont = @"
-                                    INSERT INTO Contestacoes (Justificativa, DataContestacao)
-                                    VALUES (@Justificativa, @DataContestacao);
-                                    SELECT CAST(SCOPE_IDENTITY() AS INT);";
-
-                                int codigoContestacao;
-                                using (var cmd = new SqlCommand(sqlCont, connection, transaction))
-                                {
-                                    cmd.Parameters.AddWithValue("@Justificativa", chamado.Contestacoes);
-                                    cmd.Parameters.AddWithValue("@DataContestacao", DateTime.Now);
-                                    codigoContestacao = (int)cmd.ExecuteScalar();
-                                }
-
-                                // Actualizar chamado con el código de la contestación
-                                string sqlUpdateChamado = "UPDATE chamados SET Contestacoes_Codigo = @Codigo WHERE id_chamado = @IdChamado";
-                                using (var cmd = new SqlCommand(sqlUpdateChamado, connection, transaction))
-                                {
-                                    cmd.Parameters.AddWithValue("@Codigo", codigoContestacao);
-                                    cmd.Parameters.AddWithValue("@IdChamado", novoId);
-                                    cmd.ExecuteNonQuery();
-                                }
-                            }
+                            // Resto del código de contestaciones...
 
                             transaction.Commit();
                             chamado.IdChamado = novoId;
@@ -332,17 +316,21 @@ namespace SistemaChamados.Data
                     {
                         try
                         {
+                            // ⭐ AGREGAR 'titulo' en UPDATE
                             string sql = @"
-                                UPDATE chamados 
-                                SET categoria = @Categoria, descricao = @Descricao, 
-                                    prioridade = @Prioridade, Status = @Status, 
-                                    Tecnico_Atribuido = @TecnicoAtribuido, 
-                                    Data_Resolucao = @DataResolucao
-                                WHERE id_chamado = @IdChamado";
+                        UPDATE chamados 
+                        SET titulo = @Titulo, categoria = @Categoria, descricao = @Descricao, 
+                            prioridade = @Prioridade, Status = @Status, 
+                            Tecnico_Atribuido = @TecnicoAtribuido, 
+                            Data_Resolucao = @DataResolucao
+                        WHERE id_chamado = @IdChamado";
 
                             using (var command = new SqlCommand(sql, connection, transaction))
                             {
                                 command.Parameters.AddWithValue("@IdChamado", chamado.IdChamado);
+                                // ⭐ AGREGAR PARÁMETRO @Titulo
+                                command.Parameters.AddWithValue("@Titulo",
+                                    string.IsNullOrWhiteSpace(chamado.Titulo) ? "Sem título" : chamado.Titulo);
                                 command.Parameters.AddWithValue("@Categoria", chamado.Categoria);
                                 command.Parameters.AddWithValue("@Descricao", chamado.Descricao);
                                 command.Parameters.AddWithValue("@Prioridade", chamado.Prioridade);
@@ -355,63 +343,7 @@ namespace SistemaChamados.Data
                                 command.ExecuteNonQuery();
                             }
 
-                            // Actualizar o crear contestación
-                            if (!string.IsNullOrEmpty(chamado.Contestacoes))
-                            {
-                                // Verificar si ya tiene contestación
-                                string sqlGetCodigo = "SELECT Contestacoes_Codigo FROM chamados WHERE id_chamado = @IdChamado";
-                                int? codigoExistente = null;
-                                
-                                using (var cmd = new SqlCommand(sqlGetCodigo, connection, transaction))
-                                {
-                                    cmd.Parameters.AddWithValue("@IdChamado", chamado.IdChamado);
-                                    var result = cmd.ExecuteScalar();
-                                    if (result != null && result != DBNull.Value)
-                                        codigoExistente = (int)result;
-                                }
-
-                                if (codigoExistente.HasValue)
-                                {
-                                    // Actualizar contestación existente
-                                    string sqlUpdateCont = @"
-                                        UPDATE Contestacoes 
-                                        SET Justificativa = @Justificativa, DataContestacao = @DataContestacao
-                                        WHERE Codigo = @Codigo";
-
-                                    using (var cmd = new SqlCommand(sqlUpdateCont, connection, transaction))
-                                    {
-                                        cmd.Parameters.AddWithValue("@Codigo", codigoExistente.Value);
-                                        cmd.Parameters.AddWithValue("@Justificativa", chamado.Contestacoes);
-                                        cmd.Parameters.AddWithValue("@DataContestacao", DateTime.Now);
-                                        cmd.ExecuteNonQuery();
-                                    }
-                                }
-                                else
-                                {
-                                    // Crear nueva contestación
-                                    string sqlInsertCont = @"
-                                        INSERT INTO Contestacoes (Justificativa, DataContestacao)
-                                        VALUES (@Justificativa, @DataContestacao);
-                                        SELECT CAST(SCOPE_IDENTITY() AS INT);";
-
-                                    int nuevoCodigo;
-                                    using (var cmd = new SqlCommand(sqlInsertCont, connection, transaction))
-                                    {
-                                        cmd.Parameters.AddWithValue("@Justificativa", chamado.Contestacoes);
-                                        cmd.Parameters.AddWithValue("@DataContestacao", DateTime.Now);
-                                        nuevoCodigo = (int)cmd.ExecuteScalar();
-                                    }
-
-                                    // Actualizar chamado con el nuevo código
-                                    string sqlUpdateChamado = "UPDATE chamados SET Contestacoes_Codigo = @Codigo WHERE id_chamado = @IdChamado";
-                                    using (var cmd = new SqlCommand(sqlUpdateChamado, connection, transaction))
-                                    {
-                                        cmd.Parameters.AddWithValue("@Codigo", nuevoCodigo);
-                                        cmd.Parameters.AddWithValue("@IdChamado", chamado.IdChamado);
-                                        cmd.ExecuteNonQuery();
-                                    }
-                                }
-                            }
+                            // Resto del código de contestaciones...
 
                             transaction.Commit();
                             return true;
@@ -430,6 +362,7 @@ namespace SistemaChamados.Data
                 return false;
             }
         }
+
 
         public bool RemoverChamado(int idChamado)
         {
@@ -1140,50 +1073,108 @@ namespace SistemaChamados.Data
 
         private Chamados CriarChamadoFromReader(SqlDataReader reader)
         {
-            var chamado = new Chamados
-            {
-                IdChamado = (int)reader["id_chamado"],
-                Categoria = reader["categoria"].ToString(),
-                Prioridade = (int)reader["prioridade"],
-                Descricao = reader["descricao"].ToString(),
-                Afetado = (int)reader["Afetado"],
-                DataChamado = (DateTime)reader["Data_Registro"],
-                Status = (StatusChamado)(int)reader["Status"],
-                TecnicoResponsavel = reader.IsDBNull(reader.GetOrdinal("Tecnico_Atribuido")) ?
-                    (int?)null : (int)reader["Tecnico_Atribuido"],
-                DataResolucao = reader.IsDBNull(reader.GetOrdinal("Data_Resolucao")) ?
-                    (DateTime?)null : (DateTime)reader["Data_Resolucao"]
-            };
-
-            // Buscar contestación usando Contestacoes_Codigo
             try
             {
-                using (var connection = new SqlConnection(_connectionString))
+                // Leer título con limpieza
+                string tituloRaw = reader["titulo"] != DBNull.Value
+                    ? reader["titulo"].ToString().Trim()
+                    : "";
+
+                string titulo = LimparTexto(tituloRaw);
+                if (string.IsNullOrWhiteSpace(titulo))
+                    titulo = "Sem título";
+
+                // Leer descripción con limpieza
+                string descricaoRaw = reader["descricao"] != DBNull.Value
+                    ? reader["descricao"].ToString().Trim()
+                    : "";
+
+                string descricao = LimparTexto(descricaoRaw);
+
+                var chamado = new Chamados
                 {
-                    connection.Open();
-                    string sql = @"
-                        SELECT c.Justificativa 
-                        FROM chamados ch
-                        INNER JOIN Contestacoes c ON ch.Contestacoes_Codigo = c.Codigo
-                        WHERE ch.id_chamado = @IdChamado";
-                    
-                    using (var command = new SqlCommand(sql, connection))
+                    IdChamado = (int)reader["id_chamado"],
+                    Titulo = titulo,
+                    Categoria = reader["categoria"].ToString(),
+                    Prioridade = (int)reader["prioridade"],
+                    Descricao = descricao,
+                    Afetado = (int)reader["Afetado"],
+                    DataChamado = (DateTime)reader["Data_Registro"],
+                    Status = (StatusChamado)(int)reader["Status"],
+                    TecnicoResponsavel = reader.IsDBNull(reader.GetOrdinal("Tecnico_Atribuido"))
+                        ? (int?)null : (int)reader["Tecnico_Atribuido"],
+                    DataResolucao = reader.IsDBNull(reader.GetOrdinal("Data_Resolucao"))
+                        ? (DateTime?)null : (DateTime)reader["Data_Resolucao"]
+                };
+
+                // Buscar contestación
+                try
+                {
+                    using (var connection = new SqlConnection(_connectionString))
                     {
-                        command.Parameters.AddWithValue("@IdChamado", chamado.IdChamado);
-                        var result = command.ExecuteScalar();
-                        if (result != null && result != DBNull.Value)
+                        connection.Open();
+                        string sql = @"
+                    SELECT c.Justificativa 
+                    FROM chamados ch
+                    INNER JOIN Contestacoes c ON ch.Contestacoes_Codigo = c.Codigo
+                    WHERE ch.id_chamado = @IdChamado";
+
+                        using (var command = new SqlCommand(sql, connection))
                         {
-                            chamado.Contestacoes = result.ToString();
+                            command.Parameters.AddWithValue("@IdChamado", chamado.IdChamado);
+                            var result = command.ExecuteScalar();
+                            if (result != null && result != DBNull.Value)
+                            {
+                                chamado.Contestacoes = result.ToString();
+                            }
                         }
                     }
                 }
+                catch
+                {
+                    chamado.Contestacoes = null;
+                }
+
+                // Debug
+                Console.WriteLine($"📦 Chamado {chamado.IdChamado} carregado:");
+                Console.WriteLine($"   Título: '{chamado.Titulo}' ({chamado.Titulo.Length} chars)");
+                Console.WriteLine($"   Descrição: {chamado.Descricao.Length} chars");
+
+                return chamado;
             }
-            catch
+            catch (Exception ex)
             {
-                chamado.Contestacoes = null;
+                Console.WriteLine($"❌ Erro em CriarChamadoFromReader: {ex.Message}");
+                return null;
+            }
+        }
+
+        private string LimparTexto(string texto)
+        {
+            if (string.IsNullOrWhiteSpace(texto))
+                return "";
+
+            // Remover prefijos comunes
+            string[] prefixos = new[] {
+        "TÍTULO:", "TITULO:", "TÍTULO :", "TITULO :",
+        "DESCRIÇÃO:", "DESCRICAO:", "DESCRIÇÃO :", "DESCRICAO :"
+    };
+
+            string limpo = texto.Trim();
+
+            foreach (var prefixo in prefixos)
+            {
+                if (limpo.StartsWith(prefixo, StringComparison.OrdinalIgnoreCase))
+                {
+                    limpo = limpo.Substring(prefixo.Length).Trim();
+                    break;
+                }
             }
 
-            return chamado;
+            // Remover saltos de línea extras del inicio
+            limpo = limpo.TrimStart('\r', '\n', ' ', '\t');
+
+            return limpo;
         }
         #endregion
     }

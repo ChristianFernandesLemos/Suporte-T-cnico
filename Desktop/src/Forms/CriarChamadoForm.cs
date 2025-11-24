@@ -891,13 +891,15 @@ namespace SistemaChamados.Forms
                 btnProximo.Enabled = false;
                 btnProximo.Text = "Criando...";
 
-                string descricaoCompleta = $"TÍTULO: {tituloChamado}\n\n" +
-                                          $"DESCRIÇÃO:\n{descricao}\n\n" +
+                // ⭐ Descripción SIN título (ya está en campo separado)
+                string descricaoCompleta = $"DESCRIÇÃO:\n{descricao}\n\n" +
                                           $"AFETADOS: {ObterTextoAfetado()}\n" +
                                           $"IMPEDE TRABALHO: {(impedeTrabalho ? "Sim" : "Não")}";
 
+                // ⭐ Crear chamado CON título separado
                 var chamado = new Chamados
                 {
+                    Titulo = tituloChamado,  // ⭐ NUEVO: Título en campo separado
                     Categoria = categoria,
                     Prioridade = prioridade,
                     Descricao = descricaoCompleta,
@@ -925,6 +927,7 @@ namespace SistemaChamados.Forms
                 {
                     string mensagemSucesso = $"✅ Chamado criado com sucesso!\n\n" +
                                             $"Número do chamado: #{idChamado}\n" +
+                                            $"Título: {tituloChamado}\n" +  // ⭐ Mostrar título
                                             $"Prioridade: {ObterTextoPrioridade(prioridade)}\n\n";
 
                     if (contestaPrioridade)
