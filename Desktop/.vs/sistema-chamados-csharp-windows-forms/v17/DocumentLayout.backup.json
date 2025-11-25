@@ -3,20 +3,20 @@
   "WorkspaceRootPath": "C:\\Users\\USUARIO\\Desktop\\Github\\Suporte Tecnico (chris)\\Suporte-T-cnico\\Desktop\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{12345678-1234-5678-9ABC-123456789ABC}|SistemaChamados.csproj|C:\\Users\\USUARIO\\Desktop\\Github\\Suporte Tecnico (chris)\\Suporte-T-cnico\\Desktop\\app.config||{FA3CD31E-987B-443A-9B81-186104E8DAC1}",
+      "RelativeMoniker": "D:0:0:{12345678-1234-5678-9ABC-123456789ABC}|SistemaChamados.csproj|solutionrelative:app.config||{FA3CD31E-987B-443A-9B81-186104E8DAC1}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{12345678-1234-5678-9ABC-123456789ABC}|SistemaChamados.csproj|c:\\users\\usuario\\desktop\\github\\suporte tecnico (chris)\\suporte-t-cnico\\desktop\\src\\forms\\editarusuarioform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{12345678-1234-5678-9ABC-123456789ABC}|SistemaChamados.csproj|solutionrelative:src\\forms\\editarusuarioform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{12345678-1234-5678-9ABC-123456789ABC}|SistemaChamados.csproj|c:\\users\\usuario\\desktop\\github\\suporte tecnico (chris)\\suporte-t-cnico\\desktop\\src\\forms\\gerenciarusuariosform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{12345678-1234-5678-9ABC-123456789ABC}|SistemaChamados.csproj|C:\\Users\\USUARIO\\Desktop\\Github\\Suporte Tecnico (chris)\\Suporte-T-cnico\\Desktop\\src\\forms\\gerenciarusuariosform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{12345678-1234-5678-9ABC-123456789ABC}|SistemaChamados.csproj|solutionrelative:src\\forms\\gerenciarusuariosform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{12345678-1234-5678-9ABC-123456789ABC}|SistemaChamados.csproj|c:\\users\\usuario\\desktop\\github\\suporte tecnico (chris)\\suporte-t-cnico\\desktop\\src\\forms\\esquecisenhaform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{12345678-1234-5678-9ABC-123456789ABC}|SistemaChamados.csproj|C:\\Users\\USUARIO\\Desktop\\Github\\Suporte Tecnico (chris)\\Suporte-T-cnico\\Desktop\\src\\forms\\esquecisenhaform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{12345678-1234-5678-9ABC-123456789ABC}|SistemaChamados.csproj|solutionrelative:src\\forms\\esquecisenhaform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{12345678-1234-5678-9ABC-123456789ABC}|SistemaChamados.csproj|c:\\users\\usuario\\desktop\\github\\suporte tecnico (chris)\\suporte-t-cnico\\desktop\\app.config||{FA3CD31E-987B-443A-9B81-186104E8DAC1}",
-      "RelativeMoniker": "D:0:0:{12345678-1234-5678-9ABC-123456789ABC}|SistemaChamados.csproj|solutionrelative:app.config||{FA3CD31E-987B-443A-9B81-186104E8DAC1}"
     }
   ],
   "DocumentGroupContainers": [
@@ -26,7 +26,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 2,
+          "SelectedChildIndex": 5,
           "Children": [
             {
               "$type": "Bookmark",
@@ -38,7 +38,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
               "Title": "EditarUsuarioForm.cs",
               "DocumentMoniker": "C:\\Users\\USUARIO\\Desktop\\Github\\Suporte Tecnico (chris)\\Suporte-T-cnico\\Desktop\\src\\Forms\\EditarUsuarioForm.cs",
               "RelativeDocumentMoniker": "src\\Forms\\EditarUsuarioForm.cs",
@@ -51,7 +51,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 2,
               "Title": "GerenciarUsuariosForm.cs",
               "DocumentMoniker": "C:\\Users\\USUARIO\\Desktop\\Github\\Suporte Tecnico (chris)\\Suporte-T-cnico\\Desktop\\src\\Forms\\GerenciarUsuariosForm.cs",
               "RelativeDocumentMoniker": "src\\Forms\\GerenciarUsuariosForm.cs",
@@ -59,12 +59,11 @@
               "RelativeToolTip": "src\\Forms\\GerenciarUsuariosForm.cs",
               "ViewState": "AgIAACoCAAAAAAAAAAAwwFACAAANAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-24T23:16:05.179Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-11-24T23:16:05.179Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 3,
               "Title": "EsqueciSenhaForm.cs",
               "DocumentMoniker": "C:\\Users\\USUARIO\\Desktop\\Github\\Suporte Tecnico (chris)\\Suporte-T-cnico\\Desktop\\src\\Forms\\EsqueciSenhaForm.cs",
               "RelativeDocumentMoniker": "src\\Forms\\EsqueciSenhaForm.cs",
@@ -72,18 +71,17 @@
               "RelativeToolTip": "src\\Forms\\EsqueciSenhaForm.cs",
               "ViewState": "AgIAABgAAAAAAAAAAAAAAAsBAAAoAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-24T23:12:38.097Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-11-24T23:12:38.097Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 0,
               "Title": "App.config",
               "DocumentMoniker": "C:\\Users\\USUARIO\\Desktop\\Github\\Suporte Tecnico (chris)\\Suporte-T-cnico\\Desktop\\App.config",
               "RelativeDocumentMoniker": "App.config",
               "ToolTip": "C:\\Users\\USUARIO\\Desktop\\Github\\Suporte Tecnico (chris)\\Suporte-T-cnico\\Desktop\\App.config",
               "RelativeToolTip": "App.config",
-              "ViewState": "AgIAAAoAAAAAAAAAAAAAAC4AAAA5AAAAAAAAAA==",
+              "ViewState": "AgIAAAoAAAAAAAAAAAAAACwAAAA8AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000601|",
               "WhenOpened": "2025-11-24T23:04:20.709Z",
               "EditorCaption": ""
