@@ -109,7 +109,7 @@ PRINT '';
 PRINT '   Execute a seção OPCIONAL abaixo se desejar';
 PRINT '';
 
-/*
+
 -- ============================================
 -- OPCIONAL: LIMPAR DESCRIÇÕES
 -- ============================================
@@ -151,7 +151,7 @@ WHERE descricao LIKE '%TÍTULO:%'
    OR descricao LIKE '%DESCRICAO:%';
 
 PRINT '   ✅ Descrições limpas';
-*/
+
 
 -- ============================================
 -- PASSO 4: CRIAR ÍNDICE (OPCIONAL)
