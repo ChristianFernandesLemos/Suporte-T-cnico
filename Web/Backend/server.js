@@ -42,7 +42,7 @@ app.use('/', pagesRoutes);
 // Rotas da API
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
-app.use('/api/chamados', chamadosRoutes)
+app.use('/api/chamados', chamadosRoutes);
 
 // Rota de health check (verifica conexão com banco)
 app.get('/api/health', async (req, res) => {

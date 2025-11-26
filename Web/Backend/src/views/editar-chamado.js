@@ -1,4 +1,5 @@
 // editar-chamado.js - Edição de chamados
+// VERSÃO FINAL CORRIGIDA
 console.log('🚀 editar-chamado.js carregado');
 
 // ========================================
@@ -73,17 +74,30 @@ function preencherFormulario(chamado) {
   }
 
   // Preenche campos do formulário
-  document.getElementById('titulo').value = chamado.titulo || '';
-  document.getElementById('nome').value = chamado.usuarioNome || '';
-  document.getElementById('email').value = chamado.usuarioEmail || '';
-  document.getElementById('categoria').value = chamado.categoria || '';
-  document.getElementById('impacto').value = chamado.impacto || '';
-  document.getElementById('bloqueio').value = chamado.bloqueioTotal ? 'Sim' : 'Não';
-  document.getElementById('prioridade').value = PRIORIDADE[chamado.prioridade] || '';
-  document.getElementById('status').value = STATUS[chamado.status] || '';
-  document.getElementById('descricao').value = chamado.descricao || '';
+  const campos = {
+    'titulo': chamado.titulo || '',
+    'nome': chamado.usuarioNome || '',
+    'email': chamado.usuarioEmail || '',
+    'categoria': chamado.categoria || '',
+    'impacto': chamado.impacto || '',
+    'bloqueio': chamado.bloqueioTotal ? 'Sim' : 'Não',
+    'prioridade': PRIORIDADE[chamado.prioridade] || '',
+    'status': STATUS[chamado.status] || '',
+    'descricao': chamado.descricao || ''
+  };
+
+  // Preenche cada campo verificando se existe
+  Object.keys(campos).forEach(id => {
+    const elemento = document.getElementById(id);
+    if (elemento) {
+      elemento.value = campos[id];
+      console.log(`✓ Campo ${id} preenchido com: ${campos[id]}`);
+    } else {
+      console.warn(`⚠️ Campo ${id} não encontrado no HTML`);
+    }
+  });
   
-  console.log('✅ Formulário preenchido');
+  console.log('✅ Formulário preenchido com sucesso');
 }
 
 // ========================================
@@ -99,28 +113,36 @@ async function salvarAlteracoes(event) {
     return;
   }
 
-  // Coleta dados do formulário
-  const dadosAtualizados = {
-    titulo: document.getElementById('titulo').value,
-    usuarioNome: document.getElementById('nome').value,
-    usuarioEmail: document.getElementById('email').value,
-    categoria: document.getElementById('categoria').value,
-    impacto: document.getElementById('impacto').value,
-    bloqueioTotal: document.getElementById('bloqueio').value.toLowerCase() === 'sim',
-    descricao: document.getElementById('descricao').value,
-    // Converte prioridade de texto para número
-    prioridade: Object.keys(PRIORIDADE).find(
-      key => PRIORIDADE[key] === document.getElementById('prioridade').value
-    ),
-    // Converte status de texto para número
-    status: Object.keys(STATUS).find(
-      key => STATUS[key] === document.getElementById('status').value
-    )
-  };
-
-  console.log('💾 Salvando alterações:', dadosAtualizados);
+  // Mostra loading no botão
+  const submitBtn = event.target.querySelector('button[type="submit"]');
+  const textoOriginal = submitBtn ? submitBtn.textContent : '';
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.textContent = '⏳ Salvando...';
+  }
 
   try {
+    // Coleta dados do formulário
+    const dadosAtualizados = {
+      titulo: document.getElementById('titulo')?.value || '',
+      usuarioNome: document.getElementById('nome')?.value || '',
+      usuarioEmail: document.getElementById('email')?.value || '',
+      categoria: document.getElementById('categoria')?.value || '',
+      impacto: document.getElementById('impacto')?.value || '',
+      bloqueioTotal: (document.getElementById('bloqueio')?.value || '').toLowerCase() === 'sim',
+      descricao: document.getElementById('descricao')?.value || '',
+      // Converte prioridade de texto para número
+      prioridade: Object.keys(PRIORIDADE).find(
+        key => PRIORIDADE[key] === document.getElementById('prioridade')?.value
+      ) || 2,
+      // Converte status de texto para número
+      status: Object.keys(STATUS).find(
+        key => STATUS[key] === document.getElementById('status')?.value
+      ) || 1
+    };
+
+    console.log('💾 Salvando alterações:', dadosAtualizados);
+
     const response = await fetch(`${API_URL}/${chamadoId}`, {
       method: 'PUT',
       headers: {
@@ -135,7 +157,7 @@ async function salvarAlteracoes(event) {
       console.log('✅ Chamado atualizado com sucesso!');
       alert('✅ Chamado atualizado com sucesso!');
       
-      // Redireciona para detalhes ou lista
+      // Redireciona para detalhes
       window.location.href = `/detalhes-chamado?id=${chamadoId}`;
     } else {
       throw new Error(data.message || 'Erro ao atualizar chamado');
@@ -143,6 +165,12 @@ async function salvarAlteracoes(event) {
   } catch (error) {
     console.error('❌ Erro ao salvar:', error);
     alert(`❌ Erro ao salvar alterações: ${error.message}`);
+    
+    // Restaura botão
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = textoOriginal;
+    }
   }
 }
 
@@ -168,7 +196,7 @@ function mostrarErro(mensagem) {
 // NAVEGAÇÃO
 // ========================================
 function voltarParaLista() {
-  window.location.href = '/chamados';
+  window.location.href = '/lista-chamados';
 }
 
 function configurarBotaoVoltar() {
@@ -176,7 +204,9 @@ function configurarBotaoVoltar() {
   if (backLink) {
     backLink.addEventListener('click', (e) => {
       e.preventDefault();
-      voltarParaLista('/chamados');
+      if (confirm('Deseja sair sem salvar as alterações?')) {
+        voltarParaLista();
+      }
     });
   }
 }
@@ -207,6 +237,9 @@ async function inicializar() {
     const form = document.querySelector('.ticket-form');
     if (form) {
       form.addEventListener('submit', salvarAlteracoes);
+      console.log('✓ Event listener de submit configurado');
+    } else {
+      console.error('❌ Formulário não encontrado');
     }
     
     console.log('✅ Página inicializada com sucesso');

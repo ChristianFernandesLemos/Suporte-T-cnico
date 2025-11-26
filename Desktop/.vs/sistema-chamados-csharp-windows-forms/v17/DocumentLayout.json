@@ -1,26 +1,14 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "C:\\Users\\Usuario\\OneDrive\\Desktop\\Github\\Git\\Suporte-T-cnico\\Desktop\\",
+  "WorkspaceRootPath": "C:\\Users\\Christian\\OneDrive\\Desktop\\Repositorio-pim\\Suporte-T-cnico\\Desktop\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{12345678-1234-5678-9ABC-123456789ABC}|SistemaChamados.csproj|C:\\Users\\Usuario\\OneDrive\\Desktop\\Github\\Git\\Suporte-T-cnico\\Desktop\\src\\forms\\gerenciarusuariosform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{12345678-1234-5678-9ABC-123456789ABC}|SistemaChamados.csproj|solutionrelative:src\\forms\\gerenciarusuariosform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{12345678-1234-5678-9ABC-123456789ABC}|SistemaChamados.csproj|c:\\users\\christian\\onedrive\\desktop\\repositorio-pim\\suporte-t-cnico\\desktop\\src\\models\\funcionario.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{12345678-1234-5678-9ABC-123456789ABC}|SistemaChamados.csproj|solutionrelative:src\\models\\funcionario.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{12345678-1234-5678-9ABC-123456789ABC}|SistemaChamados.csproj|c:\\users\\usuario\\onedrive\\desktop\\github\\git\\suporte-t-cnico\\desktop\\src\\forms\\alterarsenhaform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{12345678-1234-5678-9ABC-123456789ABC}|SistemaChamados.csproj|solutionrelative:src\\forms\\alterarsenhaform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{12345678-1234-5678-9ABC-123456789ABC}|SistemaChamados.csproj|c:\\users\\usuario\\onedrive\\desktop\\github\\git\\suporte-t-cnico\\desktop\\app.config||{FA3CD31E-987B-443A-9B81-186104E8DAC1}",
-      "RelativeMoniker": "D:0:0:{12345678-1234-5678-9ABC-123456789ABC}|SistemaChamados.csproj|solutionrelative:app.config||{FA3CD31E-987B-443A-9B81-186104E8DAC1}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{12345678-1234-5678-9ABC-123456789ABC}|SistemaChamados.csproj|C:\\Users\\Usuario\\OneDrive\\Desktop\\Github\\Git\\Suporte-T-cnico\\Desktop\\src\\forms\\editarusuarioform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{12345678-1234-5678-9ABC-123456789ABC}|SistemaChamados.csproj|solutionrelative:src\\forms\\editarusuarioform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{12345678-1234-5678-9ABC-123456789ABC}|SistemaChamados.csproj|C:\\Users\\Usuario\\OneDrive\\Desktop\\Github\\Git\\Suporte-T-cnico\\Desktop\\src\\forms\\esquecisenhaform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{12345678-1234-5678-9ABC-123456789ABC}|SistemaChamados.csproj|solutionrelative:src\\forms\\esquecisenhaform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{12345678-1234-5678-9ABC-123456789ABC}|SistemaChamados.csproj|c:\\users\\christian\\onedrive\\desktop\\repositorio-pim\\suporte-t-cnico\\desktop\\src\\models\\funcionarios.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{12345678-1234-5678-9ABC-123456789ABC}|SistemaChamados.csproj|solutionrelative:src\\models\\funcionarios.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -30,78 +18,40 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 4,
+          "SelectedChildIndex": 2,
           "Children": [
-            {
-              "$type": "Bookmark",
-              "Name": "ST:0:0:{b1e99781-ab81-11d0-b683-00aa00a3ee26}"
-            },
             {
               "$type": "Bookmark",
               "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
             },
             {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "AlterarSenhaForm.cs",
-              "DocumentMoniker": "C:\\Users\\Usuario\\OneDrive\\Desktop\\Github\\Git\\Suporte-T-cnico\\Desktop\\src\\Forms\\AlterarSenhaForm.cs",
-              "RelativeDocumentMoniker": "src\\Forms\\AlterarSenhaForm.cs",
-              "ToolTip": "C:\\Users\\Usuario\\OneDrive\\Desktop\\Github\\Git\\Suporte-T-cnico\\Desktop\\src\\Forms\\AlterarSenhaForm.cs",
-              "RelativeToolTip": "src\\Forms\\AlterarSenhaForm.cs",
-              "ViewState": "AgIAAMQAAAAAAAAAAAAAAMQAAAAIAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-25T12:34:12.608Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "EditarUsuarioForm.cs",
-              "DocumentMoniker": "C:\\Users\\Usuario\\OneDrive\\Desktop\\Github\\Git\\Suporte-T-cnico\\Desktop\\src\\Forms\\EditarUsuarioForm.cs",
-              "RelativeDocumentMoniker": "src\\Forms\\EditarUsuarioForm.cs",
-              "ToolTip": "C:\\Users\\Usuario\\OneDrive\\Desktop\\Github\\Git\\Suporte-T-cnico\\Desktop\\src\\Forms\\EditarUsuarioForm.cs",
-              "RelativeToolTip": "src\\Forms\\EditarUsuarioForm.cs",
-              "ViewState": "AgIAAAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-24T23:17:32.618Z"
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{b1e99781-ab81-11d0-b683-00aa00a3ee26}"
             },
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "GerenciarUsuariosForm.cs",
-              "DocumentMoniker": "C:\\Users\\Usuario\\OneDrive\\Desktop\\Github\\Git\\Suporte-T-cnico\\Desktop\\src\\Forms\\GerenciarUsuariosForm.cs",
-              "RelativeDocumentMoniker": "src\\Forms\\GerenciarUsuariosForm.cs",
-              "ToolTip": "C:\\Users\\Usuario\\OneDrive\\Desktop\\Github\\Git\\Suporte-T-cnico\\Desktop\\src\\Forms\\GerenciarUsuariosForm.cs",
-              "RelativeToolTip": "src\\Forms\\GerenciarUsuariosForm.cs",
-              "ViewState": "AgIAACQAAAAAAAAAAAAQwDgAAAAAAAAAAAAAAA==",
+              "Title": "Funcionario.cs",
+              "DocumentMoniker": "C:\\Users\\Christian\\OneDrive\\Desktop\\Repositorio-pim\\Suporte-T-cnico\\Desktop\\src\\Models\\Funcionario.cs",
+              "RelativeDocumentMoniker": "src\\Models\\Funcionario.cs",
+              "ToolTip": "C:\\Users\\Christian\\OneDrive\\Desktop\\Repositorio-pim\\Suporte-T-cnico\\Desktop\\src\\Models\\Funcionario.cs",
+              "RelativeToolTip": "src\\Models\\Funcionario.cs",
+              "ViewState": "AgIAAJIAAAAAAAAAAAAkwJ0AAAASAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-24T23:16:05.179Z",
+              "WhenOpened": "2025-11-26T12:45:29.248Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "EsqueciSenhaForm.cs",
-              "DocumentMoniker": "C:\\Users\\Usuario\\OneDrive\\Desktop\\Github\\Git\\Suporte-T-cnico\\Desktop\\src\\Forms\\EsqueciSenhaForm.cs",
-              "RelativeDocumentMoniker": "src\\Forms\\EsqueciSenhaForm.cs",
-              "ToolTip": "C:\\Users\\Usuario\\OneDrive\\Desktop\\Github\\Git\\Suporte-T-cnico\\Desktop\\src\\Forms\\EsqueciSenhaForm.cs",
-              "RelativeToolTip": "src\\Forms\\EsqueciSenhaForm.cs",
-              "ViewState": "AgIAABgAAAAAAAAAAAAAAAsBAAAoAAAAAAAAAA==",
+              "DocumentIndex": 1,
+              "Title": "Funcionarios.cs",
+              "DocumentMoniker": "C:\\Users\\Christian\\OneDrive\\Desktop\\Repositorio-pim\\Suporte-T-cnico\\Desktop\\src\\Models\\Funcionarios.cs",
+              "RelativeDocumentMoniker": "src\\Models\\Funcionarios.cs",
+              "ToolTip": "C:\\Users\\Christian\\OneDrive\\Desktop\\Repositorio-pim\\Suporte-T-cnico\\Desktop\\src\\Models\\Funcionarios.cs",
+              "RelativeToolTip": "src\\Models\\Funcionarios.cs",
+              "ViewState": "AgIAABIAAAAAAAAAAAAIwAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-24T23:12:38.097Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "App.config",
-              "DocumentMoniker": "C:\\Users\\Usuario\\OneDrive\\Desktop\\Github\\Git\\Suporte-T-cnico\\Desktop\\App.config",
-              "RelativeDocumentMoniker": "App.config",
-              "ToolTip": "C:\\Users\\Usuario\\OneDrive\\Desktop\\Github\\Git\\Suporte-T-cnico\\Desktop\\App.config",
-              "RelativeToolTip": "App.config",
-              "ViewState": "AgIAACsAAAAAAAAAAAAAAC8AAAA/AAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000601|",
-              "WhenOpened": "2025-11-24T23:04:20.709Z",
+              "WhenOpened": "2025-11-26T12:44:06.601Z",
               "EditorCaption": ""
             }
           ]

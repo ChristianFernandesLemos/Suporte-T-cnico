@@ -1,5 +1,5 @@
 // src/routes/chamados.js - Rotas para gerenciamento de chamados
-// CORRIGIDO para mapear corretamente as colunas do banco
+// CORRIGIDO para buscar nome e email do usuário através do campo Afetado
 const express = require('express');
 const router = express.Router();
 const { getConnection, sql } = require('../../db');
@@ -31,7 +31,7 @@ router.get('/', async (req, res) => {
     
     const pool = await getConnection();
     
-    // ⭐ QUERY CORRIGIDA - Mapeia os nomes corretos das colunas
+    // ⭐ QUERY CORRIGIDA - Agora busca nome e email do usuário afetado
     const result = await pool.request().query(`
       SELECT 
         c.id_chamado as id,
@@ -44,10 +44,12 @@ router.get('/', async (req, res) => {
         c.Data_Resolucao as dataResolucao,
         c.Afetado as afetadoId,
         c.Tecnico_Atribuido as tecnicoId,
-        r.id_usuario as usuarioId,
-        c.titulo
+        c.titulo,
+        u.nome as usuarioNome,
+        e.E_mail as usuarioEmail
       FROM dbo.chamados c
-      LEFT JOIN dbo.registra r ON c.id_chamado = r.id_chamado
+      LEFT JOIN dbo.Usuario u ON c.Afetado = u.Id_usuario
+      LEFT JOIN dbo.E_mail e ON u.Id_usuario = e.Id_usuario
       ORDER BY c.Data_Registro DESC
     `);
 
@@ -84,6 +86,7 @@ router.get('/:id', async (req, res) => {
     
     const pool = await getConnection();
     
+    // ⭐ QUERY CORRIGIDA - Busca nome e email através do Afetado
     const result = await pool.request()
       .input('id', sql.Int, id)
       .query(`
@@ -98,11 +101,12 @@ router.get('/:id', async (req, res) => {
           c.Data_Resolucao as dataResolucao,
           c.Afetado as afetadoId,
           c.Tecnico_Atribuido as tecnicoId,
-          r.id_usuario as usuarioId,
-          r.DataRegistro as dataRegistroUsuario,
-          c.titulo
+          c.titulo,
+          u.nome as usuarioNome,
+          e.E_mail as usuarioEmail
         FROM dbo.chamados c
-        LEFT JOIN dbo.registra r ON c.id_chamado = r.id_chamado
+        LEFT JOIN dbo.Usuario u ON c.Afetado = u.Id_usuario
+        LEFT JOIN dbo.E_mail e ON u.Id_usuario = e.Id_usuario
         WHERE c.id_chamado = @id
       `);
 
@@ -112,6 +116,8 @@ router.get('/:id', async (req, res) => {
         message: 'Chamado não encontrado'
       });
     }
+
+    console.log('✅ Chamado encontrado:', result.recordset[0]);
 
     res.json({
       success: true,
@@ -138,14 +144,15 @@ router.post('/', async (req, res) => {
       prioridade,
       descricao,
       afetadoId,
-      usuarioId
+      usuarioId,
+      titulo
     } = req.body;
 
     // Validação básica
-    if (!categoria || !descricao || !usuarioId) {
+    if (!categoria || !descricao || !afetadoId) {
       return res.status(400).json({
         success: false,
-        message: 'Categoria, descrição e usuário são obrigatórios'
+        message: 'Categoria, descrição e afetado são obrigatórios'
       });
     }
 
@@ -166,26 +173,29 @@ router.post('/', async (req, res) => {
         .input('descricao', sql.NVarChar(1000), descricao)
         .input('status', sql.Int, STATUS.ABERTO)
         .input('afetadoId', sql.Int, afetadoId)
+        .input('titulo', sql.NVarChar(200), titulo)
         .query(`
           INSERT INTO dbo.chamados (
-            categoria, prioridade, descricao, Status, Afetado, Data_Registro
+            categoria, prioridade, descricao, Status, Afetado, Data_Registro, titulo
           )
           OUTPUT INSERTED.id_chamado
           VALUES (
-            @categoria, @prioridade, @descricao, @status, @afetadoId, GETDATE()
+            @categoria, @prioridade, @descricao, @status, @afetadoId, GETDATE(), @titulo
           )
         `);
 
       const novoChamadoId = resultChamado.recordset[0].id_chamado;
 
-      // Insere na tabela registra
-      await transaction.request()
-        .input('usuarioId', sql.Int, usuarioId)
-        .input('chamadoId', sql.Int, novoChamadoId)
-        .query(`
-          INSERT INTO dbo.registra (id_usuario, id_chamado, DataRegistro)
-          VALUES (@usuarioId, @chamadoId, GETDATE())
-        `);
+      // Se usuarioId foi fornecido e é diferente de afetadoId, insere na tabela registra
+      if (usuarioId && usuarioId !== afetadoId) {
+        await transaction.request()
+          .input('usuarioId', sql.Int, usuarioId)
+          .input('chamadoId', sql.Int, novoChamadoId)
+          .query(`
+            INSERT INTO dbo.registra (id_usuario, id_chamado, DataRegistro)
+            VALUES (@usuarioId, @chamadoId, GETDATE())
+          `);
+      }
 
       await transaction.commit();
 
@@ -207,6 +217,94 @@ router.post('/', async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erro ao criar chamado',
+      error: error.message
+    });
+  }
+});
+
+// ========================================
+// ATUALIZAR CHAMADO
+// ========================================
+router.put('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const {
+      titulo,
+      categoria,
+      prioridade,
+      status,
+      descricao,
+      solucao,
+      usuarioNome,
+      usuarioEmail
+    } = req.body;
+
+    console.log(`📝 Atualizando chamado ${id}:`, req.body);
+
+    const pool = await getConnection();
+    
+    // Monta query dinamicamente
+    let updates = [];
+    const request = pool.request().input('id', sql.Int, id);
+
+    if (titulo !== undefined) {
+      updates.push('titulo = @titulo');
+      request.input('titulo', sql.NVarChar(200), titulo);
+    }
+
+    if (categoria !== undefined) {
+      updates.push('categoria = @categoria');
+      request.input('categoria', sql.NVarChar(20), categoria);
+    }
+
+    if (prioridade !== undefined) {
+      updates.push('prioridade = @prioridade');
+      request.input('prioridade', sql.Int, prioridade);
+    }
+
+    if (status !== undefined) {
+      updates.push('Status = @status');
+      request.input('status', sql.Int, status);
+      
+      // Se está sendo resolvido ou fechado, atualiza data de resolução
+      if (status === STATUS.RESOLVIDO || status === STATUS.FECHADO) {
+        updates.push('Data_Resolucao = GETDATE()');
+      }
+    }
+
+    if (descricao !== undefined) {
+      updates.push('descricao = @descricao');
+      request.input('descricao', sql.NVarChar(1000), descricao);
+    }
+
+    if (solucao !== undefined) {
+      updates.push('Solucao = @solucao');
+      request.input('solucao', sql.NVarChar(1000), solucao);
+    }
+
+    if (updates.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Nenhum campo para atualizar'
+      });
+    }
+
+    const query = `UPDATE dbo.chamados SET ${updates.join(', ')} WHERE id_chamado = @id`;
+    
+    await request.query(query);
+
+    console.log(`✅ Chamado ${id} atualizado com sucesso`);
+
+    res.json({
+      success: true,
+      message: 'Chamado atualizado com sucesso'
+    });
+
+  } catch (error) {
+    console.error('❌ Erro ao atualizar chamado:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Erro ao atualizar chamado',
       error: error.message
     });
   }
@@ -290,10 +388,12 @@ router.get('/filtrar/status/:status', async (req, res) => {
           c.Data_Registro as dataAbertura,
           c.Afetado as afetadoId,
           c.Tecnico_Atribuido as tecnicoId,
-          r.id_usuario as usuarioId,
-          c.titulo
+          c.titulo,
+          u.nome as usuarioNome,
+          e.E_mail as usuarioEmail
         FROM dbo.chamados c
-        LEFT JOIN dbo.registra r ON c.id_chamado = r.id_chamado
+        LEFT JOIN dbo.Usuario u ON c.Afetado = u.Id_usuario
+        LEFT JOIN dbo.E_mail e ON u.Id_usuario = e.Id_usuario
         WHERE c.Status = @status
         ORDER BY c.Data_Registro DESC
       `);
@@ -329,7 +429,7 @@ router.get('/stats/resumo', async (req, res) => {
         SUM(CASE WHEN Status = ${STATUS.RESOLVIDO} THEN 1 ELSE 0 END) as resolvidos,
         SUM(CASE WHEN Status = ${STATUS.FECHADO} THEN 1 ELSE 0 END) as fechados,
         SUM(CASE WHEN Status = ${STATUS.CANCELADO} THEN 1 ELSE 0 END) as cancelados,
-        SUM(CASE WHEN prioridade = ${PRIORIDADE.CRITICA} THEN 1 ELSE 0 END) as criticos,
+        SUM(CASE QUANDO prioridade = ${PRIORIDADE.CRITICA} THEN 1 ELSE 0 END) as criticos,
         SUM(CASE WHEN prioridade = ${PRIORIDADE.ALTA} THEN 1 ELSE 0 END) as altos,
         SUM(CASE WHEN prioridade = ${PRIORIDADE.MEDIA} THEN 1 ELSE 0 END) as medios,
         SUM(CASE WHEN prioridade = ${PRIORIDADE.BAIXA} THEN 1 ELSE 0 END) as baixos
