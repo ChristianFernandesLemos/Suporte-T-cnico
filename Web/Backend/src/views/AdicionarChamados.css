@@ -6,32 +6,32 @@
 |--------------------------------------------------------------------------
 */
 :root {
-    /* Variáveis da Paleta de Cores */
-    --primary-color-blue: #0d1b2a;       /* Principal (fundo escuro ou texto forte) */
-    --second-color-blue: #1b263b;        /* Fundo de elementos */
-    --third-color-blue: #415a77;         /* Elementos secundários/Bordas */
-    --fourth-color-blue: #778da9;        /* Bordas/Divisores leves */
-    --fifth-color-blue: #e0e1dd;         /* Fundo claro principal (corpo) */
-    --sixth-color-blue: #49a09d;         /* Ação principal/Sucesso (Botões) */
-    --seventh-color-blue: #004258;       /* Fundo mais escuro */
-    --eighth-color-blue: #026687;        /* Ação secundária/Destaque */
-    --ninth-color-blue: #021c33;         /* Texto mais escuro */
-    --tenth-color-blue: #1aa4e5;         /* Destaque (Hover de Botões/Links) */
-    --primary-color-dark: #050505;       /* Texto muito escuro */
-    --second-color-dark: #222222;        /* Texto escuro */
+	/* Variáveis da Paleta de Cores */
+	--primary-color-blue: #0d1b2a; 		/* Principal (fundo escuro ou texto forte) */
+	--second-color-blue: #1b263b; 		/* Fundo de elementos */
+	--third-color-blue: #415a77; 		/* Elementos secundários/Bordas */
+	--fourth-color-blue: #778da9; 		/* Bordas/Divisores leves */
+	--fifth-color-blue: #e0e1dd; 		/* Fundo claro principal (corpo) */
+	--sixth-color-blue: #49a09d; 		/* Ação principal/Sucesso (Botões) */
+	--seventh-color-blue: #004258; 		/* Fundo mais escuro */
+	--eighth-color-blue: #026687; 		/* Ação secundária/Destaque */
+	--ninth-color-blue: #021c33; 		/* Texto mais escuro */
+	--tenth-color-blue: #1aa4e5; 		/* Destaque (Hover de Botões/Links) */
+	--primary-color-dark: #050505; 		/* Texto muito escuro */
+	--second-color-dark: #222222; 		/* Texto escuro */
 
-    /* Variáveis de layout e tipografia, ajustadas para coerência */
-    --color-text: var(--primary-color-blue); /* Texto principal mais escuro */
-    --color-background-body: var(--fifth-color-blue); /* Fundo claro principal */
-    --color-background-element: #fff; /* Elementos em branco puro para bom contraste */
-    --color-action: var(--sixth-color-blue); /* Botão/Link principal de ação */
-    --color-action-hover: var(--tenth-color-blue); /* Hover do botão/link */
-    --color-border: var(--fourth-color-blue); /* Bordas leves */
-    --color-title: var(--primary-color-blue); /* Cor para títulos */
-    
-    --spacing-default: 1rem;
-    --spacing-large: 2rem;
-    --font-family-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+	/* Variáveis de layout e tipografia, ajustadas para coerência */
+	--color-text: var(--primary-color-blue); /* Texto principal mais escuro */
+	--color-background-body: var(--fifth-color-blue); /* Fundo claro principal */
+	--color-background-element: #fff; /* Elementos em branco puro para bom contraste */
+	--color-action: var(--sixth-color-blue); /* Botão/Link principal de ação */
+	--color-action-hover: var(--tenth-color-blue); /* Hover do botão/link */
+	--color-border: var(--fourth-color-blue); /* Bordas leves */
+	--color-title: var(--primary-color-blue); /* Cor para títulos */
+	
+	--spacing-default: 1rem;
+	--spacing-large: 2rem;
+	--font-family-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
 /*
@@ -40,16 +40,16 @@
 |--------------------------------------------------------------------------
 */
 * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
 }
 
 body {
-    font-family: var(--font-family-sans);
-    background-color: var(--color-background-body);
-    color: var(--color-text);
-    line-height: 1.6;
+	font-family: var(--font-family-sans);
+	background-color: var(--color-background-body);
+	color: var(--color-text);
+	line-height: 1.6;
 }
 
 /*
@@ -58,38 +58,38 @@ body {
 |--------------------------------------------------------------------------
 */
 .header {
-    background-color: var(--color-background-element);
-    box-shadow: 0 2px 4px color-mix(in srgb, var(--primary-color-dark) 10%, transparent); /* Sombra mais sutil */
-    padding: var(--spacing-default) 0;
+	background-color: var(--color-background-element);
+	box-shadow: 0 2px 4px color-mix(in srgb, var(--primary-color-dark) 10%, transparent); /* Sombra mais sutil */
+	padding: var(--spacing-default) 0;
 }
 
 .navigation {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 var(--spacing-default);
-    display: flex; /* Para centralizar/posicionar se necessário, mas aqui só serve como container */
+	max-width: 1200px;
+	margin: 0 auto;
+	padding: 0 var(--spacing-default);
+	display: flex; /* Para centralizar/posicionar se necessário, mas aqui só serve como container */
 }
 
 /* --- Menu de Saída (Back Link) --- */
 .back-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: var(--color-action); /* Cor da ação para links */
-    text-decoration: none;
-    font-weight: 600;
-    transition: color 0.2s ease-in-out;
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5rem;
+	color: var(--color-action); /* Cor da ação para links */
+	text-decoration: none;
+	font-weight: 600;
+	transition: color 0.2s ease-in-out;
 }
 
 .back-link:hover {
-    color: var(--color-action-hover); /* Destaque ao passar o mouse */
-    text-decoration: underline;
+	color: var(--color-action-hover); /* Destaque ao passar o mouse */
+	text-decoration: underline;
 }
 
 .back-link svg {
-    stroke: currentColor; 
-    width: 1.25rem; /* Tamanho padronizado */
-    height: 1.25rem;
+	stroke: currentColor;	
+	width: 1.25rem; /* Tamanho padronizado */
+	height: 1.25rem;
 }
 
 /*
@@ -98,9 +98,9 @@ body {
 |--------------------------------------------------------------------------
 */
 .main-content {
-    padding: var(--spacing-large) var(--spacing-default);
-    display: flex;
-    justify-content: center;
+	padding: var(--spacing-large) var(--spacing-default);
+	display: flex;
+	justify-content: center;
 }
 
 /*
@@ -109,19 +109,19 @@ body {
 |--------------------------------------------------------------------------
 */
 .modal-container {
-    background-color: var(--color-background-element); 
-    border-radius: 8px;
-    box-shadow: 0 4px 12px color-mix(in srgb, var(--primary-color-dark) 15%, transparent);
-    padding: var(--spacing-large);
-    width: 100%;
-    max-width: 500px;
+	background-color: var(--color-background-element);	
+	border-radius: 8px;
+	box-shadow: 0 4px 12px color-mix(in srgb, var(--primary-color-dark) 15%, transparent);
+	padding: var(--spacing-large);
+	width: 100%;
+	max-width: 500px;
 }
 
 .modal-title {
-    font-size: 1.8rem;
-    margin-bottom: var(--spacing-large);
-    color: var(--color-title); /* Título forte */
-    text-align: center;
+	font-size: 1.8rem;
+	margin-bottom: var(--spacing-large);
+	color: var(--color-title); /* Título forte */
+	text-align: center;
 }
 
 /*
@@ -130,50 +130,68 @@ body {
 |--------------------------------------------------------------------------
 */
 .user-form {
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-default);
+	display: flex;
+	flex-direction: column;
+	gap: var(--spacing-default);
 }
 
 .form-group {
-    display: flex;
-    flex-direction: column;
+	display: flex;
+	flex-direction: column;
 }
 
 .form-label {
-    margin-bottom: 0.5rem;
-    font-weight: 600;
-    color: var(--primary-color-blue); /* Label com cor forte para leitura */
+	margin-bottom: 0.5rem;
+	font-weight: 600;
+	color: var(--primary-color-blue); /* Label com cor forte para leitura */
 }
 
 .form-input,
 .form-select {
-    width: 100%;
-    padding: 0.75rem;
-    border: 1px solid var(--color-border);
-    border-radius: 4px;
-    font-size: 1rem;
-    color: var(--primary-color-dark);
-    background-color: var(--color-background-element);
-    transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+	width: 100%;
+	padding: 0.75rem;
+	border: 1px solid var(--color-border);
+	border-radius: 4px;
+	font-size: 1rem;
+	color: var(--primary-color-dark);
+	background-color: var(--color-background-element);
+	transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 }
 
 .form-input:focus,
 .form-select:focus {
-    /* Foco com a cor de ação */
-    border-color: var(--color-action); 
-    outline: none;
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-action) 25%, transparent);
+	/* Foco com a cor de ação */
+	border-color: var(--color-action);	
+	outline: none;
+	box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-action) 25%, transparent);
 }
 
 .form-select {
-    appearance: none;
-    /* Seta do select usando var(--primary-color-dark) para maior contraste */
-    background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg width='12' height='12' viewBox='0 0 12 12' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M2 4L6 8L10 4' stroke='%23050505' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 0.75rem center;
-    padding-right: 2.25rem;
+	appearance: none;
+	/* Seta do select usando var(--primary-color-dark) para maior contraste */
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg width='12' height='12' viewBox='0 0 12 12' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M2 4L6 8L10 4' stroke='%23050505' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+	background-repeat: no-repeat;
+	background-position: right 0.75rem center;
+	padding-right: 2.25rem;
 }
+
+/*
+|--------------------------------------------------------------------------
+| ANIMAÇÕES
+|--------------------------------------------------------------------------
+*/
+@keyframes pulse-glow {
+	0% {
+		box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-action) 60%, transparent);
+	}
+	50% {
+		box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-action) 10%, transparent);
+	}
+	100% {
+		box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-action) 60%, transparent);
+	}
+}
+
 
 /*
 |--------------------------------------------------------------------------
@@ -181,30 +199,41 @@ body {
 |--------------------------------------------------------------------------
 */
 .submit-button {
-    background-color: var(--color-action); /* Cor de ação primária (sixth-color-blue) */
-    color: var(--color-background-element); /* Texto claro no botão (branco) */
-    border: none;
-    padding: 0.75rem var(--spacing-large);
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 1rem;
-    font-weight: 600;
-    margin-top: var(--spacing-default);
-    transition: background-color 0.2s ease-in-out, opacity 0.2s ease-in-out;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
+	background-color: var(--color-action); /* Cor de ação primária (sixth-color-blue) */
+	color: var(--color-background-element); /* Texto claro no botão (branco) */
+	border: none;
+	padding: 0.75rem var(--spacing-large);
+	border-radius: 4px;
+	cursor: pointer;
+	font-size: 1rem;
+	font-weight: 600;
+	margin-top: var(--spacing-default);
+	/* ATUALIZADO: Adicionado transform e box-shadow à transição para a animação de hover */
+	transition: background-color 0.3s ease-in-out, opacity 0.3s ease-in-out, transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5rem;
+	
+	/* APLICAÇÃO DA ANIMAÇÃO: Um brilho pulsante sutil e constante */
+	animation: pulse-glow 2s infinite ease-in-out;
 }
 
 .submit-button:hover {
-    background-color: var(--color-action-hover); /* Cor de destaque/hover (tenth-color-blue) */
+	background-color: var(--color-action-hover); /* Cor de destaque/hover (tenth-color-blue) */
+	/* ANIMAÇÃO DE HOVER: Eleva e adiciona sombra mais definida */
+	transform: translateY(-3px);
+	box-shadow: 0 6px 15px color-mix(in srgb, var(--color-action-hover) 50%, transparent);
+	animation: none; /* Pausa o pulso para o hover ter destaque */
 }
 
 .submit-button:active {
-    opacity: 0.9;
+	opacity: 0.9;
+	/* Retorna à posição original */
+	transform: translateY(0);
+	box-shadow: 0 2px 5px color-mix(in srgb, var(--color-action) 30%, transparent);
 }
 
 .submit-button svg {
-    stroke: currentColor; 
+	stroke: currentColor;	
 }
