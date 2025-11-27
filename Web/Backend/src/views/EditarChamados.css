@@ -11,21 +11,21 @@
 	--second-color-blue: #1b263b; 		/* Fundo de Card/Elemento Escuro */
 	--third-color-blue: #415a77; 		/* Bordas / Sombra sutil */
 	--fourth-color-blue: #778da9; 		/* Texto Secundário Claro */
-	--fifth-color-blue: #e0e1dd; 		/* Texto Principal Claro */
+	--fifth-color-blue: #e0e1dd; 		/* Texto Principal Claro (usado como fundo claro do formulário) */
 	--sixth-color-blue: #49a09d; 		/* Cor de Ação Principal (Teal) */
 	--seventh-color-blue: #004258; 		/* Base Escura (não utilizada diretamente) */
 	--eighth-color-blue: #026687; 		/* Destaque Secundário */
 	--ninth-color-blue: #021c33; 		/* Fundo Base Mais Escuro */
 	--tenth-color-blue: #1aa4e5; 		/* Cor de Hover/Destaque Forte (Ciano) */
-	--primary-color-dark: #050505; 		/* Preto Puro */
+	--primary-color-dark: #050505; 		/* Preto Puro (usado como texto do formulário) */
 	--second-color-dark: #222222; 		/* Cinza Escuro */
 
 	/* Mapeamento Semântico para Tema Escuro */
 	--color-text: var(--fifth-color-blue);
 	--color-background-body: var(--ninth-color-blue);
-	--color-background-element: var(--second-color-blue); 
+	--color-background-element: var(--second-color-blue);
 	--color-action: var(--sixth-color-blue);
-	--color-action-hover: var(--tenth-color-blue); 
+	--color-action-hover: var(--tenth-color-blue);
 	--color-border: var(--third-color-blue);
 	--color-title: var(--fifth-color-blue);
 	
@@ -51,7 +51,7 @@ body {
 	background-color: var(--color-background-body);
 	background: radial-gradient(circle at top, var(--ninth-color-blue) 0%, var(--primary-color-dark) 100%);
 	background-attachment: fixed;
-	color: var(--color-text);
+	color: var(--color-text); /* Texto da página principal é claro */
 	line-height: 1.6;
 	min-height: 100vh;
 }
@@ -112,20 +112,23 @@ body {
 }
 
 .form-section {
-	/* Fundo de elemento escuro */
-	background-color: var(--color-background-element);
+	/* MUDANÇA PRINCIPAL: Fundo claro/branco para o card */
+	background-color: var(--fifth-color-blue); /* #e0e1dd (Light/White) */
+	/* MUDANÇA PRINCIPAL: Cor do texto principal do card para preto */
+	color: var(--primary-color-dark); /* #050505 (Black) */
 	border-radius: 12px;
-	/* Sombra interna sutil para simular profundidade e borda leve */
-	box-shadow: 0 0 0 1px var(--primary-color-blue), 0 10px 30px color-mix(in srgb, var(--primary-color-dark) 60%, transparent);
+	/* Ajuste da sombra para aparecer no fundo escuro */
+	box-shadow: 0 10px 30px color-mix(in srgb, var(--primary-color-dark) 40%, transparent);
 	padding: var(--spacing-large);
 	width: 100%;
-	max-width: 900px; 
+	max-width: 900px;
 }
 
 .form-title {
 	font-size: 2.2rem;
 	margin-bottom: var(--spacing-large);
-	color: var(--color-title);
+	/* Título em preto */
+	color: var(--primary-color-dark);
 	text-align: center;
 	font-weight: 700;
 }
@@ -155,7 +158,8 @@ body {
 .form-label {
 	margin-bottom: 0.5rem;
 	font-weight: 600;
-	color: var(--fourth-color-blue); /* Labels em cor intermediária */
+	/* Label em cor escura para contraste */
+	color: var(--second-color-dark); 
 }
 
 .form-input,
@@ -163,18 +167,21 @@ body {
 .form-select {
 	width: 100%;
 	padding: 0.85rem;
-	border: 1px solid var(--primary-color-blue); /* Borda muito sutil */
+	/* Borda escura para ser visível no fundo claro */
+	border: 1px solid var(--third-color-blue); 
 	border-radius: 8px; /* Cantos mais arredondados */
 	font-size: 1rem;
-	color: var(--color-text);
-	background-color: var(--primary-color-blue); /* Fundo do input mais escuro que o card */
+	/* Texto do input em preto */
+	color: var(--primary-color-dark);
+	/* Fundo do input em branco puro para contraste com o card */
+	background-color: white; 
 	transition: border-color 0.3s, box-shadow 0.3s;
 }
 
 .form-input:focus,
 .form-textarea:focus,
 .form-select:focus {
-	/* Destaque de foco forte e elegante */
+	/* Destaque de foco forte e elegante (cor Teal mantida) */
 	border-color: var(--sixth-color-blue);	
 	outline: none;
 	box-shadow: 0 0 0 2px var(--sixth-color-blue), 0 0 10px var(--sixth-color-blue);	
@@ -192,7 +199,7 @@ body {
 */
 .submit-button {
 	background-color: var(--color-action); /* Teal */
-	color: var(--ninth-color-blue); /* Texto Escuro no botão claro */
+	color: var(--ninth-color-blue); /* Texto Escuro no botão claro (mantido) */
 	border: none;
 	padding: 1rem var(--spacing-large);
 	border-radius: 8px;
