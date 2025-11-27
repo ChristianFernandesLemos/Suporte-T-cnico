@@ -2,36 +2,36 @@
 
 /*
 |--------------------------------------------------------------------------
-| Variáveis Globais (Paleta de Cores Fornecida) 🎨
+| Variáveis Globais (Sua Paleta de Cores)
 |--------------------------------------------------------------------------
 */
 :root {
-    /* Cores da sua paleta */
-    --primary-color-blue: #0d1b2a;
-    --second-color-blue: #1b263b;
-    --third-color-blue: #415a77;
-    --fourth-color-blue: #778da9;
-    --fifth-color-blue: #e0e1dd;
-    --sixth-color-blue: #49a09d;
-    --seventh-color-blue: #004258;
-    --eighth-color-blue: #026687;
-    --ninth-color-blue: #021c33;
-    --tenth-color-blue: #1aa4e5;
-    --primary-color-dark: #050505;
-    --second-color-dark: #222222;
+	/* Variáveis da Paleta de Cores */
+	--primary-color-blue: #0d1b2a; 		/* Principal (fundo escuro ou texto forte) */
+	--second-color-blue: #1b263b; 		/* Fundo de elementos escuros */
+	--third-color-blue: #415a77; 		/* Elementos secundários/Bordas */
+	--fourth-color-blue: #778da9; 		/* Bordas/Divisores leves */
+	--fifth-color-blue: #e0e1dd; 		/* Fundo claro principal (usado como texto claro) */
+	--sixth-color-blue: #49a09d; 		/* Ação principal/Sucesso (Botões) */
+	--seventh-color-blue: #004258; 		/* Fundo mais escuro */
+	--eighth-color-blue: #026687; 		/* Ação secundária/Destaque */
+	--ninth-color-blue: #021c33; 		/* Texto mais escuro (usado na base do degradê) */
+	--tenth-color-blue: #1aa4e5; 		/* Destaque (Hover de Botões/Links) */
+	--primary-color-dark: #050505; 		/* Preto puro */
+	--second-color-dark: #222222; 		/* Texto escuro */
 
-    /* Mapeamento Semântico */
-    --color-text: var(--primary-color-dark);
-    --color-background-body: var(--fifth-color-blue); /* Fundo claro principal */
-    --color-background-element: #fff; /* Fundo do container do formulário */
-    --color-action: var(--sixth-color-blue); /* Botão principal (Salvar) */
-    --color-action-hover: var(--tenth-color-blue); /* Hover do botão */
-    --color-border: var(--fourth-color-blue); /* Bordas dos inputs */
-    --color-title: var(--primary-color-blue);
-    
-    --spacing-default: 1rem;
-    --spacing-large: 2rem;
-    --font-family-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+	/* Variáveis de layout e tipografia, ajustadas para coerência em MODO ESCURO */
+	--color-text: var(--fifth-color-blue); /* Texto principal CLARO */
+	--color-background-body: var(--primary-color-dark); /* Fundo base ESCURO */
+	--color-background-element: var(--second-color-blue); /* Fundo de elementos ESCUROS (inputs, modais) */
+	--color-action: var(--sixth-color-blue); /* Botão/Link principal de ação */
+	--color-action-hover: var(--tenth-color-blue); /* Hover do botão/link */
+	--color-border: var(--third-color-blue); /* Bordas escuras/sutis */
+	--color-title: var(--fifth-color-blue); /* Cor para títulos CLAROS */
+	
+	--spacing-default: 1rem;
+	--spacing-large: 2rem;
+	--font-family-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
 /*
@@ -40,190 +40,209 @@
 |--------------------------------------------------------------------------
 */
 * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
 }
 
 body {
-    font-family: var(--font-family-sans);
-    background-color: var(--color-background-body);
-    color: var(--color-text);
-    line-height: 1.6;
+	font-family: var(--font-family-sans);
+	/* APLICANDO FUNDO PRETO COM DEGRADÊ NO FINAL */
+	background-color: var(--primary-color-dark); /* Fallback para cor escura */
+	background: linear-gradient(
+		to bottom, 
+		var(--ninth-color-blue) 0%, /* Azul muito escuro (quase preto) no topo */
+		var(--primary-color-dark) 100% /* Preto puro no final */
+	);
+	background-attachment: fixed; /* Opcional: mantém o degradê fixo ao rolar */
+	color: var(--color-text);
+	line-height: 1.6;
 }
 
 /*
 |--------------------------------------------------------------------------
-| Header e Navegação (Menu de Saída)
+| Header e Navegação (Inclui o link de voltar)
 |--------------------------------------------------------------------------
 */
 .header {
-    background-color: var(--color-background-element);
-    box-shadow: 0 2px 4px color-mix(in srgb, var(--primary-color-dark) 10%, transparent); 
-    padding: var(--spacing-default) 0;
+	/* Ajuste para fundo escuro */
+	background-color: color-mix(in srgb, var(--second-color-blue) 90%, transparent);
+	box-shadow: 0 2px 4px color-mix(in srgb, var(--primary-color-dark) 50%, transparent);
+	padding: var(--spacing-default) 0;
 }
 
 .navigation {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 var(--spacing-default);
+	max-width: 1200px;
+	margin: 0 auto;
+	padding: 0 var(--spacing-default);
+	display: flex; /* Para centralizar/posicionar se necessário, mas aqui só serve como container */
 }
 
+/* --- Menu de Saída (Back Link) --- */
 .back-link {
-    /* Cor de baixo contraste para o link de 'voltar' */
-    color: var(--third-color-blue); 
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    text-decoration: none;
-    font-weight: 600;
-    transition: color 0.2s ease-in-out;
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5rem;
+	color: var(--color-action); /* Cor da ação para links */
+	text-decoration: none;
+	font-weight: 600;
+	transition: color 0.2s ease-in-out;
 }
 
 .back-link:hover {
-    /* Cor de destaque secundária para o hover do link */
-    color: var(--eighth-color-blue); 
-    text-decoration: underline;
+	color: var(--color-action-hover); /* Destaque ao passar o mouse */
+	text-decoration: underline;
 }
 
 .back-link svg {
-    stroke: currentColor; 
-    width: 1.25rem;
-    height: 1.25rem;
+	stroke: currentColor;	
+	width: 1.25rem; /* Tamanho padronizado */
+	height: 1.25rem;
 }
 
 /*
 |--------------------------------------------------------------------------
-| Conteúdo Principal e Seção do Formulário
+| Conteúdo Principal
 |--------------------------------------------------------------------------
 */
 .main-content {
-    padding: var(--spacing-large) var(--spacing-default);
-    display: flex;
-    justify-content: center;
-}
-
-.form-section {
-    background-color: var(--color-background-element);
-    border-radius: 8px;
-    /* Sombra suave com a cor escura da paleta */
-    box-shadow: 0 4px 12px color-mix(in srgb, var(--primary-color-dark) 15%, transparent);
-    padding: var(--spacing-large);
-    width: 100%;
-    max-width: 900px; /* Largura ideal para um layout de 3 colunas */
-}
-
-.form-title {
-    font-size: 2rem;
-    margin-bottom: var(--spacing-large);
-    color: var(--color-title); 
-    text-align: center;
+	padding: var(--spacing-large) var(--spacing-default);
+	display: flex;
+	justify-content: center;
 }
 
 /*
 |--------------------------------------------------------------------------
-| Formulário de Chamado (Layout Grid)
+| Seção do Formulário / Modal
 |--------------------------------------------------------------------------
 */
-.ticket-form {
-    display: grid;
-    /* 3 colunas em telas grandes, com mínimo de 250px por coluna */
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
-    gap: var(--spacing-default) var(--spacing-large);
+.modal-container {
+	/* Fundo escuro para o modal */
+	background-color: var(--second-color-blue);	
+	border-radius: 8px;
+	box-shadow: 0 4px 12px color-mix(in srgb, var(--primary-color-dark) 40%, transparent);
+	padding: var(--spacing-large);
+	width: 100%;
+	max-width: 500px;
 }
 
-/* Garante que o textarea e o botão ocupem a largura total (todas as colunas) */
-.form-group:has(textarea),
-.submit-button {
-    grid-column: 1 / -1; 
+.modal-title {
+	font-size: 1.8rem;
+	margin-bottom: var(--spacing-large);
+	color: var(--color-title); /* Título CLARO */
+	text-align: center;
 }
 
+/*
+|--------------------------------------------------------------------------
+| Formulário
+|--------------------------------------------------------------------------
+*/
+.user-form {
+	display: flex;
+	flex-direction: column;
+	gap: var(--spacing-default);
+}
 
 .form-group {
-    display: flex;
-    flex-direction: column;
+	display: flex;
+	flex-direction: column;
 }
 
 .form-label {
-    margin-bottom: 0.5rem;
-    font-weight: 600;
-    color: var(--primary-color-blue); /* Cor forte para Labels */
+	margin-bottom: 0.5rem;
+	font-weight: 600;
+	color: var(--color-title); /* Label CLARO */
 }
 
 .form-input,
-.form-textarea,
 .form-select {
-    width: 100%;
-    padding: 0.75rem;
-    border: 1px solid var(--color-border);
-    border-radius: 4px;
-    font-size: 1rem;
-    color: var(--primary-color-dark);
-    background-color: var(--color-background-element); 
-    transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+	width: 100%;
+	padding: 0.75rem;
+	border: 1px solid var(--color-border);
+	border-radius: 4px;
+	font-size: 1rem;
+	color: var(--color-text); /* Texto do input CLARO */
+	background-color: var(--second-color-blue); /* Fundo do input ESCURO */
+	transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 }
 
 .form-input:focus,
-.form-textarea:focus,
 .form-select:focus {
-    /* Foco com a cor de ação e sombra suave */
-    border-color: var(--color-action); 
-    outline: none;
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-action) 25%, transparent); 
+	/* Foco com a cor de ação */
+	border-color: var(--color-action);	
+	outline: none;
+	box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-action) 25%, transparent);
 }
 
-.form-textarea {
-    resize: vertical;
-    min-height: 150px;
+.form-select {
+	appearance: none;
+	/* Seta do select ajustada para cor CLARA (fifth-color-blue) */
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg width='12' height='12' viewBox='0 0 12 12' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M2 4L6 8L10 4' stroke='%23e0e1dd' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+	background-repeat: no-repeat;
+	background-position: right 0.75rem center;
+	padding-right: 2.25rem;
 }
 
 /*
 |--------------------------------------------------------------------------
-| Botão de Envio (Submit) - PADRÃO DE BOTÕES
+| ANIMAÇÕES
+|--------------------------------------------------------------------------
+*/
+@keyframes pulse-glow {
+	0% {
+		box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-action) 60%, transparent);
+	}
+	50% {
+		box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-action) 10%, transparent);
+	}
+	100% {
+		box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-action) 60%, transparent);
+	}
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| Botão de Envio (Submit) - PADRÃO DE BOTÕES APLICADO
 |--------------------------------------------------------------------------
 */
 .submit-button {
-    background-color: var(--color-action); /* Padrão: sixth-color-blue */
-    color: var(--color-background-element); /* Texto claro no botão */
-    border: none;
-    padding: 0.85rem var(--spacing-large);
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 1.1rem;
-    font-weight: 700;
-    margin-top: var(--spacing-default);
-    transition: background-color 0.2s ease-in-out, opacity 0.1s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
+	background-color: var(--color-action); /* Cor de ação primária (sixth-color-blue) */
+	color: var(--color-background-element); /* Texto claro no botão (branco) */
+	border: none;
+	padding: 0.75rem var(--spacing-large);
+	border-radius: 4px;
+	cursor: pointer;
+	font-size: 1rem;
+	font-weight: 600;
+	margin-top: var(--spacing-default);
+	/* ATUALIZADO: Adicionado transform e box-shadow à transição para a animação de hover */
+	transition: background-color 0.3s ease-in-out, opacity 0.3s ease-in-out, transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5rem;
+	
+	/* APLICAÇÃO DA ANIMAÇÃO: Um brilho pulsante sutil e constante */
+	animation: pulse-glow 2s infinite ease-in-out;
 }
 
 .submit-button:hover {
-    background-color: var(--color-action-hover); /* Padrão: tenth-color-blue */
+	background-color: var(--color-action-hover); /* Cor de destaque/hover (tenth-color-blue) */
+	/* ANIMAÇÃO DE HOVER: Eleva e adiciona sombra mais definida */
+	transform: translateY(-3px);
+	box-shadow: 0 6px 15px color-mix(in srgb, var(--color-action-hover) 50%, transparent);
+	animation: none; /* Pausa o pulso para o hover ter destaque */
 }
 
 .submit-button:active {
-    opacity: 0.9;
+	opacity: 0.9;
+	/* Retorna à posição original */
+	transform: translateY(0);
+	box-shadow: 0 2px 5px color-mix(in srgb, var(--color-action) 30%, transparent);
 }
 
 .submit-button svg {
-    stroke: currentColor; 
-}
-
-/*
-|--------------------------------------------------------------------------
-| Responsividade (Ajuste para telas pequenas)
-|--------------------------------------------------------------------------
-*/
-@media (max-width: 768px) {
-    .form-section {
-        padding: var(--spacing-default);
-    }
-
-    .ticket-form {
-        /* Layout de coluna única em telas pequenas */
-        grid-template-columns: 1fr; 
-        gap: var(--spacing-default);
-    }
+	stroke: currentColor;	
 }
