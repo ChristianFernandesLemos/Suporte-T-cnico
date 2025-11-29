@@ -64,7 +64,7 @@ const chamadoStorage = {
   buscarUsuarioPorEmail(email) {
     try {
       const dados = this.obterTodos();
-      if (!dados || !dados.etapa1) return null;
+      if (!dados || !dados.etapa1) return afetadoId;
 
       return dados.etapa1.email === email ? dados.etapa1 : null;
     } catch (error) {
@@ -389,18 +389,31 @@ function inicializarEtapa4() {
 }
 
 // ========================================
-// ✅ CORRIGIDO: ENVIAR PARA N8N (IA)
+// CONFIGURAÇÕES
+// ========================================
+
+// ========================================
+// 1. FUNÇÃO DE ANÁLISE (Busca Prioridade)
 // ========================================
 async function enviarParaIA() {
   try {
-    console.log('🤖 Enviando dados para IA (N8N)...');
+    console.log('🤖 Consultando IA (Modo Análise - Piece 1)...');
     
-    // Coleta todos os dados
+    // Coleta dados
     const todosOsDados = chamadoStorage.obterTodos();
     
-    // Payload para N8N
+    // Busca ID do usuário (Etapa de segurança)
+    let userId = null;
+    try {
+      // Assumindo que essa função já existe no seu escopo global
+      userId = await buscarUsuarioPorEmail(todosOsDados.etapa1.email);
+    } catch (error) {
+      console.warn('⚠️ ID não encontrado, enviando sem ID:', error);
+    }
+
+    // Payload corrigido para o padrão do Mobile
     const payload = {
-      id_usuario: null, // Será preenchido depois
+      id_usuario: userId,
       title: todosOsDados.etapa1.titulo,
       employeeName: todosOsDados.etapa1.nome,
       email: todosOsDados.etapa1.email,
@@ -408,247 +421,251 @@ async function enviarParaIA() {
       description: todosOsDados.etapa1.descricao,
       affectedPeople: todosOsDados.etapa2.afetado,
       blocksWork: todosOsDados.etapa3.bloqueioTotal === 'sim' ? 'Sim' : 'Não',
+      
+      // Campos vazios pois é apenas análise
       userPriority: '', 
-      porqueprioridade: '', 
-      piece: 2,
+      userPriorityReason: '', // Nome corrigido (era porqueprioridade)
+      
+      piece: 1 // ✅ CORREÇÃO: 1 = Analisar, NÃO Salvar
     };
 
-    console.log('📤 Payload para N8N:', payload);
-
-    // Envia para N8N
     const response = await fetch(N8N_WEBHOOK_URL, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     });
 
-    console.log('📊 Status da resposta:', response.status);
-    console.log('📊 Headers:', response.headers);
+    if (!response.ok) throw new Error(`Erro HTTP: ${response.status}`);
 
-    // ✅ CORREÇÃO CRÍTICA: Primeiro pega o texto, depois tenta parsear
+    // Tratamento robusto do JSON (Array vs Objeto)
     const textoResposta = await response.text();
-    console.log('📄 Resposta RAW do N8N:', textoResposta);
-    
-    let resultado;
-    
-    // Tenta fazer parse do JSON
+    let resultadoRaw;
     try {
-      resultado = JSON.parse(textoResposta);
-      console.log('✅ JSON parseado com sucesso:', resultado);
-    } catch (parseError) {
-      console.error('⚠️ Erro ao parsear JSON:', parseError);
-      console.log('📄 Texto recebido:', textoResposta);
-      
-      // Se não for JSON válido, usa valores padrão
-      resultado = {
-        userPriority: 'Média',
-        porqueprioridade: `Resposta padrão - N8N retornou: ${textoResposta.substring(0, 100)}`
-      };
+        resultadoRaw = JSON.parse(textoResposta);
+    } catch (e) {
+        throw new Error("Resposta da IA não é um JSON válido");
     }
 
-    if (!response.ok) {
-      throw new Error(`Erro HTTP: ${response.status} - ${textoResposta}`);
-    }
+    // Normaliza: Se vier array [{}], pega o primeiro item. Se vier objeto {}, usa ele.
+    const resultado = Array.isArray(resultadoRaw) ? resultadoRaw[0] : resultadoRaw;
 
-    console.log('✅ Resposta processada da IA:', resultado);
+    console.log('✅ Análise Recebida:', resultado);
 
-    // Salva resposta da IA
+    // Salva a sugestão da IA no storage local
     chamadoStorage.salvarEtapa('ia_response', {
-      prioridade: resultado.userPriority || resultado.prioridade || 'Média',
-      justificativa: resultado.porqueprioridade || resultado.justificativa || 'Análise automática',
-      timestamp: new Date().toISOString()
+      prioridade: resultado.prioridade || resultado.userPriority || 'Média',
+      justificativa: resultado.justificativa || resultado.userPriorityReason || 'Análise automática',
+      timestamp: new Date().toISOString(),
+      contestado: false // Inicializa como false
     });
 
     return resultado;
+
   } catch (error) {
-    console.error('❌ Erro ao enviar para IA:', error);
-    
-    // Em caso de erro, salva resposta padrão para não bloquear o fluxo
+    console.error('❌ Erro na análise IA:', error);
+    // Fallback em caso de erro para não travar o usuário
     chamadoStorage.salvarEtapa('ia_response', {
       prioridade: 'Média',
-      justificativa: 'Erro ao contactar IA - Prioridade definida automaticamente',
-      timestamp: new Date().toISOString(),
+      justificativa: 'Sistema indisponível temporariamente',
       erro: true
     });
-    
-    // Não lança erro, permite continuar
-    /*return {
-      userPriority: 'Média',
-      porqueprioridade: 'Erro ao contactar IA'
-    };*/
+    return { prioridade: 'Média' };
   }
 }
 
 // ========================================
-// PRIORIDADE ATRIBUÍDA PELA IA
+// 2. FUNÇÃO DE REGISTRO (Salva no Banco)
+// ========================================
+async function finalizarChamado() {
+    console.log('💾 Iniciando gravação final (Piece 2)...');
+    
+    const todosOsDados = chamadoStorage.obterTodos();
+    const dadosIA = chamadoStorage.obterEtapa('ia_response');
+    const dadosContestacao = chamadoStorage.obterEtapa('contestacao'); // Caso tenha havido contestação
+
+    // Determina a prioridade final (Do usuário se contestou, ou da IA se aceitou)
+    let prioridadeFinal = dadosIA.prioridade;
+    let justificativaFinal = dadosIA.justificativa;
+
+    if (dadosIA.contestado && dadosContestacao) {
+        prioridadeFinal = dadosContestacao.prioridadeUsuario;
+        justificativaFinal = dadosContestacao.justificativa;
+    }
+
+    // Busca ID novamente para garantir
+    let userId = null;
+    try {
+        userId = await buscarUsuarioPorEmail(todosOsDados.etapa1.email);
+    } catch (e) {}
+
+    const payload = {
+      id_usuario: userId,
+      title: todosOsDados.etapa1.titulo,
+      employeeName: todosOsDados.etapa1.nome,
+      email: todosOsDados.etapa1.email,
+      category: todosOsDados.etapa1.categoria,
+      description: todosOsDados.etapa1.descricao,
+      affectedPeople: todosOsDados.etapa2.afetado,
+      blocksWork: todosOsDados.etapa3.bloqueioTotal === 'sim' ? 'Sim' : 'Não',
+      
+      // ✅ AQUI VAI A DECISÃO FINAL
+      userPriority: prioridadeFinal,
+      userPriorityReason: justificativaFinal,
+      
+      piece: 2 // ✅ CORREÇÃO: 2 = Salvar definitivamente
+    };
+
+    const response = await fetch(N8N_WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    });
+
+    if (!response.ok) throw new Error('Falha ao registrar chamado no servidor');
+    
+    // Verifica se o backend retornou sucesso
+    const respostaRaw = await response.json();
+    const resposta = Array.isArray(respostaRaw) ? respostaRaw[0] : respostaRaw;
+
+    if (resposta.status === 'Deu algum erro') {
+        throw new Error('O servidor recusou o registro do chamado.');
+    }
+
+    return true;
+}
+
+// ========================================
+// 3. LOGICA DA TELA DE PRIORIDADE (UI)
 // ========================================
 function iniciarPrioridadeIA() {
   const form = document.querySelector('form');
-  
   if (!form) return;
-  console.log('📊 Prioridade IA inicializada');
 
-  // Verifica resposta da IA
   const dadosIA = chamadoStorage.obterEtapa('ia_response');
-  console.log('📦 Dados da IA recuperados:', dadosIA);
   
+  // Se não tem dados da IA, tenta buscar agora (caso o usuário tenha recarregado a página)
   if (!dadosIA) {
-    console.error('❌ Nenhuma resposta da IA encontrada!');
-    alert('❌ Nenhuma resposta da IA encontrada. Voltando...');
-    window.location.href = '/registrar-chamado-p4';
-    return;
+      enviarParaIA().then(() => {
+          window.location.reload();
+      });
+      return; 
   }
 
-  // ✅ CORREÇÃO: Seleciona os elementos corretos do HTML
+  // Preenche HTML
   const prioridadeElement = document.querySelector('.prioridade');
   const paragrafosCard = document.querySelectorAll('.card p');
-  
-  console.log('🔍 Elementos encontrados:', {
-    prioridadeElement,
-    totalParagrafos: paragrafosCard.length
-  });
-  
-  const prioridadeTexto = dadosIA.prioridade || 'Não definida';
-  const justificativaTexto = dadosIA.justificativa || 'Sem justificativa';
-  
-  console.log('📝 Valores a exibir:', {
-    prioridade: prioridadeTexto,
-    justificativa: justificativaTexto
-  });
-  
-  // Atualiza o texto da prioridade
+
   if (prioridadeElement) {
-    prioridadeElement.innerHTML = `<strong>Prioridade: ${prioridadeTexto}</strong>`;
-    console.log('✅ Prioridade atualizada no elemento');
-  }
-  
-  // Adiciona a justificativa no parágrafo vazio que vem depois
-  if (paragrafosCard.length >= 3) {
-    const paragrafoJustificativa = paragrafosCard[2]; // Terceiro <p>
-    paragrafoJustificativa.innerHTML = `<em>${justificativaTexto}</em>`;
-    paragrafoJustificativa.style.fontSize = '0.9em';
-    paragrafoJustificativa.style.color = '#666';
-    paragrafoJustificativa.style.marginTop = '10px';
-    console.log('✅ Justificativa adicionada');
+    // Aplica cor baseada na prioridade
+    let cor = '#f1c40f'; // Média (Amarelo)
+    if(dadosIA.prioridade === 'Alta' || dadosIA.prioridade === 'Urgente') cor = '#e74c3c';
+    if(dadosIA.prioridade === 'Baixa') cor = '#2ecc71';
+    
+    prioridadeElement.innerHTML = `<strong style="color:${cor}">${dadosIA.prioridade}</strong>`;
   }
 
-  // Atualizar header
-  const headerBackLink = document.querySelector('.back-link');
-  if (headerBackLink) {
-    headerBackLink.textContent = '← Voltar';
-    headerBackLink.addEventListener('click', function(e) {
-      e.preventDefault();
-      window.location.href = '/registrar-chamado-p4';
-    });
+  // Insere Justificativa
+  if (paragrafosCard.length >= 2) {
+      // Procura onde inserir ou cria um elemento novo se necessário
+      let containerJustificativa = document.getElementById('ia-justificativa');
+      if (!containerJustificativa) {
+          containerJustificativa = document.createElement('div');
+          containerJustificativa.id = 'ia-justificativa';
+          containerJustificativa.style.marginTop = '15px';
+          containerJustificativa.style.padding = '10px';
+          containerJustificativa.style.backgroundColor = '#f8f9fa';
+          containerJustificativa.style.borderRadius = '5px';
+          document.querySelector('.card').appendChild(containerJustificativa);
+      }
+      containerJustificativa.innerHTML = `<p style="font-size:0.9em; margin:0;"><strong>Motivo da IA:</strong> ${dadosIA.justificativa}</p>`;
   }
 
-  // Botão Concordar - Salva no banco
+  // BOTÃO CONCORDAR
   form.addEventListener('submit', async function(e) {
     e.preventDefault();
+    const btn = form.querySelector('button[type="submit"]');
+    const textoOriginal = btn.textContent;
     
-    const submitBtn = form.querySelector('button[type="submit"]');
-    const textoOriginal = submitBtn.textContent;
-    submitBtn.disabled = true;
-    submitBtn.textContent = '⏳ Salvando chamado...';
-
     try {
-      await finalizarChamado();
-      alert('✅ Chamado registrado com sucesso!');
-      chamadoStorage.limpar();
-      window.location.href = '/menu';
-    } catch (error) {
-      console.error('❌ Erro:', error);
-      alert('❌ Erro ao salvar chamado. Tente novamente.');
-      submitBtn.disabled = false;
-      submitBtn.textContent = textoOriginal;
+        btn.disabled = true;
+        btn.textContent = '💾 Salvando...';
+        
+        await finalizarChamado(); // Chama a função que envia piece: 2
+        
+        alert('✅ Chamado registrado com sucesso!');
+        chamadoStorage.limpar();
+        window.location.href = '/menu'; // Ou sua página de sucesso
+        
+    } catch (erro) {
+        console.error(erro);
+        alert('Erro ao salvar: ' + erro.message);
+        btn.disabled = false;
+        btn.textContent = textoOriginal;
     }
   });
 
-  // Botão Não Concordar - Vai para contestação
-  const btnContestar = document.querySelector('.back-button');
+  // BOTÃO CONTESTAR
+  const btnContestar = document.querySelector('.back-button'); // Ou o seletor correto do seu botão "Não Concordo"
   if (btnContestar) {
-    btnContestar.addEventListener('click', function(e) {
-      e.preventDefault();
-      window.location.href = '/contestacao';
-    });
+      btnContestar.onclick = (e) => {
+          e.preventDefault();
+          window.location.href = '/contestacao';
+      };
   }
 }
 
 // ========================================
-// CONTESTAÇÃO
+// 4. LÓGICA DA TELA DE CONTESTAÇÃO
 // ========================================
 function iniciarContestacao() {
-  const form = document.querySelector('form');
-  if (!form) return;
-  
-  console.log('⚖️ Contestação iniciada');
+    const form = document.querySelector('form');
+    if (!form) return;
 
-  // Carrega dados salvos
-  const dadosSalvos = chamadoStorage.obterEtapa('contestacao');
-  if (dadosSalvos) {
-    const prioridadeUsuario = document.getElementById('prioridade-usuario');
-    const justificativa = document.getElementById('justificativa');
-    
-    if (prioridadeUsuario) prioridadeUsuario.value = dadosSalvos.prioridadeUsuario || '';
-    if (justificativa) justificativa.value = dadosSalvos.justificativa || '';
-  }
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const novaPrioridade = document.getElementById('prioridade-usuario').value;
+        const novaJustificativa = document.getElementById('justificativa').value;
 
-  // Atualiza header
-  const headerBackLink = document.querySelector('.back-link');
-  if (headerBackLink) {
-    headerBackLink.textContent = '← Voltar';
-    headerBackLink.addEventListener('click', function(e) {
-      e.preventDefault();
-      window.location.href = '/prioridadeia';
+        if(!novaPrioridade || !novaJustificativa) {
+            alert("Preencha todos os campos");
+            return;
+        }
+
+        // Salva a contestação
+        chamadoStorage.salvarEtapa('contestacao', {
+            prioridadeUsuario: novaPrioridade,
+            justificativa: novaJustificativa
+        });
+
+        // Marca que houve contestação na flag da IA também
+        const dadosIA = chamadoStorage.obterEtapa('ia_response') || {};
+        chamadoStorage.salvarEtapa('ia_response', {
+            ...dadosIA,
+            contestado: true
+        });
+
+        const btn = form.querySelector('button[type="submit"]');
+        const textoOriginal = btn.textContent;
+
+        try {
+            btn.disabled = true;
+            btn.textContent = '💾 Salvando contestação...';
+
+            await finalizarChamado(); // Chama a função que envia piece: 2
+
+            alert('✅ Chamado registrado com sua prioridade!');
+            chamadoStorage.limpar();
+            window.location.href = '/menu';
+
+        } catch (erro) {
+            alert('Erro ao salvar: ' + erro.message);
+            btn.disabled = false;
+            btn.textContent = textoOriginal;
+        }
     });
-  }
-
-  // Submit da contestação
-  form.addEventListener('submit', async function(e) {
-    e.preventDefault();
-
-    const prioridadeUsuario = document.getElementById('prioridade-usuario').value;
-    const justificativa = document.getElementById('justificativa').value.trim();
-
-    if (!prioridadeUsuario || !justificativa) {
-      alert('⚠️ Por favor, selecione uma prioridade e justifique.');
-      return;
-    }
-
-    // Salva contestação
-    chamadoStorage.salvarEtapa('contestacao', {
-      prioridadeUsuario,
-      justificativa
-    });
-
-    // Sobrescreve resposta da IA com escolha do usuário
-    chamadoStorage.salvarEtapa('ia_response', {
-      prioridade: prioridadeUsuario,
-      justificativa: `CONTESTADO PELO USUÁRIO: ${justificativa}`,
-      contestado: true
-    });
-
-    const submitBtn = form.querySelector('button[type="submit"]');
-    const textoOriginal = submitBtn.textContent;
-    submitBtn.disabled = true;
-    submitBtn.textContent = '⏳ Salvando com sua prioridade...';
-
-    try {
-      await finalizarChamado();
-      alert('✅ Chamado registrado com sua prioridade!');
-      chamadoStorage.limpar();
-      window.location.href = '/menu';
-    } catch (error) {
-      console.error('❌ Erro:', error);
-      alert('❌ Erro ao salvar. Tente novamente.');
-      submitBtn.disabled = false;
-      submitBtn.textContent = textoOriginal;
-    }
-  });
 }
-
+/*
 // ========================================
 // ✅ CORRIGIDO: FINALIZAR CHAMADO
 // ========================================
@@ -708,7 +725,7 @@ async function finalizarChamado() {
     console.error('❌ Erro ao finalizar chamado:', error);
     throw error;
   }
-}
+} */
 
 // ========================================
 // INICIALIZAÇÃO

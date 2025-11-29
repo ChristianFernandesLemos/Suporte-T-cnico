@@ -10,6 +10,11 @@ router.get('/login', (req, res) => {
   res.sendFile(path.join(viewsPath, 'login.html'));
 });
 
+// Página Esqueci a senha
+router.get('/esquecisenha', (req, res) => {
+  res.sendFile(path.join(viewsPath, '.html'));
+});
+
 // Página do menu principal
 router.get('/menu', (req, res) => {
   res.sendFile(path.join(viewsPath, 'MenuPrincipal.html'));
