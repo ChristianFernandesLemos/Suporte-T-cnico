@@ -135,7 +135,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // ========================================
-// CRIAR NOVO CHAMADO
+// ✅ CRIAR NOVO CHAMADO - CORRIGIDO
 // ========================================
 router.post('/', async (req, res) => {
   try {
@@ -166,8 +166,8 @@ router.post('/', async (req, res) => {
     await transaction.begin();
 
     try {
-      // Insere o chamado
-      const resultChamado = await transaction.request()
+      // ✅ CORREÇÃO: Remove OUTPUT INSERTED para evitar conflito com triggers
+      await transaction.request()
         .input('categoria', sql.NVarChar(20), categoria)
         .input('prioridade', sql.Int, prioridadeFinal)
         .input('descricao', sql.NVarChar(1000), descricao)
@@ -178,13 +178,17 @@ router.post('/', async (req, res) => {
           INSERT INTO dbo.chamados (
             categoria, prioridade, descricao, Status, Afetado, Data_Registro, titulo
           )
-          OUTPUT INSERTED.id_chamado
           VALUES (
             @categoria, @prioridade, @descricao, @status, @afetadoId, GETDATE(), @titulo
           )
         `);
 
-      const novoChamadoId = resultChamado.recordset[0].id_chamado;
+      // ✅ CORREÇÃO: Busca o ID inserido usando SCOPE_IDENTITY()
+      const resultId = await transaction.request().query(`
+        SELECT CAST(SCOPE_IDENTITY() AS INT) as id_chamado
+      `);
+
+      const novoChamadoId = resultId.recordset[0].id_chamado;
 
       // Se usuarioId foi fornecido e é diferente de afetadoId, insere na tabela registra
       if (usuarioId && usuarioId !== afetadoId) {
@@ -429,7 +433,7 @@ router.get('/stats/resumo', async (req, res) => {
         SUM(CASE WHEN Status = ${STATUS.RESOLVIDO} THEN 1 ELSE 0 END) as resolvidos,
         SUM(CASE WHEN Status = ${STATUS.FECHADO} THEN 1 ELSE 0 END) as fechados,
         SUM(CASE WHEN Status = ${STATUS.CANCELADO} THEN 1 ELSE 0 END) as cancelados,
-        SUM(CASE QUANDO prioridade = ${PRIORIDADE.CRITICA} THEN 1 ELSE 0 END) as criticos,
+        SUM(CASE WHEN prioridade = ${PRIORIDADE.CRITICA} THEN 1 ELSE 0 END) as criticos,
         SUM(CASE WHEN prioridade = ${PRIORIDADE.ALTA} THEN 1 ELSE 0 END) as altos,
         SUM(CASE WHEN prioridade = ${PRIORIDADE.MEDIA} THEN 1 ELSE 0 END) as medios,
         SUM(CASE WHEN prioridade = ${PRIORIDADE.BAIXA} THEN 1 ELSE 0 END) as baixos

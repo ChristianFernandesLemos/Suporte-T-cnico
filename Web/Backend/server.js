@@ -13,6 +13,7 @@ const { testConnection } = require('./db');
 const authRoutes = require('./src/routes/auth');
 const userRoutes = require('./src/routes/users');
 const chamadosRoutes = require('./src/routes/chamados');
+const contestacoesRoutes = require('./src/routes/contestacoes'); // ⭐ NOVA LINHA ADICIONADA
 
 const pagesRoutes = require('./src/routes/pages');
 
@@ -43,6 +44,7 @@ app.use('/', pagesRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/chamados', chamadosRoutes);
+app.use('/api/contestacoes', contestacoesRoutes); // ⭐ NOVA LINHA ADICIONADA
 
 // Rota de health check (verifica conexão com banco)
 app.get('/api/health', async (req, res) => {
@@ -98,7 +100,8 @@ app.listen(PORT, async () => {
   console.log('================================');
   console.log(`📍 Auth: http://localhost:${PORT}/api/auth/login`);
   console.log(`📍 Users: http://localhost:${PORT}/api/users`);
-
+  console.log(`📍 Chamados: http://localhost:${PORT}/api/chamados`);
+  console.log(`📍 Contestações: http://localhost:${PORT}/api/contestacoes`); // ⭐ NOVA LINHA ADICIONADA
   console.log(`📍 Health: http://localhost:${PORT}/api/health`);
   console.log('================================\n');
   

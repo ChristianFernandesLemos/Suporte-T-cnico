@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registrar Chamado</title>
     <link rel="shortcut icon" href="/static/img/favicon.ico" type="image/x-icon">
-    <link rel="stylesheet" href="Forms.css">
+    <link rel="stylesheet" href="/static/Forms.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
@@ -15,7 +15,7 @@
     <header class="top-bar">
         <a href="#" class="back-link">
             <span class="arrow-icon">←</span>
-            Registrar Chamado
+            voltar
         </a>
     </header>
  
@@ -25,11 +25,15 @@
             <form action="#" method="post">
                 <div class="form-group">
                     <label for="descricao">Contestação:</label>
-                    <textarea id="descricao" name="descricao" rows="4" placeholder="Não concordo com a prioridade porque..." required></textarea>
+                    <textarea id="descricao" name="descricao" rows="4" placeholder="A prioridade correta é ... porque..." required></textarea>
                 </div>
                 <div class="form-actions">
-                    <button type="submit" id="avancar">Avançar</button>
+                    <button type="submit" id="avancar" class="back-button">cancelar</button>
                 </div>
+                <div class="form-actions">
+                    <button type="submit" id="avancar" class="submit-button">Avançar</button>
+                </div>
+                
             </form>
         </section>
     </main>

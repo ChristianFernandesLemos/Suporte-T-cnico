@@ -8,6 +8,8 @@ USE master;
 GO
 
 select * from Usuario
+select * from chamados
+select * from Historial_Contestacoes
 
 -- Verificar se o banco existe e excluí-lo
 IF EXISTS (SELECT name FROM sys.databases WHERE name = N'Suporte_Tecnico')

@@ -49,7 +49,7 @@ body {
 	font-family: var(--font-family-sans);
 	/* Fundo escuro com um leve degradê para dar profundidade */
 	background-color: var(--color-background-body);
-	background: radial-gradient(circle at top, var(--ninth-color-blue) 0%, var(--primary-color-dark) 100%);
+	background: linear-gradient(to bottom, #111, #222);
 	background-attachment: fixed;
 	color: var(--color-text); /* Texto da página principal é claro */
 	line-height: 1.6;
@@ -63,7 +63,7 @@ body {
 */
 .header {
 	/* Fundo semi-transparente para o header que flutua */
-	background-color: color-mix(in srgb, var(--second-color-blue) 95%, transparent);
+	background-color:#111;
 	box-shadow: 0 4px 10px color-mix(in srgb, var(--primary-color-dark) 40%, transparent);	
 	padding: var(--spacing-default) 0;
 	backdrop-filter: blur(5px); /* Efeito moderno de desfoque */
@@ -79,7 +79,7 @@ body {
 }
 
 .back-link {
-	color: var(--fourth-color-blue); /* Cor suave para links secundários */
+	color:white; /* Cor suave para links secundários */
 	display: inline-flex;
 	align-items: center;
 	gap: 0.5rem;
@@ -113,7 +113,7 @@ body {
 
 .form-section {
 	/* MUDANÇA PRINCIPAL: Fundo claro/branco para o card */
-	background-color: var(--fifth-color-blue); /* #e0e1dd (Light/White) */
+	background-color: white; /* #e0e1dd (Light/White) */
 	/* MUDANÇA PRINCIPAL: Cor do texto principal do card para preto */
 	color: var(--primary-color-dark); /* #050505 (Black) */
 	border-radius: 12px;
@@ -174,7 +174,7 @@ body {
 	/* Texto do input em preto */
 	color: var(--primary-color-dark);
 	/* Fundo do input em branco puro para contraste com o card */
-	background-color: white; 
+	background-color: var(--fifth-color-blue); 
 	transition: border-color 0.3s, box-shadow 0.3s;
 }
 
@@ -182,7 +182,7 @@ body {
 .form-textarea:focus,
 .form-select:focus {
 	/* Destaque de foco forte e elegante (cor Teal mantida) */
-	border-color: var(--sixth-color-blue);	
+	border-color: var(--tenth-color-blue);	
 	outline: none;
 	box-shadow: 0 0 0 2px var(--sixth-color-blue), 0 0 10px var(--sixth-color-blue);	
 }

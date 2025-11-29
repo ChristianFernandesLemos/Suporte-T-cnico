@@ -25,6 +25,34 @@ const PRIORIDADE = {
 const API_URL = 'http://localhost:3000/api/chamados';
 
 // ========================================
+// FUNÇÕES DE AUTENTICAÇÃO
+// ========================================
+function obterUsuarioLogado() {
+  try {
+    const userString = localStorage.getItem('user');
+    if (!userString) return null;
+    return JSON.parse(userString);
+  } catch (error) {
+    console.error('❌ Erro ao obter usuário logado:', error);
+    return null;
+  }
+}
+
+function podeEditarChamados() {
+  const usuario = obterUsuarioLogado();
+  if (!usuario) return false;
+  
+  // Permite edição apenas para Admin e Técnico
+  // tipo_usuario retornado pelo backend: 'admin', 'tecnico', 'funcionario'
+  const tiposPermitidos = ['admin', 'tecnico'];
+  const podeEditar = tiposPermitidos.includes(usuario.tipo_usuario);
+  
+  console.log(`🔐 Verificação de permissão: ${usuario.tipo_usuario} - ${podeEditar ? 'PODE' : 'NÃO PODE'} editar`);
+  
+  return podeEditar;
+}
+
+// ========================================
 // FUNÇÕES DE LABELS
 // ========================================
 function getPrioridadeLabel(prioridade) {
@@ -127,6 +155,12 @@ function renderizarTabela(chamados) {
     return;
   }
 
+  // Verifica permissão de edição
+  const podeEditar = podeEditarChamados();
+  const usuario = obterUsuarioLogado();
+  
+  console.log(`👤 Usuário: ${usuario?.nome || 'Não identificado'} - Nível: ${usuario?.nivelAcesso || 'Desconhecido'}`);
+
   // Renderiza cada chamado
   chamados.forEach(chamado => {
     const tr = document.createElement('tr');
@@ -136,22 +170,26 @@ function renderizarTabela(chamados) {
     const statusLabel = getStatusLabel(chamado.status);
     const dataFormatada = formatarData(chamado.dataAbertura);
     
-    // Cria a célula de categoria como "título" já que não temos titulo na tabela
     const titulo = chamado.titulo || 'Sem categoria';
+    
+    // Botão de editar só aparece para Administrador e Técnico
+    const botaoEditar = podeEditar ? `
+      <button class="action-btn" aria-label="Editar chamado ${chamado.id}" onclick="editarChamado(${chamado.id})" title="Editar chamado">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M14.5 2.5a2.121 2.121 0 113 3L6 17H3v-3L14.5 2.5z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    ` : '';
     
     tr.innerHTML = `
       <td class="actions-cell">
-        <button class="action-btn" aria-label="Visualizar chamado ${chamado.id}" onclick="verDetalhes(${chamado.id})">
+        <button class="action-btn" aria-label="Visualizar chamado ${chamado.id}" onclick="verDetalhes(${chamado.id})" title="Visualizar detalhes">
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M10 4C5 4 1.73 7.11 1 10c.73 2.89 4 6 9 6s8.27-3.11 9-6c-.73-2.89-4-6-9-6z" stroke="currentColor" stroke-width="2"/>
             <circle cx="10" cy="10" r="3" stroke="currentColor" stroke-width="2"/>
           </svg>
         </button>
-        <button class="action-btn" aria-label="Editar chamado ${chamado.id}" onclick="editarChamado(${chamado.id})">
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M14.5 2.5a2.121 2.121 0 113 3L6 17H3v-3L14.5 2.5z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </button>
+        ${botaoEditar}
       </td>
       <td>${chamado.id}</td>
       <td>${titulo}</td>
@@ -162,6 +200,8 @@ function renderizarTabela(chamados) {
     
     tbody.appendChild(tr);
   });
+  
+  console.log(`✅ Tabela renderizada com ${chamados.length} chamados`);
 }
 
 // ========================================
@@ -174,6 +214,13 @@ function verDetalhes(id) {
 
 function editarChamado(id) {
   console.log('✏️ Redirecionando para edição do chamado:', id);
+  
+  // Verifica permissão antes de redirecionar
+  if (!podeEditarChamados()) {
+    alert('❌ Você não tem permissão para editar chamados.');
+    return;
+  }
+  
   window.location.href = `/editar-chamado?id=${id}`;
 }
 
@@ -202,6 +249,17 @@ function mostrarErro(mensagem) {
 // ========================================
 async function inicializar() {
   console.log('🚀 Inicializando lista de chamados');
+  
+  // Verifica se usuário está logado
+  const usuario = obterUsuarioLogado();
+  if (!usuario) {
+    console.warn('⚠️ Usuário não está logado');
+    alert('Você precisa estar logado para acessar esta página.');
+    window.location.href = '/login';
+    return;
+  }
+  
+  console.log(`👤 Usuário logado: ${usuario.nome} (${usuario.nivelAcesso})`);
   
   // Mostra loading
   const tbody = document.querySelector('.tickets-table tbody');
@@ -267,3 +325,10 @@ setInterval(async () => {
 // Expõe funções globalmente para os botões HTML
 window.verDetalhes = verDetalhes;
 window.editarChamado = editarChamado;
+
+//============================================
+// Pesquisa e filtro de chamados
+//============================================
+
+// Pesquisa chamados pelo Titulo ou Descrição
+

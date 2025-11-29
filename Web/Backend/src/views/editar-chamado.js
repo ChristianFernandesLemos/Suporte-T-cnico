@@ -1,5 +1,5 @@
 // editar-chamado.js - Edição de chamados
-// VERSÃO FINAL CORRIGIDA
+// VERSÃO ATUALIZADA COM SELECTS E CAMPOS READONLY
 console.log('🚀 editar-chamado.js carregado');
 
 // ========================================
@@ -24,6 +24,7 @@ const PRIORIDADE = {
 // CONFIGURAÇÃO DA API
 // ========================================
 const API_URL = 'http://localhost:3000/api/chamados';
+const CONTESTACOES_URL = 'http://localhost:3000/api/contestacoes';
 
 // ========================================
 // FUNÇÕES AUXILIARES
@@ -31,6 +32,19 @@ const API_URL = 'http://localhost:3000/api/chamados';
 function obterIdDaURL() {
   const urlParams = new URLSearchParams(window.location.search);
   return urlParams.get('id');
+}
+
+function formatarData(dataStr) {
+  if (!dataStr) return 'N/A';
+  
+  const data = new Date(dataStr);
+  const dia = String(data.getDate()).padStart(2, '0');
+  const mes = String(data.getMonth() + 1).padStart(2, '0');
+  const ano = data.getFullYear();
+  const hora = String(data.getHours()).padStart(2, '0');
+  const minuto = String(data.getMinutes()).padStart(2, '0');
+  
+  return `${dia}/${mes}/${ano} às ${hora}:${minuto}`;
 }
 
 // ========================================
@@ -62,9 +76,61 @@ async function buscarChamado(id) {
 }
 
 // ========================================
+// BUSCAR CONTESTAÇÕES DO CHAMADO
+// ========================================
+async function buscarContestacoes(idChamado) {
+  try {
+    console.log(`📡 Buscando contestações do chamado #${idChamado}...`);
+    
+    const response = await fetch(`${CONTESTACOES_URL}/chamado/${idChamado}`);
+    
+    if (!response.ok) {
+      if (response.status === 404) {
+        console.log('ℹ️ Nenhuma contestação encontrada');
+        return [];
+      }
+      throw new Error(`Erro HTTP: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log('📦 Contestações recebidas:', data);
+    
+    if (data.success && Array.isArray(data.contestacoes)) {
+      console.log(`✅ ${data.contestacoes.length} contestação(ões) encontrada(s)`);
+      return data.contestacoes;
+    } else {
+      return [];
+    }
+  } catch (error) {
+    console.error('⚠️ Erro ao buscar contestações:', error);
+    return [];
+  }
+}
+
+// ========================================
+// CONFIGURAR CAMPOS READONLY
+// ========================================
+function configurarCamposReadonly() {
+  // Lista de campos que devem ser readonly
+  const camposReadonly = ['titulo', 'nome', 'email', 'descricao', 'contestacao'];
+  
+  camposReadonly.forEach(id => {
+    const campo = document.getElementById(id);
+    if (campo) {
+      campo.readOnly = true;
+      campo.style.backgroundColor = '#f7fafc';
+      campo.style.cursor = 'not-allowed';
+      campo.style.color = '#4a5568';
+    }
+  });
+  
+  console.log('✅ Campos readonly configurados');
+}
+
+// ========================================
 // PREENCHER FORMULÁRIO
 // ========================================
-function preencherFormulario(chamado) {
+async function preencherFormulario(chamado) {
   console.log('📝 Preenchendo formulário com dados:', chamado);
   
   // Atualiza título da página
@@ -73,31 +139,104 @@ function preencherFormulario(chamado) {
     titulo.textContent = `Editar Chamado #${chamado.id}`;
   }
 
-  // Preenche campos do formulário
-  const campos = {
-    'titulo': chamado.titulo || '',
-    'nome': chamado.usuarioNome || '',
-    'email': chamado.usuarioEmail || '',
-    'categoria': chamado.categoria || '',
-    'impacto': chamado.impacto || '',
-    'bloqueio': chamado.bloqueioTotal ? 'Sim' : 'Não',
-    'prioridade': PRIORIDADE[chamado.prioridade] || '',
-    'status': STATUS[chamado.status] || '',
-    'descricao': chamado.descricao || ''
+  // Preenche campos readonly (texto)
+  const camposTexto = {
+    'titulo': chamado.titulo || 'Sem título',
+    'nome': chamado.usuarioNome || 'Não informado',
+    'email': chamado.usuarioEmail || 'Não informado',
+    'descricao': chamado.descricao || 'Sem descrição'
   };
 
-  // Preenche cada campo verificando se existe
-  Object.keys(campos).forEach(id => {
+  Object.keys(camposTexto).forEach(id => {
     const elemento = document.getElementById(id);
     if (elemento) {
-      elemento.value = campos[id];
-      console.log(`✓ Campo ${id} preenchido com: ${campos[id]}`);
-    } else {
-      console.warn(`⚠️ Campo ${id} não encontrado no HTML`);
+      elemento.value = camposTexto[id];
+      console.log(`✓ Campo ${id} preenchido`);
     }
   });
+
+  // Preenche SELECT de Categoria
+  const selectCategoria = document.getElementById('categoria');
+  if (selectCategoria && chamado.categoria) {
+    selectCategoria.value = chamado.categoria;
+    console.log(`✓ Categoria selecionada: ${chamado.categoria}`);
+  }
+
+  // Preenche SELECT de Prioridade (valor numérico)
+  const selectPrioridade = document.getElementById('prioridade');
+  if (selectPrioridade && chamado.prioridade) {
+    selectPrioridade.value = chamado.prioridade.toString();
+    console.log(`✓ Prioridade selecionada: ${chamado.prioridade} (${PRIORIDADE[chamado.prioridade]})`);
+  }
+
+  // Preenche SELECT de Status (valor numérico)
+  const selectStatus = document.getElementById('status');
+  if (selectStatus && chamado.status) {
+    selectStatus.value = chamado.status.toString();
+    console.log(`✓ Status selecionado: ${chamado.status} (${STATUS[chamado.status]})`);
+  }
+
+  // Busca e renderiza contestações (readonly)
+  const contestacoes = await buscarContestacoes(chamado.id);
+  renderizarContestacoesReadonly(contestacoes);
+  
+  // Configura campos como readonly
+  configurarCamposReadonly();
   
   console.log('✅ Formulário preenchido com sucesso');
+}
+
+// ========================================
+// RENDERIZAR CONTESTAÇÕES (SOMENTE LEITURA)
+// ========================================
+function renderizarContestacoesReadonly(contestacoes) {
+  console.log('🎨 Renderizando contestações no formulário:', contestacoes);
+  
+  const contestacaoTextarea = document.getElementById('contestacao');
+  
+  if (!contestacaoTextarea) {
+    console.warn('⚠️ Campo de contestação não encontrado no HTML');
+    return;
+  }
+
+  // Ajusta altura do textarea baseado na quantidade de contestações
+  contestacaoTextarea.rows = contestacoes.length > 0 ? Math.min(contestacoes.length * 4 + 2, 20) : 3;
+  
+  if (contestacoes.length === 0) {
+    contestacaoTextarea.value = '📋 Nenhuma contestação registrada para este chamado.';
+    return;
+  }
+
+  // Formata contestações como texto
+  let texto = `╔════════════════════════════════════════════════════════════╗\n`;
+  texto += `║          HISTÓRICO DE CONTESTAÇÕES DO CHAMADO             ║\n`;
+  texto += `╠════════════════════════════════════════════════════════════╣\n`;
+  texto += `║ Total de Contestações: ${contestacoes.length.toString().padStart(2, '0')}                                    ║\n`;
+  texto += `╚════════════════════════════════════════════════════════════╝\n\n`;
+  
+  contestacoes.forEach((cont, index) => {
+    texto += `┌────────────────────────────────────────────────────────────┐\n`;
+    texto += `│ 📌 CONTESTAÇÃO #${(index + 1).toString().padStart(2, '0')}                                        │\n`;
+    texto += `├────────────────────────────────────────────────────────────┤\n`;
+    texto += `│ Tipo: ${cont.Tipo || 'Não especificado'}`.padEnd(60) + '│\n';
+    texto += `│ Data: ${formatarData(cont.DataContestacao)}`.padEnd(60) + '│\n';
+    texto += `│ Usuário: ${(cont.usuarioNome || 'Não identificado')}`.padEnd(60) + '│\n';
+    texto += `├────────────────────────────────────────────────────────────┤\n`;
+    texto += `│ JUSTIFICATIVA:                                             │\n`;
+    
+    // Quebra a justificativa em linhas de 56 caracteres
+    const justificativa = cont.Justificativa || 'Sem justificativa fornecida';
+    const linhas = justificativa.match(/.{1,56}/g) || [justificativa];
+    
+    linhas.forEach(linha => {
+      texto += `│ ${linha.padEnd(56)} │\n`;
+    });
+    
+    texto += `└────────────────────────────────────────────────────────────┘\n\n`;
+  });
+  
+  contestacaoTextarea.value = texto;
+  console.log('✅ Contestações renderizadas no formulário (readonly)');
 }
 
 // ========================================
@@ -122,23 +261,20 @@ async function salvarAlteracoes(event) {
   }
 
   try {
-    // Coleta dados do formulário
+    // Coleta APENAS os dados editáveis (selects)
+    const categoria = document.getElementById('categoria')?.value;
+    const prioridade = document.getElementById('prioridade')?.value;
+    const status = document.getElementById('status')?.value;
+
+    // Validação
+    if (!categoria || !prioridade || !status) {
+      throw new Error('Por favor, preencha todos os campos obrigatórios');
+    }
+
     const dadosAtualizados = {
-      titulo: document.getElementById('titulo')?.value || '',
-      usuarioNome: document.getElementById('nome')?.value || '',
-      usuarioEmail: document.getElementById('email')?.value || '',
-      categoria: document.getElementById('categoria')?.value || '',
-      impacto: document.getElementById('impacto')?.value || '',
-      bloqueioTotal: (document.getElementById('bloqueio')?.value || '').toLowerCase() === 'sim',
-      descricao: document.getElementById('descricao')?.value || '',
-      // Converte prioridade de texto para número
-      prioridade: Object.keys(PRIORIDADE).find(
-        key => PRIORIDADE[key] === document.getElementById('prioridade')?.value
-      ) || 2,
-      // Converte status de texto para número
-      status: Object.keys(STATUS).find(
-        key => STATUS[key] === document.getElementById('status')?.value
-      ) || 1
+      categoria: categoria,
+      prioridade: parseInt(prioridade),
+      status: parseInt(status)
     };
 
     console.log('💾 Salvando alterações:', dadosAtualizados);
@@ -204,11 +340,40 @@ function configurarBotaoVoltar() {
   if (backLink) {
     backLink.addEventListener('click', (e) => {
       e.preventDefault();
-      if (confirm('Deseja sair sem salvar as alterações?')) {
-        voltarParaLista();
+      
+      // Verifica se houve alterações nos selects
+      const categoria = document.getElementById('categoria');
+      const prioridade = document.getElementById('prioridade');
+      const status = document.getElementById('status');
+      
+      const houveAlteracao = categoria?.dataset.original !== categoria?.value ||
+                            prioridade?.dataset.original !== prioridade?.value ||
+                            status?.dataset.original !== status?.value;
+      
+      if (houveAlteracao) {
+        if (confirm('Você fez alterações. Deseja sair sem salvar?')) {
+          window.location.href ='/chamados';
+        }
+      } else {
+          window.location.href ='/chamados'
       }
     });
   }
+}
+
+// ========================================
+// GUARDAR VALORES ORIGINAIS
+// ========================================
+function guardarValoresOriginais() {
+  const categoria = document.getElementById('categoria');
+  const prioridade = document.getElementById('prioridade');
+  const status = document.getElementById('status');
+  
+  if (categoria) categoria.dataset.original = categoria.value;
+  if (prioridade) prioridade.dataset.original = prioridade.value;
+  if (status) status.dataset.original = status.value;
+  
+  console.log('✅ Valores originais guardados para detecção de alterações');
 }
 
 // ========================================
@@ -230,8 +395,11 @@ async function inicializar() {
     // Busca dados do chamado
     const chamado = await buscarChamado(chamadoId);
     
-    // Preenche formulário
-    preencherFormulario(chamado);
+    // Preenche formulário (incluindo contestações)
+    await preencherFormulario(chamado);
+    
+    // Guarda valores originais para detectar alterações
+    guardarValoresOriginais();
     
     // Configura envio do formulário
     const form = document.querySelector('.ticket-form');

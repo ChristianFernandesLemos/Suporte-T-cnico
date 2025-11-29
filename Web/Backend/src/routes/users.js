@@ -2,26 +2,12 @@ const express = require('express');
 const router = express.Router();
 const UserController = require('../controllers/UserController');
 const { requireAuth, requireAdmin } = require('../middleware/auth');
-
-// Todas as rotas de usuários requerem autenticação
-router.use(requireAuth);
-
-// Rotas que requerem permissão de admin
-router.get('/', requireAdmin, UserController.index);
-router.get('/:id', requireAdmin, UserController.show);
-router.post('/', requireAdmin, UserController.create);
-router.put('/:id', requireAdmin, UserController.update);
-router.patch('/:id/deactivate', requireAdmin, UserController.deactivate);
-router.patch('/:id/activate', requireAdmin, UserController.activate);
-
-module.exports = router;
-
-// src/routes/users.js - Rotas para gerenciamento de usuários
 const { getConnection, sql } = require('../../db');
 
 // ========================================
-// BUSCAR USUÁRIO POR EMAIL
+// ⭐ ROTA PÚBLICA - BUSCAR USUÁRIO POR EMAIL
 // ========================================
+// IMPORTANTE: Esta rota DEVE ficar ANTES do router.use(requireAuth)
 router.get('/buscar-por-email', async (req, res) => {
   try {
     const { email } = req.query;
@@ -80,7 +66,20 @@ router.get('/buscar-por-email', async (req, res) => {
 });
 
 // ========================================
-// BUSCAR USUÁRIO POR ID
+// ⬇️ A partir daqui, TODAS as rotas exigem autenticação
+// ========================================
+router.use(requireAuth);
+
+// Rotas que requerem permissão de admin
+router.get('/', requireAdmin, UserController.index);
+router.get('/:id', requireAdmin, UserController.show);
+router.post('/', requireAdmin, UserController.create);
+router.put('/:id', requireAdmin, UserController.update);
+router.patch('/:id/deactivate', requireAdmin, UserController.deactivate);
+router.patch('/:id/activate', requireAdmin, UserController.activate);
+
+// ========================================
+// BUSCAR USUÁRIO POR ID (PROTEGIDO)
 // ========================================
 router.get('/:id', async (req, res) => {
   try {
@@ -137,7 +136,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // ========================================
-// LISTAR TODOS OS USUÁRIOS
+// LISTAR TODOS OS USUÁRIOS (PROTEGIDO)
 // ========================================
 router.get('/', async (req, res) => {
   try {
@@ -178,7 +177,7 @@ router.get('/', async (req, res) => {
 });
 
 // ========================================
-// CRIAR NOVO USUÁRIO
+// CRIAR NOVO USUÁRIO (PROTEGIDO)
 // ========================================
 router.post('/', async (req, res) => {
   try {
@@ -254,7 +253,7 @@ router.post('/', async (req, res) => {
 });
 
 // ========================================
-// ATUALIZAR USUÁRIO
+// ATUALIZAR USUÁRIO (PROTEGIDO)
 // ========================================
 router.put('/:id', async (req, res) => {
   try {
