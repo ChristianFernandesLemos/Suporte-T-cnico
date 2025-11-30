@@ -3,20 +3,16 @@
   "WorkspaceRootPath": "C:\\Users\\Usuario\\OneDrive\\Desktop\\Github\\Git\\Suporte-T-cnico\\Desktop\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{12345678-1234-5678-9ABC-123456789ABC}|SistemaChamados.csproj|c:\\users\\usuario\\onedrive\\desktop\\github\\git\\suporte-t-cnico\\desktop\\src\\forms\\criarchamadoform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{12345678-1234-5678-9ABC-123456789ABC}|SistemaChamados.csproj|solutionrelative:src\\forms\\criarchamadoform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{12345678-1234-5678-9ABC-123456789ABC}|SistemaChamados.csproj|c:\\users\\usuario\\onedrive\\desktop\\github\\git\\suporte-t-cnico\\desktop\\src\\forms\\menuprincipalform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{12345678-1234-5678-9ABC-123456789ABC}|SistemaChamados.csproj|solutionrelative:src\\forms\\menuprincipalform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{12345678-1234-5678-9ABC-123456789ABC}|SistemaChamados.csproj|C:\\Users\\Usuario\\OneDrive\\Desktop\\Github\\Git\\Suporte-T-cnico\\Desktop\\src\\controllers\\chamadoscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{12345678-1234-5678-9ABC-123456789ABC}|SistemaChamados.csproj|solutionrelative:src\\controllers\\chamadoscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{12345678-1234-5678-9ABC-123456789ABC}|SistemaChamados.csproj|c:\\users\\usuario\\onedrive\\desktop\\github\\git\\suporte-t-cnico\\desktop\\src\\forms\\visualizarchamadosform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{12345678-1234-5678-9ABC-123456789ABC}|SistemaChamados.csproj|solutionrelative:src\\forms\\visualizarchamadosform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{12345678-1234-5678-9ABC-123456789ABC}|SistemaChamados.csproj|C:\\Users\\Usuario\\OneDrive\\Desktop\\Github\\Git\\Suporte-T-cnico\\Desktop\\src\\forms\\detalheschamadoform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{12345678-1234-5678-9ABC-123456789ABC}|SistemaChamados.csproj|c:\\users\\usuario\\onedrive\\desktop\\github\\git\\suporte-t-cnico\\desktop\\src\\forms\\detalheschamadoform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{12345678-1234-5678-9ABC-123456789ABC}|SistemaChamados.csproj|solutionrelative:src\\forms\\detalheschamadoform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{12345678-1234-5678-9ABC-123456789ABC}|SistemaChamados.csproj|C:\\Users\\Usuario\\OneDrive\\Desktop\\Github\\Git\\Suporte-T-cnico\\Desktop\\src\\services\\iaservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{12345678-1234-5678-9ABC-123456789ABC}|SistemaChamados.csproj|solutionrelative:src\\services\\iaservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -26,7 +22,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 3,
+          "SelectedChildIndex": 1,
           "Children": [
             {
               "$type": "Bookmark",
@@ -34,15 +30,28 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "ChamadosController.cs",
-              "DocumentMoniker": "C:\\Users\\Usuario\\OneDrive\\Desktop\\Github\\Git\\Suporte-T-cnico\\Desktop\\src\\Controllers\\ChamadosController.cs",
-              "RelativeDocumentMoniker": "src\\Controllers\\ChamadosController.cs",
-              "ToolTip": "C:\\Users\\Usuario\\OneDrive\\Desktop\\Github\\Git\\Suporte-T-cnico\\Desktop\\src\\Controllers\\ChamadosController.cs",
-              "RelativeToolTip": "src\\Controllers\\ChamadosController.cs",
-              "ViewState": "AgIAACMBAAAAAAAAAAAAACMBAAAJAAAAAAAAAA==",
+              "DocumentIndex": 0,
+              "Title": "MenuPrincipalForm.cs",
+              "DocumentMoniker": "C:\\Users\\Usuario\\OneDrive\\Desktop\\Github\\Git\\Suporte-T-cnico\\Desktop\\src\\Forms\\MenuPrincipalForm.cs",
+              "RelativeDocumentMoniker": "src\\Forms\\MenuPrincipalForm.cs",
+              "ToolTip": "C:\\Users\\Usuario\\OneDrive\\Desktop\\Github\\Git\\Suporte-T-cnico\\Desktop\\src\\Forms\\MenuPrincipalForm.cs",
+              "RelativeToolTip": "src\\Forms\\MenuPrincipalForm.cs",
+              "ViewState": "AgIAAHICAAAAAAAAAIAwwH4CAAAjAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-30T06:30:27.846Z",
+              "WhenOpened": "2025-11-30T21:58:31.137Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "VisualizarChamadosForm.cs",
+              "DocumentMoniker": "C:\\Users\\Usuario\\OneDrive\\Desktop\\Github\\Git\\Suporte-T-cnico\\Desktop\\src\\Forms\\VisualizarChamadosForm.cs",
+              "RelativeDocumentMoniker": "src\\Forms\\VisualizarChamadosForm.cs",
+              "ToolTip": "C:\\Users\\Usuario\\OneDrive\\Desktop\\Github\\Git\\Suporte-T-cnico\\Desktop\\src\\Forms\\VisualizarChamadosForm.cs",
+              "RelativeToolTip": "src\\Forms\\VisualizarChamadosForm.cs",
+              "ViewState": "AgIAAFMCAAAAAAAAAAAcwGgCAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-30T21:39:57.996Z",
               "EditorCaption": ""
             },
             {
@@ -53,34 +62,10 @@
               "RelativeDocumentMoniker": "src\\Forms\\DetalhesChamadoForm.cs",
               "ToolTip": "C:\\Users\\Usuario\\OneDrive\\Desktop\\Github\\Git\\Suporte-T-cnico\\Desktop\\src\\Forms\\DetalhesChamadoForm.cs",
               "RelativeToolTip": "src\\Forms\\DetalhesChamadoForm.cs",
-              "ViewState": "AgIAAMMAAAAAAAAAAAAAAMsAAAAoAAAAAAAAAA==",
+              "ViewState": "AgIAAMoBAAAAAAAAAAAcwN8BAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-29T23:41:03.873Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "CriarChamadoForm.cs",
-              "DocumentMoniker": "C:\\Users\\Usuario\\OneDrive\\Desktop\\Github\\Git\\Suporte-T-cnico\\Desktop\\src\\Forms\\CriarChamadoForm.cs",
-              "RelativeDocumentMoniker": "src\\Forms\\CriarChamadoForm.cs",
-              "ToolTip": "C:\\Users\\Usuario\\OneDrive\\Desktop\\Github\\Git\\Suporte-T-cnico\\Desktop\\src\\Forms\\CriarChamadoForm.cs",
-              "RelativeToolTip": "src\\Forms\\CriarChamadoForm.cs",
-              "ViewState": "AgIAAKgEAAAAAAAAAAAwwLwEAAAIAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-29T22:53:37.183Z",
+              "WhenOpened": "2025-11-30T17:33:41.322Z",
               "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "IAService.cs",
-              "DocumentMoniker": "C:\\Users\\Usuario\\OneDrive\\Desktop\\Github\\Git\\Suporte-T-cnico\\Desktop\\src\\Services\\IAService.cs",
-              "RelativeDocumentMoniker": "src\\Services\\IAService.cs",
-              "ToolTip": "C:\\Users\\Usuario\\OneDrive\\Desktop\\Github\\Git\\Suporte-T-cnico\\Desktop\\src\\Services\\IAService.cs",
-              "RelativeToolTip": "src\\Services\\IAService.cs",
-              "ViewState": "AgIAALAAAAAAAAAAAAAcwMUAAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-29T20:10:11.493Z"
             }
           ]
         }

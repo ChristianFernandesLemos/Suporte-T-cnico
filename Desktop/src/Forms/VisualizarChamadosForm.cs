@@ -15,6 +15,7 @@ namespace SistemaChamados.Forms
     public partial class VisualizarChamadosForm : Form
     {
         private ChamadosController _chamadosController;
+        private FuncionariosController _funcionariosController; // ⭐ AGREGADO
         private Funcionarios _funcionarioLogado;
         private DataGridView dgvChamados;
         private ComboBox cmbFiltroStatus;
@@ -30,7 +31,19 @@ namespace SistemaChamados.Forms
         private GroupBox gbFiltros;
         private List<Chamados> _chamadosCarregados;
 
-        
+        // ⭐ MODIFICADO: Ahora recibe FuncionariosController también
+        public VisualizarChamadosForm(Funcionarios funcionario, ChamadosController chamadosController, FuncionariosController funcionariosController)
+        {
+            _funcionarioLogado = funcionario;
+            _chamadosController = chamadosController;
+            _funcionariosController = funcionariosController; // ⭐ AGREGADO
+            _chamadosCarregados = new List<Chamados>();
+            InitializeComponent();
+            this.Text = GetTituloFormulario();
+            ConfigurarFormulario();
+            CarregarChamados();
+        }
+
         private void InitializeComponent()
         {
             this.dgvChamados = new DataGridView();
@@ -48,17 +61,13 @@ namespace SistemaChamados.Forms
 
             this.SuspendLayout();
 
-            // 
             // gbFiltros
-            // 
             this.gbFiltros.Text = "Filtros";
             this.gbFiltros.Location = new Point(12, 12);
             this.gbFiltros.Size = new Size(1000, 80);
             this.gbFiltros.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
 
-            // 
             // txtPesquisa
-            // 
             this.txtPesquisa.Location = new Point(15, 25);
             this.txtPesquisa.Size = new Size(200, 20);
             this.txtPesquisa.ForeColor = Color.Gray;
@@ -66,52 +75,39 @@ namespace SistemaChamados.Forms
             this.txtPesquisa.GotFocus += TxtPesquisa_GotFocus;
             this.txtPesquisa.LostFocus += TxtPesquisa_LostFocus;
 
-            // 
             // cmbFiltroStatus
-            // 
             this.cmbFiltroStatus.DropDownStyle = ComboBoxStyle.DropDownList;
             this.cmbFiltroStatus.Location = new Point(225, 25);
             this.cmbFiltroStatus.Size = new Size(120, 21);
 
-            // 
             // cmbFiltroPrioridade
-            // 
             this.cmbFiltroPrioridade.DropDownStyle = ComboBoxStyle.DropDownList;
             this.cmbFiltroPrioridade.Location = new Point(355, 25);
             this.cmbFiltroPrioridade.Size = new Size(120, 21);
 
-            // 
             // cmbFiltroCategoria
-            // 
             this.cmbFiltroCategoria.DropDownStyle = ComboBoxStyle.DropDownList;
             this.cmbFiltroCategoria.Location = new Point(485, 25);
             this.cmbFiltroCategoria.Size = new Size(120, 21);
 
-            // 
             // btnPesquisar
-            // 
             this.btnPesquisar.Text = "Pesquisar";
             this.btnPesquisar.Location = new Point(620, 23);
             this.btnPesquisar.Size = new Size(80, 25);
             this.btnPesquisar.Click += new EventHandler(this.btnPesquisar_Click);
 
-            // 
             // btnLimparFiltros
-            // 
             this.btnLimparFiltros.Text = "Limpar";
             this.btnLimparFiltros.Location = new Point(710, 23);
             this.btnLimparFiltros.Size = new Size(70, 25);
             this.btnLimparFiltros.Click += new EventHandler(this.btnLimparFiltros_Click);
 
-            // 
             // btnAtualizar
-            // 
             this.btnAtualizar.Text = "Atualizar";
             this.btnAtualizar.Location = new Point(790, 23);
             this.btnAtualizar.Size = new Size(70, 25);
             this.btnAtualizar.Click += new EventHandler(this.btnAtualizar_Click);
 
-            // Adicionar controles ao GroupBox
             this.gbFiltros.Controls.AddRange(new Control[]
             {
                 this.txtPesquisa, this.cmbFiltroStatus, this.cmbFiltroPrioridade,
@@ -119,9 +115,7 @@ namespace SistemaChamados.Forms
                 this.btnAtualizar
             });
 
-            // 
             // dgvChamados
-            // 
             this.dgvChamados.Location = new Point(12, 110);
             this.dgvChamados.Size = new Size(1000, 400);
             this.dgvChamados.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
@@ -134,16 +128,12 @@ namespace SistemaChamados.Forms
             this.dgvChamados.RowHeadersVisible = false;
             this.dgvChamados.CellDoubleClick += new DataGridViewCellEventHandler(this.dgvChamados_CellDoubleClick);
 
-            // 
             // lblTotalChamados
-            // 
             this.lblTotalChamados.Location = new Point(12, 520);
             this.lblTotalChamados.Size = new Size(200, 15);
             this.lblTotalChamados.Text = "Total: 0 chamados";
 
-            // 
             // btnDetalhes
-            // 
             this.btnDetalhes = new Button();
             this.btnDetalhes.Text = "Ver Detalhes";
             this.btnDetalhes.Location = new Point(535, 20);
@@ -153,17 +143,13 @@ namespace SistemaChamados.Forms
             this.btnDetalhes.FlatStyle = FlatStyle.Flat;
             this.btnDetalhes.Click += new EventHandler(this.btnDetalhes_Click);
 
-            // 
             // btnNovoContestacao
-            // 
             this.btnNovoContestacao.Text = "Contestar";
             this.btnNovoContestacao.Location = new Point(820, 520);
             this.btnNovoContestacao.Size = new Size(90, 30);
             this.btnNovoContestacao.Click += new EventHandler(this.btnNovoContestacao_Click);
 
-            // 
             // VisualizarChamadosForm
-            // 
             this.AutoScaleDimensions = new SizeF(6F, 13F);
             this.AutoScaleMode = AutoScaleMode.Font;
             this.BackColor = Color.White;
@@ -179,6 +165,7 @@ namespace SistemaChamados.Forms
             this.WindowState = FormWindowState.Maximized;
             this.ResumeLayout(false);
         }
+
         private void TxtPesquisa_GotFocus(object sender, EventArgs e)
         {
             if (txtPesquisa.Text == "Pesquisar por nome ou email...")
@@ -197,22 +184,10 @@ namespace SistemaChamados.Forms
             }
         }
 
-        public VisualizarChamadosForm(Funcionarios funcionario, ChamadosController chamadosController)
-        {
-            _funcionarioLogado = funcionario;
-            _chamadosController = chamadosController;
-            _chamadosCarregados = new List<Chamados>();
-            InitializeComponent();
-            this.Text = GetTituloFormulario(); // Define o título após InitializeComponent
-            ConfigurarFormulario();
-            CarregarChamados();
-        }
-
         private void ConfigurarFormulario()
         {
             try
             {
-                // Configurar combo de status
                 cmbFiltroStatus.Items.Add("Todos");
                 cmbFiltroStatus.Items.Add("Aberto");
                 cmbFiltroStatus.Items.Add("Em Andamento");
@@ -221,7 +196,6 @@ namespace SistemaChamados.Forms
                 cmbFiltroStatus.Items.Add("Cancelado");
                 cmbFiltroStatus.SelectedIndex = 0;
 
-                // Configurar combo de prioridades
                 cmbFiltroPrioridade.Items.Add("Todas");
                 cmbFiltroPrioridade.Items.Add("Baixa");
                 cmbFiltroPrioridade.Items.Add("Média");
@@ -229,7 +203,6 @@ namespace SistemaChamados.Forms
                 cmbFiltroPrioridade.Items.Add("Crítica");
                 cmbFiltroPrioridade.SelectedIndex = 0;
 
-                // Configurar combo de categorias
                 cmbFiltroCategoria.Items.Add("Todas");
                 cmbFiltroCategoria.Items.AddRange(new string[]
                 {
@@ -237,10 +210,7 @@ namespace SistemaChamados.Forms
                 });
                 cmbFiltroCategoria.SelectedIndex = 0;
 
-                // Configurar DataGridView
                 ConfigurarDataGridView();
-
-                // Mostrar/ocultar botões baseado no nível de acesso
                 ConfigurarPermissoes();
             }
             catch (Exception ex)
@@ -254,7 +224,6 @@ namespace SistemaChamados.Forms
         {
             dgvChamados.Columns.Clear();
 
-            // ID
             dgvChamados.Columns.Add(new DataGridViewTextBoxColumn
             {
                 Name = "IdChamado",
@@ -263,7 +232,6 @@ namespace SistemaChamados.Forms
                 ReadOnly = true
             });
 
-            // Data
             dgvChamados.Columns.Add(new DataGridViewTextBoxColumn
             {
                 Name = "DataChamado",
@@ -273,7 +241,6 @@ namespace SistemaChamados.Forms
                 DefaultCellStyle = new DataGridViewCellStyle { Format = "dd/MM/yyyy HH:mm" }
             });
 
-            // ⭐ NUEVO: Coluna Título
             dgvChamados.Columns.Add(new DataGridViewTextBoxColumn
             {
                 Name = "Titulo",
@@ -282,7 +249,6 @@ namespace SistemaChamados.Forms
                 ReadOnly = true
             });
 
-            // Categoria
             dgvChamados.Columns.Add(new DataGridViewTextBoxColumn
             {
                 Name = "Categoria",
@@ -291,16 +257,14 @@ namespace SistemaChamados.Forms
                 ReadOnly = true
             });
 
-            // Descrição (reducida porque tenemos título)
             dgvChamados.Columns.Add(new DataGridViewTextBoxColumn
             {
                 Name = "Descricao",
                 HeaderText = "Descrição",
-                Width = 220, // ⭐ Reducido de 300 a 220
+                Width = 220,
                 ReadOnly = true
             });
 
-            // Prioridade
             dgvChamados.Columns.Add(new DataGridViewTextBoxColumn
             {
                 Name = "Prioridade",
@@ -309,7 +273,6 @@ namespace SistemaChamados.Forms
                 ReadOnly = true
             });
 
-            // Status
             dgvChamados.Columns.Add(new DataGridViewTextBoxColumn
             {
                 Name = "Status",
@@ -318,7 +281,7 @@ namespace SistemaChamados.Forms
                 ReadOnly = true
             });
 
-            if (_funcionarioLogado.NivelAcesso >= 2) // Técnico ou Admin
+            if (_funcionarioLogado.NivelAcesso >= 2)
             {
                 dgvChamados.Columns.Add(new DataGridViewTextBoxColumn
                 {
@@ -329,7 +292,7 @@ namespace SistemaChamados.Forms
                 });
             }
 
-            if (_funcionarioLogado.NivelAcesso >= 3) // Admin
+            if (_funcionarioLogado.NivelAcesso >= 3)
             {
                 dgvChamados.Columns.Add(new DataGridViewTextBoxColumn
                 {
@@ -340,16 +303,13 @@ namespace SistemaChamados.Forms
                 });
             }
 
-            // Configurar aparência alternada das linhas
             dgvChamados.AlternatingRowsDefaultCellStyle.BackColor = Color.LightGray;
             dgvChamados.DefaultCellStyle.SelectionBackColor = Color.DodgerBlue;
             dgvChamados.DefaultCellStyle.SelectionForeColor = Color.White;
         }
 
-
         private void ConfigurarPermissoes()
         {
-            // Funcionário comum só vê contestação
             if (_funcionarioLogado.NivelAcesso == 1)
             {
                 btnNovoContestacao.Visible = true;
@@ -382,16 +342,15 @@ namespace SistemaChamados.Forms
                 dgvChamados.DataSource = null;
                 dgvChamados.Rows.Clear();
 
-                // Carregar chamados baseado no nível de acesso
                 switch (_funcionarioLogado.NivelAcesso)
                 {
-                    case 1: // Funcionário - apenas seus chamados
+                    case 1:
                         _chamadosCarregados = _chamadosController.ListarChamadosPorFuncionario(_funcionarioLogado.Id);
                         break;
-                    case 2: // Técnico - chamados atribuídos a ele
+                    case 2:
                         _chamadosCarregados = _chamadosController.ListarChamadosPorTecnico(_funcionarioLogado.Id);
                         break;
-                    case 3: // Admin - todos os chamados
+                    case 3:
                         _chamadosCarregados = _chamadosController.ListarTodosChamados();
                         break;
                 }
@@ -414,33 +373,25 @@ namespace SistemaChamados.Forms
             {
                 var row = new DataGridViewRow();
 
-                // ID
                 row.Cells.Add(new DataGridViewTextBoxCell { Value = chamado.IdChamado });
-
-                // Data
                 row.Cells.Add(new DataGridViewTextBoxCell { Value = chamado.DataChamado });
 
-                // ⭐ NUEVO: Título
                 string tituloMostrar = !string.IsNullOrWhiteSpace(chamado.Titulo)
                     ? chamado.Titulo
                     : "Sem título";
                 row.Cells.Add(new DataGridViewTextBoxCell { Value = tituloMostrar });
 
-                // Categoria
                 row.Cells.Add(new DataGridViewTextBoxCell { Value = chamado.Categoria });
 
-                // Descrição (resumida y más corta)
                 string descricaoResumida = chamado.Descricao.Length > 40
                     ? chamado.Descricao.Substring(0, 40) + "..."
                     : chamado.Descricao;
                 row.Cells.Add(new DataGridViewTextBoxCell { Value = descricaoResumida });
 
-                // Prioridade
                 row.Cells.Add(new DataGridViewTextBoxCell { Value = ObterTextoPrioridade(chamado.Prioridade) });
-
-                // Status
                 row.Cells.Add(new DataGridViewTextBoxCell { Value = ObterTextoStatus((int)chamado.Status) });
 
+                // ⭐ CORREGIDO: Mostrar nombres en lugar de IDs
                 if (_funcionarioLogado.NivelAcesso >= 2)
                 {
                     row.Cells.Add(new DataGridViewTextBoxCell { Value = ObterNomeAfetado(chamado.Afetado) });
@@ -451,27 +402,25 @@ namespace SistemaChamados.Forms
                     row.Cells.Add(new DataGridViewTextBoxCell { Value = ObterNomeTecnico(chamado.TecnicoResponsavel) });
                 }
 
-                // Colorir linha baseado na prioridade
                 ColorirLinhaPorPrioridade(row, chamado.Prioridade);
 
                 dgvChamados.Rows.Add(row);
             }
         }
 
-
         private void ColorirLinhaPorPrioridade(DataGridViewRow row, int prioridade)
         {
             switch (prioridade)
             {
-                case 1: // Baixa - Verde claro
+                case 1:
                     row.DefaultCellStyle.BackColor = Color.LightGreen;
                     break;
-                case 2: // Média - Sem cor especial
+                case 2:
                     break;
-                case 3: // Alta - Amarelo
+                case 3:
                     row.DefaultCellStyle.BackColor = Color.LightYellow;
                     break;
-                case 4: // Crítica - Vermelho claro
+                case 4:
                     row.DefaultCellStyle.BackColor = Color.LightCoral;
                     break;
             }
@@ -502,19 +451,21 @@ namespace SistemaChamados.Forms
             }
         }
 
+        // ⭐ CORREGIDO: Ahora usa FuncionariosController
         private string ObterNomeAfetado(int idFuncionario)
         {
-            // Implementar busca do nome do funcionário
-            return $"Funcionário {idFuncionario}"; // Placeholder
+            var funcionario = _funcionariosController.BuscarFuncionarioPorId(idFuncionario);
+            return funcionario != null ? funcionario.Nome.ToString() : $"ID:{idFuncionario}";
         }
 
+        // ⭐ CORREGIDO: Ahora usa FuncionariosController
         private string ObterNomeTecnico(int? idTecnico)
         {
             if (!idTecnico.HasValue)
                 return "Não atribuído";
 
-            // Implementar busca do nome do técnico
-            return $"Técnico {idTecnico}"; // Placeholder
+            var tecnico = _funcionariosController.BuscarFuncionarioPorId(idTecnico.Value);
+            return tecnico != null ? tecnico.Nome.ToString() : $"ID:{idTecnico}";
         }
 
         private void AtualizarContador()
@@ -541,31 +492,27 @@ namespace SistemaChamados.Forms
             {
                 var chamadosFiltrados = _chamadosCarregados.AsEnumerable();
 
-                // Filtro por texto (ahora también busca en título)
                 if (!string.IsNullOrWhiteSpace(txtPesquisa.Text))
                 {
                     string termo = txtPesquisa.Text.ToLower();
                     chamadosFiltrados = chamadosFiltrados.Where(c =>
                         c.Descricao.ToLower().Contains(termo) ||
                         c.Categoria.ToLower().Contains(termo) ||
-                        (!string.IsNullOrWhiteSpace(c.Titulo) && c.Titulo.ToLower().Contains(termo))); // ⭐ NUEVO
+                        (!string.IsNullOrWhiteSpace(c.Titulo) && c.Titulo.ToLower().Contains(termo)));
                 }
 
-                // Filtro por status
                 if (cmbFiltroStatus.SelectedIndex > 0)
                 {
                     int statusFiltro = cmbFiltroStatus.SelectedIndex;
                     chamadosFiltrados = chamadosFiltrados.Where(c => (int)c.Status == statusFiltro);
                 }
 
-                // Filtro por prioridade
                 if (cmbFiltroPrioridade.SelectedIndex > 0)
                 {
                     int prioridadeFiltro = cmbFiltroPrioridade.SelectedIndex;
                     chamadosFiltrados = chamadosFiltrados.Where(c => c.Prioridade == prioridadeFiltro);
                 }
 
-                // Filtro por categoria
                 if (cmbFiltroCategoria.SelectedIndex > 0)
                 {
                     string categoriaFiltro = cmbFiltroCategoria.Text;
@@ -621,9 +568,8 @@ namespace SistemaChamados.Forms
 
                 if (chamado != null)
                 {
-                    // ← MODIFICADO: permiteEdicao = false
                     var formDetalhes = new DetalhesChamadoForm(chamado, _funcionarioLogado, _chamadosController, permiteEdicao: false);
-                    formDetalhes.ShowDialog(); 
+                    formDetalhes.ShowDialog();
                 }
             }
             catch (Exception ex)
@@ -669,4 +615,3 @@ namespace SistemaChamados.Forms
         }
     }
 }
-
