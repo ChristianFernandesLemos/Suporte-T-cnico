@@ -3,17 +3,17 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using SistemaChamados.Config;
-using SistemaChamados.Controllers;
+using SistemaChamados.Controllers; // Asegúrate de tener los Enums aquí (StatusChamado)
 using SistemaChamados.Interfaces;
 using SistemaChamados.Models;
 
 namespace SistemaChamados.Data
 {
     /// <summary>
-    /// ✅ MIGRADO PARA: Suporte_Tecnico
-    /// - Tabla Usuario (antes Funcionarios)
-    /// - Tabla chamados (antes Chamados)
-    /// - Usa VIEWs: vw_LoginUsuarios, vw_ChamadosCompletos
+    /// ✅ Sincronizado con: ChamadosRepository, FuncionariosRepository, RelatoriosRepository y ContestacoesRepository.
+    /// - Eliminada lógica obsoleta de tabla 'Contestacoes'.
+    /// - Implementada lógica de 'Historial_Contestacoes'.
+    /// - Unificados criterios de limpieza de texto y conversión de tipos.
     /// </summary>
     public class SqlServerConnection : IDatabaseConnection, IDisposable
     {
@@ -47,7 +47,14 @@ namespace SistemaChamados.Data
         public void Dispose() => GC.SuppressFinalize(this);
         #endregion
 
-        #region CHAMADOS - BUSCAR/LISTAR
+        #region CHAMADOS - BUSCAR/LISTAR (Sincronizado con ChamadosRepository)
+
+        // SQL Base compartido para evitar duplicidad, igual que en el Repository
+        private const string SQL_SELECT_CHAMADOS = @"
+            SELECT id_chamado, titulo, categoria, prioridade, descricao, Afetado,
+                   Data_Registro, Status, Tecnico_Atribuido, Data_Resolucao
+            FROM chamados ";
+
         public Chamados BuscarChamadoPorId(int idChamado)
         {
             try
@@ -55,12 +62,7 @@ namespace SistemaChamados.Data
                 using (var connection = new SqlConnection(_connectionString))
                 {
                     connection.Open();
-                    // ⭐ AGREGAR 'titulo'
-                    string sql = @"
-                SELECT id_chamado, titulo, categoria, prioridade, descricao, Afetado,
-                       Data_Registro, Status, Tecnico_Atribuido, Data_Resolucao
-                FROM chamados 
-                WHERE id_chamado = @IdChamado";
+                    string sql = SQL_SELECT_CHAMADOS + " WHERE id_chamado = @IdChamado";
 
                     using (var command = new SqlCommand(sql, connection))
                     {
@@ -68,7 +70,7 @@ namespace SistemaChamados.Data
                         using (var reader = command.ExecuteReader())
                         {
                             if (reader.Read())
-                                return CriarChamadoFromReader(reader);
+                                return CriarChamadoFromReader(reader, connection); // Pasamos conexión para buscar contestación
                         }
                     }
                 }
@@ -88,18 +90,13 @@ namespace SistemaChamados.Data
                 using (var connection = new SqlConnection(_connectionString))
                 {
                     connection.Open();
-                    // ⭐ AGREGAR 'titulo'
-                    string sql = @"
-                SELECT id_chamado, titulo, categoria, prioridade, descricao, Afetado,
-                       Data_Registro, Status, Tecnico_Atribuido, Data_Resolucao
-                FROM chamados 
-                ORDER BY Data_Registro DESC";
+                    string sql = SQL_SELECT_CHAMADOS + " ORDER BY Data_Registro DESC";
 
                     using (var command = new SqlCommand(sql, connection))
                     using (var reader = command.ExecuteReader())
                     {
                         while (reader.Read())
-                            chamados.Add(CriarChamadoFromReader(reader));
+                            chamados.Add(CriarChamadoFromReader(reader, connection)); // Pasamos conexión
                     }
                 }
             }
@@ -118,13 +115,7 @@ namespace SistemaChamados.Data
                 using (var connection = new SqlConnection(_connectionString))
                 {
                     connection.Open();
-                    // ⭐ AGREGAR 'titulo'
-                    string sql = @"
-                SELECT id_chamado, titulo, categoria, prioridade, descricao, Afetado,
-                       Data_Registro, Status, Tecnico_Atribuido, Data_Resolucao
-                FROM chamados 
-                WHERE Afetado = @FuncionarioId
-                ORDER BY Data_Registro DESC";
+                    string sql = SQL_SELECT_CHAMADOS + " WHERE Afetado = @FuncionarioId ORDER BY Data_Registro DESC";
 
                     using (var command = new SqlCommand(sql, connection))
                     {
@@ -132,7 +123,7 @@ namespace SistemaChamados.Data
                         using (var reader = command.ExecuteReader())
                         {
                             while (reader.Read())
-                                chamados.Add(CriarChamadoFromReader(reader));
+                                chamados.Add(CriarChamadoFromReader(reader, connection));
                         }
                     }
                 }
@@ -152,13 +143,7 @@ namespace SistemaChamados.Data
                 using (var connection = new SqlConnection(_connectionString))
                 {
                     connection.Open();
-                    // ⭐ AGREGAR 'titulo'
-                    string sql = @"
-                SELECT id_chamado, titulo, categoria, prioridade, descricao, Afetado,
-                       Data_Registro, Status, Tecnico_Atribuido, Data_Resolucao
-                FROM chamados 
-                WHERE Tecnico_Atribuido = @TecnicoId
-                ORDER BY prioridade DESC, Data_Registro ASC";
+                    string sql = SQL_SELECT_CHAMADOS + " WHERE Tecnico_Atribuido = @TecnicoId ORDER BY prioridade DESC, Data_Registro ASC";
 
                     using (var command = new SqlCommand(sql, connection))
                     {
@@ -166,7 +151,7 @@ namespace SistemaChamados.Data
                         using (var reader = command.ExecuteReader())
                         {
                             while (reader.Read())
-                                chamados.Add(CriarChamadoFromReader(reader));
+                                chamados.Add(CriarChamadoFromReader(reader, connection));
                         }
                     }
                 }
@@ -186,13 +171,7 @@ namespace SistemaChamados.Data
                 using (var connection = new SqlConnection(_connectionString))
                 {
                     connection.Open();
-                    // ⭐ AGREGAR 'titulo'
-                    string sql = @"
-                SELECT id_chamado, titulo, categoria, prioridade, descricao, Afetado,
-                       Data_Registro, Status, Tecnico_Atribuido, Data_Resolucao
-                FROM chamados 
-                WHERE Status = @Status
-                ORDER BY Data_Registro DESC";
+                    string sql = SQL_SELECT_CHAMADOS + " WHERE Status = @Status ORDER BY Data_Registro DESC";
 
                     using (var command = new SqlCommand(sql, connection))
                     {
@@ -200,7 +179,7 @@ namespace SistemaChamados.Data
                         using (var reader = command.ExecuteReader())
                         {
                             while (reader.Read())
-                                chamados.Add(CriarChamadoFromReader(reader));
+                                chamados.Add(CriarChamadoFromReader(reader, connection));
                         }
                     }
                 }
@@ -211,6 +190,7 @@ namespace SistemaChamados.Data
             }
             return chamados;
         }
+
         public List<Chamados> ListarChamadosPorPrioridade(int prioridade)
         {
             var chamados = new List<Chamados>();
@@ -219,13 +199,7 @@ namespace SistemaChamados.Data
                 using (var connection = new SqlConnection(_connectionString))
                 {
                     connection.Open();
-                    // ⭐ AGREGAR 'titulo'
-                    string sql = @"
-                SELECT id_chamado, titulo, categoria, prioridade, descricao, Afetado,
-                       Data_Registro, Status, Tecnico_Atribuido, Data_Resolucao
-                FROM chamados 
-                WHERE prioridade = @Prioridade
-                ORDER BY Data_Registro DESC";
+                    string sql = SQL_SELECT_CHAMADOS + " WHERE prioridade = @Prioridade ORDER BY Data_Registro DESC";
 
                     using (var command = new SqlCommand(sql, connection))
                     {
@@ -233,7 +207,7 @@ namespace SistemaChamados.Data
                         using (var reader = command.ExecuteReader())
                         {
                             while (reader.Read())
-                                chamados.Add(CriarChamadoFromReader(reader));
+                                chamados.Add(CriarChamadoFromReader(reader, connection));
                         }
                     }
                 }
@@ -247,6 +221,7 @@ namespace SistemaChamados.Data
         #endregion
 
         #region CHAMADOS - INSERIR/ATUALIZAR/REMOVER
+
         public int InserirChamado(Chamados chamado)
         {
             try
@@ -254,47 +229,28 @@ namespace SistemaChamados.Data
                 using (var connection = new SqlConnection(_connectionString))
                 {
                     connection.Open();
-                    using (var transaction = connection.BeginTransaction())
-                    {
-                        try
-                        {
-                            // ⭐ AGREGAR 'titulo' en INSERT
-                            string sql = @"
+                    // Implementación idéntica a ChamadosRepository
+                    string sql = @"
                         INSERT INTO chamados (titulo, categoria, descricao, prioridade, Afetado, 
                                             Data_Registro, Status, Tecnico_Atribuido)
                         VALUES (@Titulo, @Categoria, @Descricao, @Prioridade, @Afetado, 
                                 @DataRegistro, @Status, @TecnicoAtribuido);
                         SELECT CAST(SCOPE_IDENTITY() AS INT);";
 
-                            int novoId;
-                            using (var command = new SqlCommand(sql, connection, transaction))
-                            {
-                                // ⭐ AGREGAR PARÁMETRO @Titulo
-                                command.Parameters.AddWithValue("@Titulo",
-                                    string.IsNullOrWhiteSpace(chamado.Titulo) ? "Sem título" : chamado.Titulo);
-                                command.Parameters.AddWithValue("@Categoria", chamado.Categoria);
-                                command.Parameters.AddWithValue("@Descricao", chamado.Descricao);
-                                command.Parameters.AddWithValue("@Prioridade", chamado.Prioridade);
-                                command.Parameters.AddWithValue("@Afetado", chamado.Afetado);
-                                command.Parameters.AddWithValue("@DataRegistro", chamado.DataChamado);
-                                command.Parameters.AddWithValue("@Status", (int)chamado.Status);
-                                command.Parameters.AddWithValue("@TecnicoAtribuido",
-                                    chamado.TecnicoResponsavel.HasValue ? (object)chamado.TecnicoResponsavel.Value : DBNull.Value);
+                    using (var command = new SqlCommand(sql, connection))
+                    {
+                        command.Parameters.AddWithValue("@Titulo", string.IsNullOrWhiteSpace(chamado.Titulo) ? "Sem título" : chamado.Titulo);
+                        command.Parameters.AddWithValue("@Categoria", chamado.Categoria);
+                        command.Parameters.AddWithValue("@Descricao", chamado.Descricao);
+                        command.Parameters.AddWithValue("@Prioridade", chamado.Prioridade);
+                        command.Parameters.AddWithValue("@Afetado", chamado.Afetado);
+                        command.Parameters.AddWithValue("@DataRegistro", chamado.DataChamado);
+                        command.Parameters.AddWithValue("@Status", (int)chamado.Status);
+                        command.Parameters.AddWithValue("@TecnicoAtribuido", chamado.TecnicoResponsavel.HasValue ? (object)chamado.TecnicoResponsavel.Value : DBNull.Value);
 
-                                novoId = (int)command.ExecuteScalar();
-                            }
-
-                            // Resto del código de contestaciones...
-
-                            transaction.Commit();
-                            chamado.IdChamado = novoId;
-                            return novoId;
-                        }
-                        catch
-                        {
-                            transaction.Rollback();
-                            throw;
-                        }
+                        int novoId = (int)command.ExecuteScalar();
+                        chamado.IdChamado = novoId;
+                        return novoId;
                     }
                 }
             }
@@ -312,12 +268,8 @@ namespace SistemaChamados.Data
                 using (var connection = new SqlConnection(_connectionString))
                 {
                     connection.Open();
-                    using (var transaction = connection.BeginTransaction())
-                    {
-                        try
-                        {
-                            // ⭐ AGREGAR 'titulo' en UPDATE
-                            string sql = @"
+                    // Implementación idéntica a ChamadosRepository
+                    string sql = @"
                         UPDATE chamados 
                         SET titulo = @Titulo, categoria = @Categoria, descricao = @Descricao, 
                             prioridade = @Prioridade, Status = @Status, 
@@ -325,34 +277,18 @@ namespace SistemaChamados.Data
                             Data_Resolucao = @DataResolucao
                         WHERE id_chamado = @IdChamado";
 
-                            using (var command = new SqlCommand(sql, connection, transaction))
-                            {
-                                command.Parameters.AddWithValue("@IdChamado", chamado.IdChamado);
-                                // ⭐ AGREGAR PARÁMETRO @Titulo
-                                command.Parameters.AddWithValue("@Titulo",
-                                    string.IsNullOrWhiteSpace(chamado.Titulo) ? "Sem título" : chamado.Titulo);
-                                command.Parameters.AddWithValue("@Categoria", chamado.Categoria);
-                                command.Parameters.AddWithValue("@Descricao", chamado.Descricao);
-                                command.Parameters.AddWithValue("@Prioridade", chamado.Prioridade);
-                                command.Parameters.AddWithValue("@Status", (int)chamado.Status);
-                                command.Parameters.AddWithValue("@TecnicoAtribuido",
-                                    chamado.TecnicoResponsavel.HasValue ? (object)chamado.TecnicoResponsavel.Value : DBNull.Value);
-                                command.Parameters.AddWithValue("@DataResolucao",
-                                    chamado.DataResolucao.HasValue ? (object)chamado.DataResolucao.Value : DBNull.Value);
+                    using (var command = new SqlCommand(sql, connection))
+                    {
+                        command.Parameters.AddWithValue("@IdChamado", chamado.IdChamado);
+                        command.Parameters.AddWithValue("@Titulo", string.IsNullOrWhiteSpace(chamado.Titulo) ? "Sem título" : chamado.Titulo);
+                        command.Parameters.AddWithValue("@Categoria", chamado.Categoria);
+                        command.Parameters.AddWithValue("@Descricao", chamado.Descricao);
+                        command.Parameters.AddWithValue("@Prioridade", chamado.Prioridade);
+                        command.Parameters.AddWithValue("@Status", (int)chamado.Status);
+                        command.Parameters.AddWithValue("@TecnicoAtribuido", chamado.TecnicoResponsavel.HasValue ? (object)chamado.TecnicoResponsavel.Value : DBNull.Value);
+                        command.Parameters.AddWithValue("@DataResolucao", chamado.DataResolucao.HasValue ? (object)chamado.DataResolucao.Value : DBNull.Value);
 
-                                command.ExecuteNonQuery();
-                            }
-
-                            // Resto del código de contestaciones...
-
-                            transaction.Commit();
-                            return true;
-                        }
-                        catch
-                        {
-                            transaction.Rollback();
-                            throw;
-                        }
+                        return command.ExecuteNonQuery() > 0;
                     }
                 }
             }
@@ -363,7 +299,6 @@ namespace SistemaChamados.Data
             }
         }
 
-
         public bool RemoverChamado(int idChamado)
         {
             try
@@ -371,49 +306,15 @@ namespace SistemaChamados.Data
                 using (var connection = new SqlConnection(_connectionString))
                 {
                     connection.Open();
-                    using (var transaction = connection.BeginTransaction())
+                    // ⚠️ ACTUALIZADO: Ya no busca ni elimina de la tabla antigua 'Contestacoes'
+                    // El borrado en Historial_Contestacoes debe manejarse por CASCADE en la BD
+                    // o lógica externa, pero aquí replicamos ChamadosRepository.Remover
+                    string sql = "DELETE FROM chamados WHERE id_chamado = @IdChamado";
+
+                    using (var command = new SqlCommand(sql, connection))
                     {
-                        try
-                        {
-                            // Obtener código de contestación
-                            string sqlGetCodigo = "SELECT Contestacoes_Codigo FROM chamados WHERE id_chamado = @IdChamado";
-                            int? codigoCont = null;
-                            
-                            using (var cmd = new SqlCommand(sqlGetCodigo, connection, transaction))
-                            {
-                                cmd.Parameters.AddWithValue("@IdChamado", idChamado);
-                                var result = cmd.ExecuteScalar();
-                                if (result != null && result != DBNull.Value)
-                                    codigoCont = (int)result;
-                            }
-
-                            // Remover chamado
-                            string sql = "DELETE FROM chamados WHERE id_chamado = @IdChamado";
-                            using (var command = new SqlCommand(sql, connection, transaction))
-                            {
-                                command.Parameters.AddWithValue("@IdChamado", idChamado);
-                                command.ExecuteNonQuery();
-                            }
-
-                            // Remover contestación si existe
-                            if (codigoCont.HasValue)
-                            {
-                                string sqlDelCont = "DELETE FROM Contestacoes WHERE Codigo = @Codigo";
-                                using (var cmd = new SqlCommand(sqlDelCont, connection, transaction))
-                                {
-                                    cmd.Parameters.AddWithValue("@Codigo", codigoCont.Value);
-                                    cmd.ExecuteNonQuery();
-                                }
-                            }
-
-                            transaction.Commit();
-                            return true;
-                        }
-                        catch
-                        {
-                            transaction.Rollback();
-                            throw;
-                        }
+                        command.Parameters.AddWithValue("@IdChamado", idChamado);
+                        return command.ExecuteNonQuery() > 0;
                     }
                 }
             }
@@ -425,7 +326,8 @@ namespace SistemaChamados.Data
         }
         #endregion
 
-        #region FUNCIONÁRIOS - LOGIN/BUSCAR
+        #region FUNCIONÁRIOS (Sincronizado con FuncionariosRepository)
+        // La lógica aquí ya estaba mayormente correcta, solo aseguro el uso de vw_LoginUsuarios y la misma validación
         public bool ValidarLogin(string email, string senha)
         {
             try
@@ -433,29 +335,19 @@ namespace SistemaChamados.Data
                 using (var connection = new SqlConnection(_connectionString))
                 {
                     connection.Open();
-
-                    string sql = @"
-                SELECT COUNT(*) 
-                FROM vw_LoginUsuarios 
-                WHERE Email = @Email AND Senha = @Senha AND Ativo = 1";
+                    string sql = "SELECT COUNT(*) FROM vw_LoginUsuarios WHERE Email = @Email AND Senha = @Senha AND Ativo = 1";
 
                     using (var command = new SqlCommand(sql, connection))
                     {
                         command.Parameters.AddWithValue("@Email", email);
                         command.Parameters.AddWithValue("@Senha", senha);
-
                         int count = (int)command.ExecuteScalar();
-
-                        // Log solo en Debug Output (no visible para usuarios)
-                        System.Diagnostics.Debug.WriteLine($"[LOGIN] {email} - {(count > 0 ? "Sucesso" : "Falhou")}");
-
                         return count > 0;
                     }
                 }
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"[LOGIN ERRO] {ex.Message}");
                 Console.WriteLine($"Erro ao validar login: {ex.Message}");
                 return false;
             }
@@ -468,40 +360,27 @@ namespace SistemaChamados.Data
                 using (var connection = new SqlConnection(_connectionString))
                 {
                     connection.Open();
-
                     string sql = @"
-                SELECT Id, Nome, Cpf, Email, Senha, NivelAcesso,
-                       DataCadastro, Ativo
-                FROM vw_LoginUsuarios
-                WHERE Email = @Email AND Ativo = 1";
+                        SELECT Id, Nome, Cpf, Email, Senha, NivelAcesso,
+                               DataCadastro, Ativo, Especializacao, Departamento, Cargo
+                        FROM vw_LoginUsuarios
+                        WHERE Email = @Email AND Ativo = 1";
 
                     using (var command = new SqlCommand(sql, connection))
                     {
                         command.Parameters.AddWithValue("@Email", email);
-
                         using (var reader = command.ExecuteReader())
                         {
                             if (reader.Read())
-                            {
-                                var funcionario = CriarFuncionarioPorTipo(reader);
-
-                                if (funcionario != null)
-                                {
-                                    System.Diagnostics.Debug.WriteLine($"[USUARIO] {funcionario.Nome} ({funcionario.GetType().Name})");
-                                }
-
-                                return funcionario;
-                            }
+                                return CriarFuncionarioPorTipo(reader);
                         }
                     }
                 }
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"[BUSCAR ERRO] {ex.Message}");
                 Console.WriteLine($"Erro ao buscar funcionário por email: {ex.Message}");
             }
-
             return null;
         }
 
@@ -556,8 +435,7 @@ namespace SistemaChamados.Data
                         while (reader.Read())
                         {
                             var func = CriarFuncionarioPorTipo(reader);
-                            if (func != null)
-                                funcionarios.Add(func);
+                            if (func != null) funcionarios.Add(func);
                         }
                     }
                 }
@@ -589,9 +467,8 @@ namespace SistemaChamados.Data
                     {
                         while (reader.Read())
                         {
-                            var tecnico = (Tecnico)CriarFuncionarioPorTipo(reader);
-                            if (tecnico != null)
-                                tecnicos.Add(tecnico);
+                            var tecnico = CriarFuncionarioPorTipo(reader) as Tecnico;
+                            if (tecnico != null) tecnicos.Add(tecnico);
                         }
                     }
                 }
@@ -602,9 +479,7 @@ namespace SistemaChamados.Data
             }
             return tecnicos;
         }
-        #endregion
 
-        #region FUNCIONÁRIOS - INSERIR/ATUALIZAR/EXCLUIR
         public int InserirFuncionario(Funcionarios funcionario)
         {
             try
@@ -616,11 +491,10 @@ namespace SistemaChamados.Data
                     {
                         try
                         {
-                            // 1. Insertar en Usuario (SOLO 2 TABLAS)
                             string sqlUsuario = @"
-                        INSERT INTO Usuario (nome, Cpf, senha, Acess_codigo, DataCadastro, Ativo)
-                        VALUES (@Nome, @Cpf, @Senha, @Acess_codigo, @DataCadastro, @Ativo);
-                        SELECT CAST(SCOPE_IDENTITY() AS INT);";
+                                INSERT INTO Usuario (nome, Cpf, senha, Acess_codigo, DataCadastro, Ativo)
+                                VALUES (@Nome, @Cpf, @Senha, @Acess_codigo, @DataCadastro, @Ativo);
+                                SELECT CAST(SCOPE_IDENTITY() AS INT);";
 
                             int novoId;
                             using (var cmd = new SqlCommand(sqlUsuario, connection, transaction))
@@ -631,11 +505,9 @@ namespace SistemaChamados.Data
                                 cmd.Parameters.AddWithValue("@Acess_codigo", funcionario.NivelAcesso);
                                 cmd.Parameters.AddWithValue("@DataCadastro", funcionario.DataCadastro);
                                 cmd.Parameters.AddWithValue("@Ativo", funcionario.Ativo ? 1 : 0);
-
                                 novoId = (int)cmd.ExecuteScalar();
                             }
 
-                            // 2. Insertar en E_mail
                             string sqlEmail = "INSERT INTO E_mail (Id_usuario, E_mail) VALUES (@Id, @Email)";
                             using (var cmd = new SqlCommand(sqlEmail, connection, transaction))
                             {
@@ -643,9 +515,6 @@ namespace SistemaChamados.Data
                                 cmd.Parameters.AddWithValue("@Email", funcionario.Email);
                                 cmd.ExecuteNonQuery();
                             }
-
-                            // ⚠️ NO insertar en Tecnico/Funcionario porque NO EXISTEN
-                            // El tipo se determina solo por Acess_codigo
 
                             transaction.Commit();
                             return novoId;
@@ -665,7 +534,6 @@ namespace SistemaChamados.Data
             }
         }
 
-
         public bool AtualizarFuncionario(Funcionarios funcionario)
         {
             try
@@ -677,11 +545,10 @@ namespace SistemaChamados.Data
                     {
                         try
                         {
-                            // 1. Atualizar Usuario
                             string sqlUsuario = @"
-                        UPDATE Usuario 
-                        SET nome = @Nome, Cpf = @Cpf, Acess_codigo = @Acess, Ativo = @Ativo
-                        WHERE Id_usuario = @Id";
+                                UPDATE Usuario 
+                                SET nome = @Nome, Cpf = @Cpf, Acess_codigo = @Acess, Ativo = @Ativo
+                                WHERE Id_usuario = @Id";
 
                             using (var cmd = new SqlCommand(sqlUsuario, connection, transaction))
                             {
@@ -693,7 +560,6 @@ namespace SistemaChamados.Data
                                 cmd.ExecuteNonQuery();
                             }
 
-                            // 2. Atualizar E_mail
                             string sqlEmail = "UPDATE E_mail SET E_mail = @Email WHERE Id_usuario = @Id";
                             using (var cmd = new SqlCommand(sqlEmail, connection, transaction))
                             {
@@ -701,8 +567,6 @@ namespace SistemaChamados.Data
                                 cmd.Parameters.AddWithValue("@Email", funcionario.Email);
                                 cmd.ExecuteNonQuery();
                             }
-
-                            // ⚠️ NO actualizar Tecnico/Funcionario porque NO EXISTEN
 
                             transaction.Commit();
                             return true;
@@ -730,7 +594,6 @@ namespace SistemaChamados.Data
                 {
                     connection.Open();
                     string sql = "UPDATE Usuario SET senha = @Senha WHERE Id_usuario = @Id";
-
                     using (var command = new SqlCommand(sql, connection))
                     {
                         command.Parameters.AddWithValue("@Senha", novaSenha);
@@ -746,7 +609,6 @@ namespace SistemaChamados.Data
             }
         }
 
-
         public bool AlterarNivelAcesso(int funcionarioId, int novoNivel)
         {
             try
@@ -755,7 +617,6 @@ namespace SistemaChamados.Data
                 {
                     connection.Open();
                     string sql = "UPDATE Usuario SET Acess_codigo = @Nivel WHERE Id_usuario = @Id";
-
                     using (var command = new SqlCommand(sql, connection))
                     {
                         command.Parameters.AddWithValue("@Nivel", novoNivel);
@@ -771,7 +632,6 @@ namespace SistemaChamados.Data
             }
         }
 
-
         public bool RemoverFuncionario(int id) => ExcluirFuncionario(id);
 
         public bool ExcluirFuncionario(int funcionarioId)
@@ -782,42 +642,34 @@ namespace SistemaChamados.Data
                 {
                     connection.Open();
 
-                    // Verificar chamados ativos
+                    // Validación igual a FuncionariosRepository
                     string sqlCheck = @"
-                SELECT COUNT(*) FROM chamados 
-                WHERE (Afetado = @Id OR Tecnico_Atribuido = @Id) 
-                AND Status NOT IN (3, 4, 5)"; // Resolvido=3, Fechado=4, Cancelado=5
+                        SELECT COUNT(*) FROM chamados 
+                        WHERE (Afetado = @Id OR Tecnico_Atribuido = @Id) 
+                        AND Status NOT IN (3, 4, 5)";
 
                     using (var checkCommand = new SqlCommand(sqlCheck, connection))
                     {
                         checkCommand.Parameters.AddWithValue("@Id", funcionarioId);
                         int chamadosAtivos = (int)checkCommand.ExecuteScalar();
-
                         if (chamadosAtivos > 0)
-                        {
                             throw new InvalidOperationException($"Funcionário possui {chamadosAtivos} chamado(s) ativo(s)");
-                        }
                     }
 
                     using (var transaction = connection.BeginTransaction())
                     {
                         try
                         {
-                            // Eliminar en orden (solo 2 tablas)
-                            string sqlEmail = "DELETE FROM E_mail WHERE Id_usuario = @Id";
-                            using (var cmd = new SqlCommand(sqlEmail, connection, transaction))
+                            using (var cmd = new SqlCommand("DELETE FROM E_mail WHERE Id_usuario = @Id", connection, transaction))
                             {
                                 cmd.Parameters.AddWithValue("@Id", funcionarioId);
                                 cmd.ExecuteNonQuery();
                             }
-
-                            string sqlUsuario = "DELETE FROM Usuario WHERE Id_usuario = @Id";
-                            using (var cmd = new SqlCommand(sqlUsuario, connection, transaction))
+                            using (var cmd = new SqlCommand("DELETE FROM Usuario WHERE Id_usuario = @Id", connection, transaction))
                             {
                                 cmd.Parameters.AddWithValue("@Id", funcionarioId);
                                 cmd.ExecuteNonQuery();
                             }
-
                             transaction.Commit();
                             return true;
                         }
@@ -835,10 +687,11 @@ namespace SistemaChamados.Data
                 return false;
             }
         }
-
         #endregion
 
-        #region RELATÓRIOS
+        #region RELATÓRIOS (Sincronizado con RelatoriosRepository)
+        // ⚠️ ACTUALIZADO: Antes usabas consultas simples. Ahora usamos las consultas detalladas de RelatoriosRepository.
+
         public DataTable ObterRelatorioGeral()
         {
             var dataTable = new DataTable();
@@ -847,12 +700,26 @@ namespace SistemaChamados.Data
                 using (var connection = new SqlConnection(_connectionString))
                 {
                     connection.Open();
+                    // Consulta idéntica a RelatoriosRepository.ObterRelatorioGeral
                     string sql = @"
-                        SELECT id_chamado, categoria, descricao, prioridade, Status,
-                               Data_Registro, Data_Resolucao,
-                               Solicitante_Nome as Solicitante, Tecnico_Nome as Tecnico
-                        FROM vw_ChamadosCompletos
-                        ORDER BY Data_Registro DESC";
+                        SELECT 
+                            c.id_chamado AS ID,
+                            c.categoria AS Categoria,
+                            c.descricao AS Descrição,
+                            CASE c.prioridade
+                                WHEN 1 THEN 'Baixa' WHEN 2 THEN 'Média' WHEN 3 THEN 'Alta' WHEN 4 THEN 'Crítica'
+                            END AS Prioridade,
+                            CASE c.Status
+                                WHEN 1 THEN 'Aberto' WHEN 2 THEN 'Em Andamento' WHEN 3 THEN 'Resolvido' WHEN 4 THEN 'Fechado' WHEN 5 THEN 'Cancelado'
+                            END AS Status,
+                            c.Data_Registro AS [Data Registro],
+                            c.Data_Resolucao AS [Data Resolução],
+                            u1.nome AS Solicitante,
+                            u2.nome AS Técnico
+                        FROM chamados c
+                        INNER JOIN Usuario u1 ON c.Afetado = u1.Id_usuario
+                        LEFT JOIN Usuario u2 ON c.Tecnico_Atribuido = u2.Id_usuario
+                        ORDER BY c.Data_Registro DESC";
 
                     using (var adapter = new SqlDataAdapter(sql, connection))
                     {
@@ -875,19 +742,32 @@ namespace SistemaChamados.Data
                 using (var connection = new SqlConnection(_connectionString))
                 {
                     connection.Open();
+                    // Consulta idéntica a RelatoriosRepository.ObterRelatorioPorPeriodo
                     string sql = @"
-                        SELECT id_chamado, categoria, descricao, prioridade, Status,
-                               Data_Registro, Data_Resolucao,
-                               Solicitante_Nome as Solicitante, Tecnico_Nome as Tecnico
-                        FROM vw_ChamadosCompletos
-                        WHERE Data_Registro BETWEEN @DataInicio AND @DataFim
-                        ORDER BY Data_Registro DESC";
+                        SELECT 
+                            c.id_chamado AS ID,
+                            c.categoria AS Categoria,
+                            c.descricao AS Descrição,
+                            CASE c.prioridade
+                                WHEN 1 THEN 'Baixa' WHEN 2 THEN 'Média' WHEN 3 THEN 'Alta' WHEN 4 THEN 'Crítica'
+                            END AS Prioridade,
+                            CASE c.Status
+                                WHEN 1 THEN 'Aberto' WHEN 2 THEN 'Em Andamento' WHEN 3 THEN 'Resolvido' WHEN 4 THEN 'Fechado' WHEN 5 THEN 'Cancelado'
+                            END AS Status,
+                            c.Data_Registro AS [Data Registro],
+                            c.Data_Resolucao AS [Data Resolução],
+                            u1.nome AS Solicitante,
+                            u2.nome AS Técnico
+                        FROM chamados c
+                        INNER JOIN Usuario u1 ON c.Afetado = u1.Id_usuario
+                        LEFT JOIN Usuario u2 ON c.Tecnico_Atribuido = u2.Id_usuario
+                        WHERE c.Data_Registro BETWEEN @DataInicio AND @DataFim
+                        ORDER BY c.Data_Registro DESC";
 
                     using (var command = new SqlCommand(sql, connection))
                     {
                         command.Parameters.AddWithValue("@DataInicio", dataInicio);
-                        command.Parameters.AddWithValue("@DataFim", dataFim.AddDays(1));
-
+                        command.Parameters.AddWithValue("@DataFim", dataFim.AddDays(1).AddSeconds(-1));
                         using (var adapter = new SqlDataAdapter(command))
                         {
                             adapter.Fill(dataTable);
@@ -910,6 +790,7 @@ namespace SistemaChamados.Data
                 using (var connection = new SqlConnection(_connectionString))
                 {
                     connection.Open();
+                    // Consulta idéntica a RelatoriosRepository.ObterEstatisticasFuncionarios
                     string sql = @"
                         SELECT 
                             COUNT(*) as Total,
@@ -942,60 +823,25 @@ namespace SistemaChamados.Data
         #endregion
 
         #region MÉTODOS AUXILIARES
+
         private Funcionarios CriarFuncionarioPorTipo(SqlDataReader reader)
         {
+            // Implementación exacta de FuncionariosRepository
             try
             {
-                System.Diagnostics.Debug.WriteLine("--- CRIAR FUNCIONÁRIO POR TIPO ---");
-
-                // ✅ CORREÇÃO: Converter DECIMAL para INT corretamente
                 int nivelAcesso;
-
-                // Verificar o tipo real da coluna
-                var tipoColuna = reader.GetFieldType(reader.GetOrdinal("NivelAcesso"));
-                System.Diagnostics.Debug.WriteLine($"Tipo da coluna NivelAcesso: {tipoColuna.Name}");
-
-                // Fazer conversão segura
                 var valorNivel = reader["NivelAcesso"];
-                if (valorNivel is decimal decimalValue)
-                {
-                    nivelAcesso = Convert.ToInt32(decimalValue);
-                }
-                else if (valorNivel is int intValue)
-                {
-                    nivelAcesso = intValue;
-                }
-                else
-                {
-                    // Tentar conversão genérica
-                    nivelAcesso = Convert.ToInt32(valorNivel);
-                }
 
-                System.Diagnostics.Debug.WriteLine($"Nível de Acesso convertido: {nivelAcesso}");
+                if (valorNivel is decimal decimalValue) nivelAcesso = Convert.ToInt32(decimalValue);
+                else if (valorNivel is int intValue) nivelAcesso = intValue;
+                else nivelAcesso = Convert.ToInt32(valorNivel);
 
-                // Criar instância baseada no nível
                 Funcionarios funcionario;
-                if (nivelAcesso == 1)
-                {
-                    funcionario = new Funcionario();
-                    System.Diagnostics.Debug.WriteLine("Criando: Funcionario (comum)");
-                }
-                else if (nivelAcesso == 2)
-                {
-                    funcionario = new Tecnico();
-                    System.Diagnostics.Debug.WriteLine("Criando: Tecnico");
-                }
-                else if (nivelAcesso == 3)
-                {
-                    funcionario = new ADM();
-                    System.Diagnostics.Debug.WriteLine("Criando: ADM (Administrador)");
-                }
-                else
-                {
-                    throw new ArgumentException($"Nível de acesso inválido: {nivelAcesso}");
-                }
+                if (nivelAcesso == 1) funcionario = new Funcionario();
+                else if (nivelAcesso == 2) funcionario = new Tecnico();
+                else if (nivelAcesso == 3) funcionario = new ADM();
+                else throw new ArgumentException($"Nível de acesso inválido: {nivelAcesso}");
 
-                // Propriedades básicas
                 funcionario.Id = Convert.ToInt32(reader["Id"]);
                 funcionario.Nome = reader["Nome"].ToString();
                 funcionario.Cpf = reader["Cpf"].ToString();
@@ -1005,90 +851,38 @@ namespace SistemaChamados.Data
                 funcionario.DataCadastro = (DateTime)reader["DataCadastro"];
                 funcionario.Ativo = (bool)reader["Ativo"];
 
-                System.Diagnostics.Debug.WriteLine($"✅ Funcionário criado:");
-                System.Diagnostics.Debug.WriteLine($"   Id: {funcionario.Id}");
-                System.Diagnostics.Debug.WriteLine($"   Nome: {funcionario.Nome}");
-                System.Diagnostics.Debug.WriteLine($"   Email: {funcionario.Email}");
-                System.Diagnostics.Debug.WriteLine($"   NivelAcesso: {funcionario.NivelAcesso}");
+                // Campos opcionales seguros
+                try { if (!reader.IsDBNull(reader.GetOrdinal("TipoFuncionario"))) funcionario.TipoFuncionario = reader["TipoFuncionario"].ToString(); } catch { }
 
-                // Campos opcionais
-                try
-                {
-                    int ordTipo = reader.GetOrdinal("TipoFuncionario");
-                    if (!reader.IsDBNull(ordTipo))
-                    {
-                        funcionario.TipoFuncionario = reader["TipoFuncionario"].ToString();
-                    }
-                }
-                catch { }
-
-                // Especialização para Técnico
                 if (funcionario is Tecnico tecnico)
                 {
-                    try
-                    {
-                        int ordEspec = reader.GetOrdinal("Especializacao");
-                        if (!reader.IsDBNull(ordEspec))
-                        {
-                            tecnico.Especializacao = reader["Especializacao"].ToString();
-                        }
-                    }
-                    catch { }
+                    try { if (!reader.IsDBNull(reader.GetOrdinal("Especializacao"))) tecnico.Especializacao = reader["Especializacao"].ToString(); } catch { }
                 }
 
-                // Departamento e Cargo para Funcionário comum
                 if (funcionario is Funcionario func)
                 {
-                    try
-                    {
-                        int ordDept = reader.GetOrdinal("Departamento");
-                        if (!reader.IsDBNull(ordDept))
-                        {
-                            func.Departamento = reader["Departamento"].ToString();
-                        }
-                    }
-                    catch { }
-
-                    try
-                    {
-                        int ordCargo = reader.GetOrdinal("Cargo");
-                        if (!reader.IsDBNull(ordCargo))
-                        {
-                            func.Cargo = reader["Cargo"].ToString();
-                        }
-                    }
-                    catch { }
+                    try { if (!reader.IsDBNull(reader.GetOrdinal("Departamento"))) func.Departamento = reader["Departamento"].ToString(); } catch { }
+                    try { if (!reader.IsDBNull(reader.GetOrdinal("Cargo"))) func.Cargo = reader["Cargo"].ToString(); } catch { }
                 }
 
                 return funcionario;
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"❌ ERRO ao criar funcionário: {ex.Message}");
-                System.Diagnostics.Debug.WriteLine($"Stack: {ex.StackTrace}");
                 Console.WriteLine($"Erro ao criar funcionário: {ex.Message}");
                 return null;
             }
         }
 
-        private Chamados CriarChamadoFromReader(SqlDataReader reader)
+        private Chamados CriarChamadoFromReader(SqlDataReader reader, SqlConnection connection)
         {
             try
             {
-                // Leer título con limpieza
-                string tituloRaw = reader["titulo"] != DBNull.Value
-                    ? reader["titulo"].ToString().Trim()
-                    : "";
-
+                string tituloRaw = reader["titulo"] != DBNull.Value ? reader["titulo"].ToString().Trim() : "";
                 string titulo = LimparTexto(tituloRaw);
-                if (string.IsNullOrWhiteSpace(titulo))
-                    titulo = "Sem título";
+                if (string.IsNullOrWhiteSpace(titulo)) titulo = "Sem título";
 
-                // Leer descripción con limpieza
-                string descricaoRaw = reader["descricao"] != DBNull.Value
-                    ? reader["descricao"].ToString().Trim()
-                    : "";
-
+                string descricaoRaw = reader["descricao"] != DBNull.Value ? reader["descricao"].ToString().Trim() : "";
                 string descricao = LimparTexto(descricaoRaw);
 
                 var chamado = new Chamados
@@ -1101,44 +895,11 @@ namespace SistemaChamados.Data
                     Afetado = (int)reader["Afetado"],
                     DataChamado = (DateTime)reader["Data_Registro"],
                     Status = (StatusChamado)(int)reader["Status"],
-                    TecnicoResponsavel = reader.IsDBNull(reader.GetOrdinal("Tecnico_Atribuido"))
-                        ? (int?)null : (int)reader["Tecnico_Atribuido"],
-                    DataResolucao = reader.IsDBNull(reader.GetOrdinal("Data_Resolucao"))
-                        ? (DateTime?)null : (DateTime)reader["Data_Resolucao"]
+                    TecnicoResponsavel = reader.IsDBNull(reader.GetOrdinal("Tecnico_Atribuido")) ? (int?)null : (int)reader["Tecnico_Atribuido"],
+                    DataResolucao = reader.IsDBNull(reader.GetOrdinal("Data_Resolucao")) ? (DateTime?)null : (DateTime)reader["Data_Resolucao"]
                 };
 
-                // Buscar contestación
-                try
-                {
-                    using (var connection = new SqlConnection(_connectionString))
-                    {
-                        connection.Open();
-                        string sql = @"
-                    SELECT c.Justificativa 
-                    FROM chamados ch
-                    INNER JOIN Contestacoes c ON ch.Contestacoes_Codigo = c.Codigo
-                    WHERE ch.id_chamado = @IdChamado";
-
-                        using (var command = new SqlCommand(sql, connection))
-                        {
-                            command.Parameters.AddWithValue("@IdChamado", chamado.IdChamado);
-                            var result = command.ExecuteScalar();
-                            if (result != null && result != DBNull.Value)
-                            {
-                                chamado.Contestacoes = result.ToString();
-                            }
-                        }
-                    }
-                }
-                catch
-                {
-                    chamado.Contestacoes = null;
-                }
-
-                // Debug
-                Console.WriteLine($"📦 Chamado {chamado.IdChamado} carregado:");
-                Console.WriteLine($"   Título: '{chamado.Titulo}' ({chamado.Titulo.Length} chars)");
-                Console.WriteLine($"   Descrição: {chamado.Descricao.Length} chars");
+                chamado.Contestacoes = BuscarContestacaoTexto(chamado.IdChamado, connection);
 
                 return chamado;
             }
@@ -1151,17 +912,9 @@ namespace SistemaChamados.Data
 
         private string LimparTexto(string texto)
         {
-            if (string.IsNullOrWhiteSpace(texto))
-                return "";
-
-            // Remover prefijos comunes
-            string[] prefixos = new[] {
-        "TÍTULO:", "TITULO:", "TÍTULO :", "TITULO :",
-        "DESCRIÇÃO:", "DESCRICAO:", "DESCRIÇÃO :", "DESCRICAO :"
-    };
-
+            if (string.IsNullOrWhiteSpace(texto)) return "";
+            string[] prefixos = { "TÍTULO:", "TITULO:", "TÍTULO :", "TITULO :", "DESCRIÇÃO:", "DESCRICAO:", "DESCRIÇÃO :", "DESCRICAO :" };
             string limpo = texto.Trim();
-
             foreach (var prefixo in prefixos)
             {
                 if (limpo.StartsWith(prefixo, StringComparison.OrdinalIgnoreCase))
@@ -1170,14 +923,33 @@ namespace SistemaChamados.Data
                     break;
                 }
             }
+            return limpo.TrimStart('\r', '\n', ' ', '\t');
+        }
 
-            // Remover saltos de línea extras del inicio
-            limpo = limpo.TrimStart('\r', '\n', ' ', '\t');
+        private string BuscarContestacaoTexto(int idChamado, SqlConnection connection)
+        {
+            try
+            {
+               
 
-            return limpo;
+                string sql = @"
+                    SELECT TOP 1 Justificativa 
+                    FROM Historial_Contestacoes
+                    WHERE id_chamado = @IdChamado
+                    ORDER BY DataContestacao DESC";
+
+                using (var command = new SqlCommand(sql, connection))
+                {
+                    command.Parameters.AddWithValue("@IdChamado", idChamado);
+                    var result = command.ExecuteScalar();
+                    return result != null && result != DBNull.Value ? result.ToString() : null;
+                }
+            }
+            catch
+            {
+                return null;
+            }
         }
         #endregion
     }
 }
-
-

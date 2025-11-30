@@ -52,9 +52,8 @@ namespace SistemaChamados.Controllers
                     {
                         var contestacao = new Contestacao(
                             idChamado,
-                            chamado.Afetado,  // ID do funcionário que criou o chamado
-                            contestacaoTexto,
-                            TipoContestacao.Contestacao
+                            chamado.Afetado,
+                            contestacaoTexto
                         );
 
                         int contestacaoId = _contestacoesRepository.Inserir(contestacao);
@@ -67,7 +66,6 @@ namespace SistemaChamados.Controllers
                     catch (Exception exCont)
                     {
                         Console.WriteLine($"⚠️ Erro ao adicionar contestação: {exCont.Message}");
-                        // Não falhar a criação do chamado por causa da contestação
                     }
                 }
 
@@ -76,7 +74,6 @@ namespace SistemaChamados.Controllers
             catch (Exception ex)
             {
                 Console.WriteLine($"Erro ao criar chamado: {ex.Message}");
-                Console.WriteLine($"StackTrace: {ex.StackTrace}");
                 throw;
             }
         }
@@ -243,16 +240,13 @@ namespace SistemaChamados.Controllers
                 if (chamado == null)
                     throw new Exception("Chamado não encontrado");
 
-                // Adicionar no Historial_Contestacoes
                 var novaContestacao = new Contestacao(
                     idChamado,
-                    chamado.TecnicoResponsavel ?? chamado.Afetado,  // ID do usuário
-                    contestacao,
-                    TipoContestacao.Resposta
+                    chamado.TecnicoResponsavel ?? chamado.Afetado,
+                    contestacao
                 );
 
                 int contestacaoId = _contestacoesRepository.Inserir(novaContestacao);
-
                 return contestacaoId > 0;
             }
             catch (Exception ex)

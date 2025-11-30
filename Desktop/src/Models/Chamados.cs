@@ -15,10 +15,7 @@ namespace SistemaChamados.Models
     {
         // Propriedades principais
         public int IdChamado { get; set; }
-
-        // ⭐ NOVO: Título separado
         public string Titulo { get; set; }
-
         public string Descricao { get; set; }
         public string Categoria { get; set; }
         public int Prioridade { get; set; }

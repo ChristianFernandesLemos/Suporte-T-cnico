@@ -6,16 +6,10 @@ using SistemaChamados.Models;
 
 namespace SistemaChamados.Data.Repositories
 {
-    /// <summary>
-    /// 📦 REPOSITÓRIO: Operações para Contestações (Historial)
-    /// </summary>
     public class ContestacoesRepository
     {
-        #region 🔍 CONSULTAR / BUSCAR
+        #region CONSULTAR / BUSCAR
 
-        /// <summary>
-        /// Lista todas as contestações de um chamado (ordenadas por data DESC)
-        /// </summary>
         public List<Contestacao> ListarPorChamado(int idChamado)
         {
             var contestacoes = new List<Contestacao>();
@@ -32,8 +26,7 @@ namespace SistemaChamados.Data.Repositories
                             e.E_mail AS EmailUsuario,
                             n.Nivel_acesso AS TipoUsuario,
                             hc.Justificativa,
-                            hc.DataContestacao,
-                            hc.Tipo
+                            hc.DataContestacao
                         FROM Historial_Contestacoes hc
                         INNER JOIN Usuario u ON hc.Id_usuario = u.Id_usuario
                         LEFT JOIN E_mail e ON u.Id_usuario = e.Id_usuario
@@ -60,9 +53,6 @@ namespace SistemaChamados.Data.Repositories
             return contestacoes;
         }
 
-        /// <summary>
-        /// Busca uma contestação específica por ID
-        /// </summary>
         public Contestacao BuscarPorId(int id)
         {
             try
@@ -78,8 +68,7 @@ namespace SistemaChamados.Data.Repositories
                             e.E_mail AS EmailUsuario,
                             n.Nivel_acesso AS TipoUsuario,
                             hc.Justificativa,
-                            hc.DataContestacao,
-                            hc.Tipo
+                            hc.DataContestacao
                         FROM Historial_Contestacoes hc
                         INNER JOIN Usuario u ON hc.Id_usuario = u.Id_usuario
                         LEFT JOIN E_mail e ON u.Id_usuario = e.Id_usuario
@@ -106,9 +95,6 @@ namespace SistemaChamados.Data.Repositories
             }
         }
 
-        /// <summary>
-        /// Obtém a última contestação de um chamado
-        /// </summary>
         public Contestacao ObterUltima(int idChamado)
         {
             try
@@ -124,8 +110,7 @@ namespace SistemaChamados.Data.Repositories
                             e.E_mail AS EmailUsuario,
                             n.Nivel_acesso AS TipoUsuario,
                             hc.Justificativa,
-                            hc.DataContestacao,
-                            hc.Tipo
+                            hc.DataContestacao
                         FROM Historial_Contestacoes hc
                         INNER JOIN Usuario u ON hc.Id_usuario = u.Id_usuario
                         LEFT JOIN E_mail e ON u.Id_usuario = e.Id_usuario
@@ -153,9 +138,6 @@ namespace SistemaChamados.Data.Repositories
             }
         }
 
-        /// <summary>
-        /// Conta quantas contestações tem um chamado
-        /// </summary>
         public int ContarPorChamado(int idChamado)
         {
             try
@@ -178,9 +160,6 @@ namespace SistemaChamados.Data.Repositories
             }
         }
 
-        /// <summary>
-        /// Lista contestações por usuário
-        /// </summary>
         public List<Contestacao> ListarPorUsuario(int idUsuario)
         {
             var contestacoes = new List<Contestacao>();
@@ -197,8 +176,7 @@ namespace SistemaChamados.Data.Repositories
                             e.E_mail AS EmailUsuario,
                             n.Nivel_acesso AS TipoUsuario,
                             hc.Justificativa,
-                            hc.DataContestacao,
-                            hc.Tipo
+                            hc.DataContestacao
                         FROM Historial_Contestacoes hc
                         INNER JOIN Usuario u ON hc.Id_usuario = u.Id_usuario
                         LEFT JOIN E_mail e ON u.Id_usuario = e.Id_usuario
@@ -227,23 +205,19 @@ namespace SistemaChamados.Data.Repositories
 
         #endregion
 
-        #region ➕ INSERIR
+        #region INSERIR
 
-        /// <summary>
-        /// Adiciona uma nova contestação
-        /// </summary>
         public int Inserir(Contestacao contestacao)
         {
             try
             {
-                // Validar antes de inserir
                 contestacao.Validar();
 
                 return DatabaseConnectionManager.ExecuteWithConnection(connection =>
                 {
                     string sql = @"
-                        INSERT INTO Historial_Contestacoes (id_chamado, Id_usuario, Justificativa, DataContestacao, Tipo)
-                        VALUES (@IdChamado, @IdUsuario, @Justificativa, @DataContestacao, @Tipo);
+                        INSERT INTO Historial_Contestacoes (id_chamado, Id_usuario, Justificativa, DataContestacao)
+                        VALUES (@IdChamado, @IdUsuario, @Justificativa, @DataContestacao);
                         SELECT CAST(SCOPE_IDENTITY() AS INT);";
 
                     using (var command = new SqlCommand(sql, connection))
@@ -252,7 +226,6 @@ namespace SistemaChamados.Data.Repositories
                         command.Parameters.AddWithValue("@IdUsuario", contestacao.IdUsuario);
                         command.Parameters.AddWithValue("@Justificativa", contestacao.Justificativa);
                         command.Parameters.AddWithValue("@DataContestacao", contestacao.DataContestacao);
-                        command.Parameters.AddWithValue("@Tipo", contestacao.Tipo.ToString());
 
                         int novoId = (int)command.ExecuteScalar();
                         contestacao.Id = novoId;
@@ -267,42 +240,10 @@ namespace SistemaChamados.Data.Repositories
             }
         }
 
-        /// <summary>
-        /// Adiciona uma contestação usando stored procedure
-        /// </summary>
-        public int InserirUsandoSP(int idChamado, int idUsuario, string justificativa, TipoContestacao tipo = TipoContestacao.Contestacao)
-        {
-            try
-            {
-                return DatabaseConnectionManager.ExecuteWithConnection(connection =>
-                {
-                    using (var command = new SqlCommand("sp_AdicionarContestacao", connection))
-                    {
-                        command.CommandType = System.Data.CommandType.StoredProcedure;
-
-                        command.Parameters.AddWithValue("@IdChamado", idChamado);
-                        command.Parameters.AddWithValue("@IdUsuario", idUsuario);
-                        command.Parameters.AddWithValue("@Justificativa", justificativa);
-                        command.Parameters.AddWithValue("@Tipo", tipo.ToString());
-
-                        return (int)command.ExecuteScalar();
-                    }
-                });
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Erro ao inserir contestação (SP): {ex.Message}");
-                throw;
-            }
-        }
-
         #endregion
 
-        #region ❌ REMOVER
+        #region REMOVER
 
-        /// <summary>
-        /// Remove uma contestação (usar com cuidado!)
-        /// </summary>
         public bool Remover(int id)
         {
             try
@@ -325,9 +266,6 @@ namespace SistemaChamados.Data.Repositories
             }
         }
 
-        /// <summary>
-        /// Remove todas as contestações de um chamado
-        /// </summary>
         public bool RemoverTodosDoChamado(int idChamado)
         {
             try
@@ -352,32 +290,23 @@ namespace SistemaChamados.Data.Repositories
 
         #endregion
 
-        #region 🛠️ MÉTODOS AUXILIARES
+        #region MÉTODOS AUXILIARES
 
-        /// <summary>
-        /// Cria objeto Contestacao a partir do SqlDataReader
-        /// </summary>
+        // ✅✅✅ MÉTODO CORREGIDO SIN TipoContestacao ✅✅✅
         private Contestacao CriarContestacaoFromReader(SqlDataReader reader)
         {
-            // Parse do tipo (string -> enum)
-            TipoContestacao tipo = TipoContestacao.Contestacao;
-            string tipoStr = reader["Tipo"].ToString();
-            if (Enum.TryParse(tipoStr, out TipoContestacao tipoEnum))
-                tipo = tipoEnum;
-
             return new Contestacao
             {
                 Id = (int)reader["Id"],
                 IdChamado = (int)reader["IdChamado"],
                 IdUsuario = (int)reader["IdUsuario"],
                 NomeUsuario = reader["NomeUsuario"].ToString(),
-                EmailUsuario = reader.IsDBNull(reader.GetOrdinal("EmailUsuario")) ? 
+                EmailUsuario = reader.IsDBNull(reader.GetOrdinal("EmailUsuario")) ?
                     null : reader["EmailUsuario"].ToString(),
-                TipoUsuario = reader.IsDBNull(reader.GetOrdinal("TipoUsuario")) ? 
+                TipoUsuario = reader.IsDBNull(reader.GetOrdinal("TipoUsuario")) ?
                     null : reader["TipoUsuario"].ToString(),
                 Justificativa = reader["Justificativa"].ToString(),
-                DataContestacao = (DateTime)reader["DataContestacao"],
-                Tipo = tipo
+                DataContestacao = (DateTime)reader["DataContestacao"]
             };
         }
 

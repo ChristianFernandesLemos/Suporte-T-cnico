@@ -94,7 +94,6 @@ C:\Users\Usuario\OneDrive\Desktop\Github\Git\Suporte-T-cnico\Desktop\bin\Debug\S
 C:\Users\Usuario\OneDrive\Desktop\Github\Git\Suporte-T-cnico\Desktop\bin\Debug\System.Numerics.Vectors.dll
 C:\Users\Usuario\OneDrive\Desktop\Github\Git\Suporte-T-cnico\Desktop\bin\Debug\System.Reflection.Metadata.dll
 C:\Users\Usuario\OneDrive\Desktop\Github\Git\Suporte-T-cnico\Desktop\bin\Debug\System.Runtime.CompilerServices.Unsafe.dll
-C:\Users\Usuario\OneDrive\Desktop\Github\Git\Suporte-T-cnico\Desktop\bin\Debug\System.Threading.Tasks.Extensions.dll
 C:\Users\Usuario\OneDrive\Desktop\Github\Git\Suporte-T-cnico\Desktop\bin\Debug\xunit.assert.dll
 C:\Users\Usuario\OneDrive\Desktop\Github\Git\Suporte-T-cnico\Desktop\bin\Debug\xunit.core.dll
 C:\Users\Usuario\OneDrive\Desktop\Github\Git\Suporte-T-cnico\Desktop\bin\Debug\xunit.execution.desktop.dll
@@ -110,7 +109,6 @@ C:\Users\Usuario\OneDrive\Desktop\Github\Git\Suporte-T-cnico\Desktop\bin\Debug\S
 C:\Users\Usuario\OneDrive\Desktop\Github\Git\Suporte-T-cnico\Desktop\bin\Debug\System.Numerics.Vectors.xml
 C:\Users\Usuario\OneDrive\Desktop\Github\Git\Suporte-T-cnico\Desktop\bin\Debug\System.Reflection.Metadata.xml
 C:\Users\Usuario\OneDrive\Desktop\Github\Git\Suporte-T-cnico\Desktop\bin\Debug\System.Runtime.CompilerServices.Unsafe.xml
-C:\Users\Usuario\OneDrive\Desktop\Github\Git\Suporte-T-cnico\Desktop\bin\Debug\System.Threading.Tasks.Extensions.xml
 C:\Users\Usuario\OneDrive\Desktop\Github\Git\Suporte-T-cnico\Desktop\bin\Debug\xunit.assert.xml
 C:\Users\Usuario\OneDrive\Desktop\Github\Git\Suporte-T-cnico\Desktop\bin\Debug\xunit.core.xml
 C:\Users\Usuario\OneDrive\Desktop\Github\Git\Suporte-T-cnico\Desktop\bin\Debug\xunit.execution.desktop.xml
@@ -150,3 +148,6 @@ C:\Users\Usuario\OneDrive\Desktop\Github\Git\Suporte-T-cnico\Desktop\obj\Debug\S
 C:\Users\Usuario\OneDrive\Desktop\Github\Git\Suporte-T-cnico\Desktop\obj\Debug\SistemaC.458C2CAD.Up2Date
 C:\Users\Usuario\OneDrive\Desktop\Github\Git\Suporte-T-cnico\Desktop\obj\Debug\SistemaChamados.exe
 C:\Users\Usuario\OneDrive\Desktop\Github\Git\Suporte-T-cnico\Desktop\obj\Debug\SistemaChamados.pdb
+C:\Users\Usuario\OneDrive\Desktop\Github\Git\Suporte-T-cnico\Desktop\bin\Debug\Newtonsoft.Json.dll
+C:\Users\Usuario\OneDrive\Desktop\Github\Git\Suporte-T-cnico\Desktop\bin\Debug\Plugin.Payments.Weixin.dll
+C:\Users\Usuario\OneDrive\Desktop\Github\Git\Suporte-T-cnico\Desktop\bin\Debug\Newtonsoft.Json.xml

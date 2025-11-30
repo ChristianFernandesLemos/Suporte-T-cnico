@@ -1,7 +1,5 @@
 C:\Users\Usuario\OneDrive\Desktop\Github\Git\Suporte-T-cnico\Desktop\SistemaChamados.Tests\bin\Debug\xunit.runner.visualstudio.testadapter.dll
 C:\Users\Usuario\OneDrive\Desktop\Github\Git\Suporte-T-cnico\Desktop\SistemaChamados.Tests\bin\Debug\xunit.abstractions.dll
-C:\Users\Usuario\OneDrive\Desktop\Github\Git\Suporte-T-cnico\Desktop\SistemaChamados.Tests\bin\Debug\xunit.runner.reporters.net452.dll
-C:\Users\Usuario\OneDrive\Desktop\Github\Git\Suporte-T-cnico\Desktop\SistemaChamados.Tests\bin\Debug\xunit.runner.utility.net452.dll
 C:\Users\Usuario\OneDrive\Desktop\Github\Git\Suporte-T-cnico\Desktop\SistemaChamados.Tests\bin\Debug\SistemaChamados.Tests.dll
 C:\Users\Usuario\OneDrive\Desktop\Github\Git\Suporte-T-cnico\Desktop\SistemaChamados.Tests\bin\Debug\SistemaChamados.Tests.pdb
 C:\Users\Usuario\OneDrive\Desktop\Github\Git\Suporte-T-cnico\Desktop\SistemaChamados.Tests\bin\Debug\Castle.Core.dll
@@ -122,3 +120,15 @@ C:\Users\USUARIO\Desktop\Github\Suporte Tecnico (chris)\Suporte-T-cnico\Desktop\
 C:\Users\USUARIO\Desktop\Github\Suporte Tecnico (chris)\Suporte-T-cnico\Desktop\SistemaChamados.Tests\obj\Debug\SistemaC.A9B2BB04.Up2Date
 C:\Users\USUARIO\Desktop\Github\Suporte Tecnico (chris)\Suporte-T-cnico\Desktop\SistemaChamados.Tests\obj\Debug\SistemaChamados.Tests.dll
 C:\Users\USUARIO\Desktop\Github\Suporte Tecnico (chris)\Suporte-T-cnico\Desktop\SistemaChamados.Tests\obj\Debug\SistemaChamados.Tests.pdb
+C:\Users\Usuario\OneDrive\Desktop\Github\Git\Suporte-T-cnico\Desktop\SistemaChamados.Tests\bin\Debug\SistemaChamados.Tests.dll.config
+C:\Users\Usuario\OneDrive\Desktop\Github\Git\Suporte-T-cnico\Desktop\SistemaChamados.Tests\bin\Debug\Newtonsoft.Json.dll
+C:\Users\Usuario\OneDrive\Desktop\Github\Git\Suporte-T-cnico\Desktop\SistemaChamados.Tests\bin\Debug\System.Buffers.dll
+C:\Users\Usuario\OneDrive\Desktop\Github\Git\Suporte-T-cnico\Desktop\SistemaChamados.Tests\bin\Debug\System.Memory.dll
+C:\Users\Usuario\OneDrive\Desktop\Github\Git\Suporte-T-cnico\Desktop\SistemaChamados.Tests\bin\Debug\System.Numerics.Vectors.dll
+C:\Users\Usuario\OneDrive\Desktop\Github\Git\Suporte-T-cnico\Desktop\SistemaChamados.Tests\bin\Debug\Newtonsoft.Json.xml
+C:\Users\Usuario\OneDrive\Desktop\Github\Git\Suporte-T-cnico\Desktop\SistemaChamados.Tests\bin\Debug\NuGet.Frameworks.xml
+C:\Users\Usuario\OneDrive\Desktop\Github\Git\Suporte-T-cnico\Desktop\SistemaChamados.Tests\bin\Debug\System.Buffers.xml
+C:\Users\Usuario\OneDrive\Desktop\Github\Git\Suporte-T-cnico\Desktop\SistemaChamados.Tests\bin\Debug\System.Memory.xml
+C:\Users\Usuario\OneDrive\Desktop\Github\Git\Suporte-T-cnico\Desktop\SistemaChamados.Tests\bin\Debug\System.Numerics.Vectors.xml
+C:\Users\Usuario\OneDrive\Desktop\Github\Git\Suporte-T-cnico\Desktop\SistemaChamados.Tests\obj\Debug\SistemaChamados.Tests.csproj.SuggestedBindingRedirects.cache
+C:\Users\Usuario\OneDrive\Desktop\Github\Git\Suporte-T-cnico\Desktop\SistemaChamados.Tests\obj\Debug\SistemaChamados.Tests.dll.config

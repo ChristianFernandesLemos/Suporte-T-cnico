@@ -1,229 +1,317 @@
--- ============================================
--- AGREGAR COLUNA 'titulo' À TABELA chamados
--- E MIGRAR DADOS EXISTENTES
--- ============================================
+-- 1
+ALTER TABLE Historial_Contestacoes
+DROP CONSTRAINT DF__Historial___Tipo__1BC821DD;
+
+-- 2
+ALTER TABLE Historial_Contestacoes
+DROP CONSTRAINT CK_Tipo_Valido;
+
+-- 3
+ALTER TABLE Historial_Contestacoes
+DROP COLUMN Tipo;
+
+select * from chamados
+select * from Historial_Contestacoes
 
 USE Suporte_Tecnico;
 GO
 
-PRINT '============================================';
-PRINT 'ADICIONANDO COLUNA titulo';
-PRINT '============================================';
+PRINT '========================================';
+PRINT 'LIMPIEZA COMPLETA - INCLUYENDO AZURE DATA SYNC';
+PRINT '========================================';
 PRINT '';
 
 -- ============================================
--- PASSO 1: ADICIONAR COLUNA
+-- 1. ELIMINAR STORED PROCEDURES DE AZURE DATA SYNC
 -- ============================================
-PRINT '1. Adicionando coluna titulo...';
+PRINT '1. Eliminando Stored Procedures de Azure Data Sync...';
 
-IF NOT EXISTS (
-    SELECT * FROM INFORMATION_SCHEMA.COLUMNS 
-    WHERE TABLE_NAME = 'chamados' 
-    AND COLUMN_NAME = 'titulo'
-)
+DECLARE @ProcName NVARCHAR(255);
+DECLARE @SQL NVARCHAR(MAX);
+
+DECLARE proc_cursor CURSOR FOR
+SELECT name 
+FROM sys.procedures
+WHERE name LIKE 'chamados_dss_%' OR name LIKE '%_dss_%';
+
+OPEN proc_cursor;
+FETCH NEXT FROM proc_cursor INTO @ProcName;
+
+WHILE @@FETCH_STATUS = 0
 BEGIN
-    ALTER TABLE chamados
-    ADD titulo VARCHAR(200) NULL;
+    SET @SQL = 'DROP PROCEDURE [' + @ProcName + ']';
+    EXEC sp_executesql @SQL;
+    PRINT '   ✓ ' + @ProcName + ' eliminado';
     
-    PRINT '   ✅ Coluna titulo adicionada';
+    FETCH NEXT FROM proc_cursor INTO @ProcName;
+END;
+
+CLOSE proc_cursor;
+DEALLOCATE proc_cursor;
+
+PRINT '';
+
+-- ============================================
+-- 2. ELIMINAR STORED PROCEDURES CUSTOM
+-- ============================================
+PRINT '2. Eliminando Stored Procedures personalizados...';
+
+IF OBJECT_ID('sp_CrearChamado', 'P') IS NOT NULL
+BEGIN
+    DROP PROCEDURE sp_CrearChamado;
+    PRINT '   ✓ sp_CrearChamado eliminado';
+END
+
+IF OBJECT_ID('sp_CriarChamado', 'P') IS NOT NULL
+BEGIN
+    DROP PROCEDURE sp_CriarChamado;
+    PRINT '   ✓ sp_CriarChamado eliminado';
+END
+
+IF OBJECT_ID('sp_ActualizarChamado', 'P') IS NOT NULL
+BEGIN
+    DROP PROCEDURE sp_ActualizarChamado;
+    PRINT '   ✓ sp_ActualizarChamado eliminado';
+END
+
+IF OBJECT_ID('sp_EliminarChamado', 'P') IS NOT NULL
+BEGIN
+    DROP PROCEDURE sp_EliminarChamado;
+    PRINT '   ✓ sp_EliminarChamado eliminado';
+END
+
+IF OBJECT_ID('sp_SincronizarDesdeNube', 'P') IS NOT NULL
+BEGIN
+    DROP PROCEDURE sp_SincronizarDesdeNube;
+    PRINT '   ✓ sp_SincronizarDesdeNube eliminado';
+END
+
+IF OBJECT_ID('sp_ProcesarColaSync', 'P') IS NOT NULL
+BEGIN
+    DROP PROCEDURE sp_ProcesarColaSync;
+    PRINT '   ✓ sp_ProcesarColaSync eliminado';
+END
+
+IF OBJECT_ID('sp_ListarContestacoesChamado', 'P') IS NOT NULL
+BEGIN
+    DROP PROCEDURE sp_ListarContestacoesChamado;
+    PRINT '   ✓ sp_ListarContestacoesChamado eliminado';
+END
+
+PRINT '';
+
+-- ============================================
+-- 3. ELIMINAR TABLAS DE CONTROL
+-- ============================================
+PRINT '3. Eliminando Tablas de Control...';
+
+IF OBJECT_ID('SyncQueue', 'U') IS NOT NULL
+BEGIN
+    DROP TABLE SyncQueue;
+    PRINT '   ✓ Tabla SyncQueue eliminada';
+END
+
+IF OBJECT_ID('SyncControl', 'U') IS NOT NULL
+BEGIN
+    DROP TABLE SyncControl;
+    PRINT '   ✓ Tabla SyncControl eliminada';
+END
+
+PRINT '';
+
+-- ============================================
+-- 4. ELIMINAR LINKED SERVER
+-- ============================================
+PRINT '4. Eliminando Linked Server...';
+
+IF EXISTS (SELECT * FROM sys.servers WHERE name = 'AZURE_INTERFIX')
+BEGIN
+    EXEC sp_dropserver 'AZURE_INTERFIX', 'droplogins';
+    PRINT '   ✓ Linked Server AZURE_INTERFIX eliminado';
 END
 ELSE
 BEGIN
-    PRINT '   ⚠️  Coluna titulo já existe';
+    PRINT '   ℹ Linked Server AZURE_INTERFIX no existe';
 END
 
 PRINT '';
 
 -- ============================================
--- PASSO 2: MIGRAR DADOS EXISTENTES
+-- 5. ELIMINAR TRIGGERS (si existen)
 -- ============================================
-PRINT '2. Migrando dados existentes...';
-PRINT '';
+PRINT '5. Verificando y eliminando Triggers...';
 
--- Ver dados ANTES da migração
-PRINT 'ANTES DA MIGRAÇÃO:';
-SELECT 
-    id_chamado,
-    titulo,
-    LEFT(descricao, 50) + '...' AS descricao_resumida
-FROM chamados;
+DECLARE @TriggerName NVARCHAR(255);
 
-PRINT '';
+DECLARE trigger_cursor CURSOR FOR
+SELECT name 
+FROM sys.triggers
+WHERE parent_id = OBJECT_ID('Chamados')
+    AND (name LIKE '%sync%' OR name LIKE '%dss%');
 
--- Migrar títulos existentes
-UPDATE chamados
-SET titulo = CASE
-    -- Se tem "TÍTULO:" ou "TITULO:" na descrição
-    WHEN descricao LIKE '%TÍTULO:%' OR descricao LIKE '%TITULO:%' THEN
-        LTRIM(RTRIM(
-            SUBSTRING(
-                descricao,
-                CASE 
-                    WHEN descricao LIKE '%TÍTULO:%' THEN CHARINDEX('TÍTULO:', descricao) + 8
-                    ELSE CHARINDEX('TITULO:', descricao) + 8
-                END,
-                CASE
-                    -- Encontrar o fim do título (até DESCRIÇÃO: ou DESCRICAO:)
-                    WHEN descricao LIKE '%DESCRIÇÃO:%' THEN 
-                        CHARINDEX('DESCRIÇÃO:', descricao) - 
-                        CASE 
-                            WHEN descricao LIKE '%TÍTULO:%' THEN CHARINDEX('TÍTULO:', descricao) + 8
-                            ELSE CHARINDEX('TITULO:', descricao) + 8
-                        END
-                    WHEN descricao LIKE '%DESCRICAO:%' THEN 
-                        CHARINDEX('DESCRICAO:', descricao) - 
-                        CASE 
-                            WHEN descricao LIKE '%TÍTULO:%' THEN CHARINDEX('TÍTULO:', descricao) + 8
-                            ELSE CHARINDEX('TITULO:', descricao) + 8
-                        END
-                    -- Se não tem DESCRIÇÃO, pegar até o fim ou até 200 chars
-                    ELSE 200
-                END
-            )
-        ))
-    -- Se NÃO tem "TÍTULO:", usar os primeiros 50 caracteres da descrição
-    ELSE LEFT(descricao, 50)
-END
-WHERE titulo IS NULL;
+OPEN trigger_cursor;
+FETCH NEXT FROM trigger_cursor INTO @TriggerName;
 
-DECLARE @RowsAffected INT = @@ROWCOUNT;
-PRINT CONCAT('   ✅ ', @RowsAffected, ' títulos migrados');
-PRINT '';
-
--- Ver dados DEPOIS da migração
-PRINT 'DEPOIS DA MIGRAÇÃO:';
-SELECT 
-    id_chamado,
-    titulo,
-    LEFT(descricao, 50) + '...' AS descricao_resumida
-FROM chamados;
-
-PRINT '';
-
--- ============================================
--- PASSO 3: LIMPAR DESCRIÇÕES (OPCIONAL)
--- ============================================
-PRINT '3. Deseja limpar as descrições?';
-PRINT '   (remover TÍTULO: e DESCRIÇÃO: do texto)';
-PRINT '';
-PRINT '   Execute a seção OPCIONAL abaixo se desejar';
-PRINT '';
-
-
--- ============================================
--- OPCIONAL: LIMPAR DESCRIÇÕES
--- ============================================
--- Descomente este bloco se quiser remover
--- "TÍTULO: xxx" da coluna descricao
-
-UPDATE chamados
-SET descricao = CASE
-    -- Se tem TÍTULO: seguido de DESCRIÇÃO:
-    WHEN descricao LIKE '%TÍTULO:%DESCRIÇÃO:%' OR descricao LIKE '%TITULO:%DESCRICAO:%' THEN
-        LTRIM(RTRIM(
-            SUBSTRING(
-                descricao,
-                CASE 
-                    WHEN descricao LIKE '%DESCRIÇÃO:%' THEN CHARINDEX('DESCRIÇÃO:', descricao) + 11
-                    ELSE CHARINDEX('DESCRICAO:', descricao) + 11
-                END,
-                LEN(descricao)
-            )
-        ))
-    -- Se só tem DESCRIÇÃO: (sem TÍTULO:)
-    WHEN descricao LIKE '%DESCRIÇÃO:%' OR descricao LIKE '%DESCRICAO:%' THEN
-        LTRIM(RTRIM(
-            SUBSTRING(
-                descricao,
-                CASE 
-                    WHEN descricao LIKE '%DESCRIÇÃO:%' THEN CHARINDEX('DESCRIÇÃO:', descricao) + 11
-                    ELSE CHARINDEX('DESCRICAO:', descricao) + 11
-                END,
-                LEN(descricao)
-            )
-        ))
-    -- Se não tem marcadores, manter como está
-    ELSE descricao
-END
-WHERE descricao LIKE '%TÍTULO:%' 
-   OR descricao LIKE '%TITULO:%'
-   OR descricao LIKE '%DESCRIÇÃO:%'
-   OR descricao LIKE '%DESCRICAO:%';
-
-PRINT '   ✅ Descrições limpas';
-
-
--- ============================================
--- PASSO 4: CRIAR ÍNDICE (OPCIONAL)
--- ============================================
-PRINT '4. Criando índice para busca por título...';
-
-IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'IX_Chamados_Titulo')
+WHILE @@FETCH_STATUS = 0
 BEGIN
-    CREATE INDEX IX_Chamados_Titulo ON chamados(titulo);
-    PRINT '   ✅ Índice criado';
-END
-ELSE
+    SET @SQL = 'DROP TRIGGER [' + @TriggerName + ']';
+    EXEC sp_executesql @SQL;
+    PRINT '   ✓ Trigger ' + @TriggerName + ' eliminado';
+    
+    FETCH NEXT FROM trigger_cursor INTO @TriggerName;
+END;
+
+CLOSE trigger_cursor;
+DEALLOCATE trigger_cursor;
+
+PRINT '';
+
+-- ============================================
+-- 6. ELIMINAR RESTRICCIONES Y COLUMNAS
+-- ============================================
+PRINT '6. Eliminando restricciones y columnas...';
+
+-- Eliminar índice
+IF EXISTS (SELECT * FROM sys.indexes WHERE name = 'IX_Chamados_Sync' AND object_id = OBJECT_ID('Chamados'))
 BEGIN
-    PRINT '   ⚠️  Índice já existe';
+    DROP INDEX IX_Chamados_Sync ON Chamados;
+    PRINT '   ✓ Índice IX_Chamados_Sync eliminado';
+END
+
+-- Eliminar restricción y columna LastModified
+DECLARE @ConstraintName NVARCHAR(200);
+
+SELECT @ConstraintName = name
+FROM sys.default_constraints
+WHERE parent_object_id = OBJECT_ID('Chamados')
+    AND parent_column_id = (SELECT column_id FROM sys.columns 
+                            WHERE object_id = OBJECT_ID('Chamados') 
+                            AND name = 'LastModified');
+
+IF @ConstraintName IS NOT NULL
+BEGIN
+    EXEC('ALTER TABLE Chamados DROP CONSTRAINT ' + @ConstraintName);
+    PRINT '   ✓ Restricción de LastModified eliminada';
+END
+
+IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS 
+           WHERE TABLE_NAME = 'Chamados' AND COLUMN_NAME = 'LastModified')
+BEGIN
+    ALTER TABLE Chamados DROP COLUMN LastModified;
+    PRINT '   ✓ Columna LastModified eliminada';
+END
+
+-- Eliminar restricción y columna ModifiedBy
+SET @ConstraintName = NULL;
+
+SELECT @ConstraintName = name
+FROM sys.default_constraints
+WHERE parent_object_id = OBJECT_ID('Chamados')
+    AND parent_column_id = (SELECT column_id FROM sys.columns 
+                            WHERE object_id = OBJECT_ID('Chamados') 
+                            AND name = 'ModifiedBy');
+
+IF @ConstraintName IS NOT NULL
+BEGIN
+    EXEC('ALTER TABLE Chamados DROP CONSTRAINT ' + @ConstraintName);
+    PRINT '   ✓ Restricción de ModifiedBy eliminada';
+END
+
+IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS 
+           WHERE TABLE_NAME = 'Chamados' AND COLUMN_NAME = 'ModifiedBy')
+BEGIN
+    ALTER TABLE Chamados DROP COLUMN ModifiedBy;
+    PRINT '   ✓ Columna ModifiedBy eliminada';
+END
+
+-- Eliminar restricción y columna Origin
+SET @ConstraintName = NULL;
+
+SELECT @ConstraintName = name
+FROM sys.default_constraints
+WHERE parent_object_id = OBJECT_ID('Chamados')
+    AND parent_column_id = (SELECT column_id FROM sys.columns 
+                            WHERE object_id = OBJECT_ID('Chamados') 
+                            AND name = 'Origin');
+
+IF @ConstraintName IS NOT NULL
+BEGIN
+    EXEC('ALTER TABLE Chamados DROP CONSTRAINT ' + @ConstraintName);
+    PRINT '   ✓ Restricción de Origin eliminada';
+END
+
+IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS 
+           WHERE TABLE_NAME = 'Chamados' AND COLUMN_NAME = 'Origin')
+BEGIN
+    ALTER TABLE Chamados DROP COLUMN Origin;
+    PRINT '   ✓ Columna Origin eliminada';
+END
+
+-- Eliminar restricción y columna SyncVersion
+SET @ConstraintName = NULL;
+
+SELECT @ConstraintName = name
+FROM sys.default_constraints
+WHERE parent_object_id = OBJECT_ID('Chamados')
+    AND parent_column_id = (SELECT column_id FROM sys.columns 
+                            WHERE object_id = OBJECT_ID('Chamados') 
+                            AND name = 'SyncVersion');
+
+IF @ConstraintName IS NOT NULL
+BEGIN
+    EXEC('ALTER TABLE Chamados DROP CONSTRAINT ' + @ConstraintName);
+    PRINT '   ✓ Restricción de SyncVersion eliminada';
+END
+
+IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS 
+           WHERE TABLE_NAME = 'Chamados' AND COLUMN_NAME = 'SyncVersion')
+BEGIN
+    ALTER TABLE Chamados DROP COLUMN SyncVersion;
+    PRINT '   ✓ Columna SyncVersion eliminada';
 END
 
 PRINT '';
+PRINT '========================================';
+PRINT 'LIMPIEZA COMPLETADA';
+PRINT '========================================';
 
--- ============================================
--- PASSO 5: VERIFICAÇÃO FINAL
--- ============================================
-PRINT '============================================';
-PRINT 'VERIFICAÇÃO FINAL';
-PRINT '============================================';
+
+----------------------------------------------------------------------------------------------------------------------------------------
+USE Suporte_Tecnico;
+
+PRINT 'VERIFICACION POST-LIMPIEZA:';
 PRINT '';
 
--- Estatísticas
+-- Verificar Stored Procedures
+PRINT 'Stored Procedures restantes relacionados con sync:';
+SELECT name FROM sys.procedures
+WHERE name LIKE '%sync%' OR name LIKE '%Chamado%' OR name LIKE '%Nube%';
+PRINT '';
+
+-- Verificar Tablas
+PRINT 'Tablas de sincronizacion restantes:';
+SELECT name FROM sys.tables
+WHERE name IN ('SyncControl', 'SyncQueue');
+PRINT '';
+
+-- Verificar Linked Server
+PRINT 'Linked Servers:';
+SELECT name, data_source FROM sys.servers
+WHERE is_linked = 1;
+PRINT '';
+
+-- Verificar columnas en Chamados
+PRINT 'Estructura actual de la tabla Chamados:';
 SELECT 
-    'Total de Chamados' AS Info,
-    COUNT(*) AS Quantidade
-FROM chamados
-UNION ALL
-SELECT 
-    'Com Título Preenchido',
-    COUNT(*)
-FROM chamados
-WHERE titulo IS NOT NULL AND titulo != ''
-UNION ALL
-SELECT 
-    'Sem Título',
-    COUNT(*)
-FROM chamados
-WHERE titulo IS NULL OR titulo = '';
+    COLUMN_NAME,
+    DATA_TYPE,
+    CHARACTER_MAXIMUM_LENGTH,
+    IS_NULLABLE
+FROM INFORMATION_SCHEMA.COLUMNS
+WHERE TABLE_NAME = 'Chamados'
+ORDER BY ORDINAL_POSITION;
 
-PRINT '';
-
--- Exemplo de chamados
-PRINT 'EXEMPLO DE CHAMADOS:';
-SELECT TOP 5
-    id_chamado,
-    titulo,
-    LEFT(descricao, 80) AS descricao_resumida,
-    categoria,
-    prioridade,
-    Status
-FROM chamados
-ORDER BY id_chamado;
-
-PRINT '';
-PRINT '============================================';
-PRINT '✅ MIGRAÇÃO CONCLUÍDA COM SUCESSO!';
-PRINT '============================================';
-PRINT '';
-PRINT 'PRÓXIMOS PASSOS:';
-PRINT '1. Atualizar Model Chamados.cs (adicionar propriedade Titulo)';
-PRINT '2. Atualizar ChamadosRepository.cs (incluir titulo em queries)';
-PRINT '3. Atualizar Forms para capturar título separado';
-PRINT '4. Opcional: Executar bloco de limpeza de descrições';
-PRINT '';
-GO
----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
+-----------------------------------------------------------------------------------------------------------------------------------------------------
 -- ============================================
 -- SCRIPT DE CRIAÇÃO DO BANCO DE DADOS
 -- Sistema de Chamados InterFix
@@ -1076,251 +1164,6 @@ PRINT '';
 PRINT '================================================';
 GO
 
---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
--- ============================================
--- 🔧 FIX DEFINITIVO - INSERTAR DATOS
--- ============================================
-
-USE Suporte_Tecnico;
-GO
-
-PRINT '========================================';
-PRINT 'LIMPIANDO Y RECREANDO DATOS';
-PRINT '========================================';
-PRINT '';
-
--- ============================================
--- 1. LIMPIAR TODO
--- ============================================
-PRINT '1. Limpiando datos existentes...';
-
--- Eliminar en orden por FK
-DELETE FROM registra;
-DELETE FROM chamados;
-DELETE FROM Contestacoes;
-DELETE FROM E_mail;
-DELETE FROM Usuario;
-DELETE FROM Nivel_de_acesso;
-
-PRINT '   ✅ Datos eliminados';
-PRINT '';
-
--- ============================================
--- 2. INSERTAR NIVELES DE ACCESO
--- ============================================
-PRINT '2. Insertando niveles de acceso...';
-
-INSERT INTO Nivel_de_acesso (codigo, Nivel_acesso) VALUES (1, 'Funcionario');
-INSERT INTO Nivel_de_acesso (codigo, Nivel_acesso) VALUES (2, 'Tecnico');
-INSERT INTO Nivel_de_acesso (codigo, Nivel_acesso) VALUES (3, 'Administrador');
-
-PRINT '   ✅ Niveles insertados:';
-PRINT '      1 = Funcionario';
-PRINT '      2 = Tecnico';
-PRINT '      3 = Administrador';
-PRINT '';
-
--- ============================================
--- 3. INSERTAR USUARIOS
--- ============================================
-PRINT '3. Insertando usuarios...';
-
-SET IDENTITY_INSERT Usuario ON;
-
--- Usuario 1: Admin
-INSERT INTO Usuario (Id_usuario, nome, senha, Cpf, Acess_codigo, DataCadastro, Ativo) 
-VALUES (1, 'Christopher Camp', 'MinhaSenha', '12345678900', 3, GETDATE(), 1);
-
--- Usuario 2: Técnico
-INSERT INTO Usuario (Id_usuario, nome, senha, Cpf, Acess_codigo, DataCadastro, Ativo) 
-VALUES (2, 'Juan Silva', 'senhaJuan', '21987654321', 2, GETDATE(), 1);
-
--- Usuario 3: Funcionario
-INSERT INTO Usuario (Id_usuario, nome, senha, Cpf, Acess_codigo, DataCadastro, Ativo) 
-VALUES (3, 'Theo Santos', 'senhaTheo', '10192838374', 1, GETDATE(), 1);
-
--- Usuario 4: Funcionario
-INSERT INTO Usuario (Id_usuario, nome, senha, Cpf, Acess_codigo, DataCadastro, Ativo) 
-VALUES (4, 'Nycolas Costa', 'senhaNycolas', '65473923981', 1, GETDATE(), 1);
-
-SET IDENTITY_INSERT Usuario OFF;
-
-PRINT '   ✅ 4 usuarios insertados';
-PRINT '';
-
--- ============================================
--- 4. INSERTAR EMAILS
--- ============================================
-PRINT '4. Insertando emails...';
-
-INSERT INTO E_mail (E_mail, Id_usuario) VALUES ('chriscamplopes@gmail.com', 1);
-INSERT INTO E_mail (E_mail, Id_usuario) VALUES ('Juan@gmail.com', 2);
-INSERT INTO E_mail (E_mail, Id_usuario) VALUES ('theo@gmail.com', 3);
-INSERT INTO E_mail (E_mail, Id_usuario) VALUES ('nycolas@gmail.com', 4);
-
-PRINT '   ✅ 4 emails insertados';
-PRINT '';
-
--- ============================================
--- 5. INSERTAR CONTESTACIONES Y CHAMADOS
--- ============================================
-PRINT '5. Insertando chamados...';
-
--- Contestación
-SET IDENTITY_INSERT Contestacoes ON;
-INSERT INTO Contestacoes (Codigo, Justificativa, DataContestacao) 
-VALUES (1, 'Problema crítico - Sistema não funciona', GETDATE());
-SET IDENTITY_INSERT Contestacoes OFF;
-
--- Chamados
-SET IDENTITY_INSERT chamados ON;
-
-INSERT INTO chamados (id_chamado, categoria, prioridade, descricao, Afetado, Data_Registro, Status, Tecnico_Atribuido, Contestacoes_Codigo) 
-VALUES (1, 'Software', 3, 'Sistema não inicia', 3, GETDATE()-2, 1, 2, NULL);
-
-INSERT INTO chamados (id_chamado, categoria, prioridade, descricao, Afetado, Data_Registro, Status, Tecnico_Atribuido, Contestacoes_Codigo) 
-VALUES (2, 'Hardware', 2, 'Mouse não funciona', 4, GETDATE()-1, 1, NULL, NULL);
-
-INSERT INTO chamados (id_chamado, categoria, prioridade, descricao, Afetado, Data_Registro, Status, Tecnico_Atribuido, Contestacoes_Codigo) 
-VALUES (3, 'Rede', 4, 'Sem internet', 3, GETDATE(), 1, 2, 1);
-
-SET IDENTITY_INSERT chamados OFF;
-
-PRINT '   ✅ 3 chamados insertados';
-PRINT '';
-
--- ============================================
--- 6. VERIFICACIÓN COMPLETA
--- ============================================
-PRINT '========================================';
-PRINT 'VERIFICACIÓN DE DATOS INSERTADOS';
-PRINT '========================================';
-PRINT '';
-
-PRINT 'USUARIOS:';
-SELECT 
-    u.Id_usuario AS ID,
-    u.nome AS Nombre,
-    u.Cpf,
-    u.senha AS Senha,
-    u.Acess_codigo AS Nivel,
-    n.Nivel_acesso AS Tipo,
-    u.Ativo
-FROM Usuario u
-INNER JOIN Nivel_de_acesso n ON u.Acess_codigo = n.codigo
-ORDER BY u.Id_usuario;
-
-PRINT '';
-PRINT 'EMAILS:';
-SELECT 
-    Id,
-    E_mail AS Email,
-    Id_usuario
-FROM E_mail
-ORDER BY Id_usuario;
-
-PRINT '';
-PRINT 'TEST DE LOGIN:';
-
-DECLARE @Email VARCHAR(100) = 'chriscamplopes@gmail.com';
-DECLARE @Senha VARCHAR(100) = 'MinhaSenha';
-
--- Test en tablas directas
-DECLARE @CountTablas INT;
-SELECT @CountTablas = COUNT(*)
-FROM Usuario u
-INNER JOIN E_mail e ON u.Id_usuario = e.Id_usuario
-WHERE e.E_mail = @Email
-AND u.senha = @Senha
-AND u.Ativo = 1;
-
-PRINT 'Test en tablas: ' + CAST(@CountTablas AS VARCHAR);
-
-IF @CountTablas > 0
-BEGIN
-    PRINT '✅ LOGIN FUNCIONARÁ EN TABLAS';
-    
-    SELECT 
-        u.Id_usuario,
-        u.nome,
-        e.E_mail,
-        u.senha,
-        u.Acess_codigo,
-        u.Ativo
-    FROM Usuario u
-    INNER JOIN E_mail e ON u.Id_usuario = e.Id_usuario
-    WHERE e.E_mail = @Email
-    AND u.senha = @Senha
-    AND u.Ativo = 1;
-END
-ELSE
-BEGIN
-    PRINT '❌ LOGIN NO FUNCIONARÁ';
-END
-
--- Test en VIEW
-IF EXISTS (SELECT * FROM sys.views WHERE name = 'vw_LoginUsuarios')
-BEGIN
-    PRINT '';
-    PRINT 'Test en VIEW:';
-    
-    DECLARE @CountView INT;
-    SELECT @CountView = COUNT(*)
-    FROM vw_LoginUsuarios
-    WHERE Email = @Email
-    AND Senha = @Senha
-    AND Ativo = 1;
-    
-    PRINT 'Test en VIEW: ' + CAST(@CountView AS VARCHAR);
-    
-    IF @CountView > 0
-    BEGIN
-        PRINT '✅ LOGIN FUNCIONARÁ EN VIEW';
-        
-        SELECT 
-            Id,
-            Nome,
-            Email,
-            Senha,
-            NivelAcesso,
-            TipoFuncionario,
-            Ativo
-        FROM vw_LoginUsuarios
-        WHERE Email = @Email
-        AND Senha = @Senha
-        AND Ativo = 1;
-    END
-    ELSE
-    BEGIN
-        PRINT '❌ LOGIN NO FUNCIONARÁ EN VIEW';
-    END
-END
-
-PRINT '';
-PRINT '========================================';
-PRINT 'PROCESO COMPLETADO';
-PRINT '========================================';
-PRINT '';
-PRINT 'CREDENCIALES DE LOGIN:';
-PRINT '';
-PRINT '1. ADMINISTRADOR:';
-PRINT '   Email: chriscamplopes@gmail.com';
-PRINT '   Senha: MinhaSenha';
-PRINT '';
-PRINT '2. TÉCNICO:';
-PRINT '   Email: Juan@gmail.com';
-PRINT '   Senha: senhaJuan';
-PRINT '';
-PRINT '3. FUNCIONARIO (Theo):';
-PRINT '   Email: theo@gmail.com';
-PRINT '   Senha: senhaTheo';
-PRINT '';
-PRINT '4. FUNCIONARIO (Nycolas):';
-PRINT '   Email: nycolas@gmail.com';
-PRINT '   Senha: senhaNycolas';
-PRINT '';
-PRINT '========================================';
-
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 -- ============================================
@@ -1430,408 +1273,396 @@ PRINT '✅ FIX COMPLETO!';
 
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
--- =====================================================
--- SCRIPT DE MIGRAÇÃO PERSONALIZADO
--- Sistema de Chamados - Estrutura Real
--- =====================================================
--- ATENÇÃO: Execute este script com MUITO cuidado!
--- Faça BACKUP da base de dados antes de executar!
--- =====================================================
+------------------------------------------------------------------------------------------------------------------------------------------
+
+-- ============================================
+-- SCRIPT: Insertar Usuarios con Emails Reales
+-- ============================================
 
 USE Suporte_Tecnico;
 GO
 
-PRINT '============================================================';
-PRINT 'INICIANDO MIGRAÇÃO DE SENHAS PARA HASH SHA256';
-PRINT '============================================================';
+PRINT '============================================';
+PRINT 'INSERTANDO USUARIOS CON EMAILS REALES';
+PRINT '============================================';
 PRINT '';
 
--- =====================================================
--- PASSO 1: VERIFICAR ESTRUTURA ATUAL
--- =====================================================
-PRINT 'Verificando estrutura atual...';
-PRINT '';
+-- USUARIO 1: Administrador (Interfix)
+-- Email: Interfix851@gmail.com
+-- Senha: Admin123
+-- Hash SHA256: 8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918
 
-SELECT 
-    'Estrutura da tabela Usuario:' AS Info;
-    
-SELECT 
-    COLUMN_NAME AS Coluna,
-    DATA_TYPE AS Tipo,
-    CHARACTER_MAXIMUM_LENGTH AS Tamanho,
-    IS_NULLABLE AS Nullable
-FROM INFORMATION_SCHEMA.COLUMNS
-WHERE TABLE_NAME = 'Usuario';
+DECLARE @IdAdmin INT;
 
-PRINT '';
-GO
-
--- =====================================================
--- PASSO 2: CRIAR BACKUP DA TABELA USUARIO
--- =====================================================
-PRINT 'Criando backup da tabela Usuario...';
-
--- Verificar se já existe backup
-IF OBJECT_ID('Usuario_Backup_PreHash', 'U') IS NOT NULL
+IF NOT EXISTS (SELECT 1 FROM E_mail WHERE E_mail = 'Interfix851@gmail.com')
 BEGIN
-    PRINT 'Backup anterior encontrado. Excluindo...';
-    DROP TABLE Usuario_Backup_PreHash;
+    INSERT INTO Usuario (nome, Cpf, senha, Acess_codigo, DataCadastro, Ativo)
+    VALUES ('Administrador InterFix', '11111111111', 
+            '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918', 
+            3, GETDATE(), 1);
+    
+    SET @IdAdmin = SCOPE_IDENTITY();
+    
+    INSERT INTO E_mail (Id_usuario, E_mail)
+    VALUES (@IdAdmin, 'Interfix851@gmail.com');
+    
+    PRINT '✅ Admin: Interfix851@gmail.com / Senha: Admin123';
+END
+ELSE
+BEGIN
+    PRINT '⚠️ Email Interfix851@gmail.com já existe';
 END
 
--- Criar backup
-SELECT * 
-INTO Usuario_Backup_PreHash 
-FROM Usuario;
-
-DECLARE @TotalBackup INT = (SELECT COUNT(*) FROM Usuario_Backup_PreHash);
-PRINT CONCAT('✅ Backup criado com sucesso! Total de registros: ', @TotalBackup);
 PRINT '';
-GO
 
--- =====================================================
--- PASSO 3: VERIFICAR DADOS ANTES DA MIGRAÇÃO
--- =====================================================
-PRINT 'Dados ANTES da migração:';
+-- USUARIO 2: Técnico (Juan Vargas)
+-- Email: vargasjuan8096@gmail.com
+-- Senha: Tecnico123
+-- Hash SHA256: 86e8f7ab32cfd12577bc2619bc635690dbd9ccf7d8b37f3e5c2d2e9f3c6f4c0a
+
+DECLARE @IdTecnico INT;
+
+IF NOT EXISTS (SELECT 1 FROM E_mail WHERE E_mail = 'vargasjuan8096@gmail.com')
+BEGIN
+    INSERT INTO Usuario (nome, Cpf, senha, Acess_codigo, DataCadastro, Ativo)
+    VALUES ('Juan Vargas', '22222222222', 
+            '86e8f7ab32cfd12577bc2619bc635690dbd9ccf7d8b37f3e5c2d2e9f3c6f4c0a', 
+            2, GETDATE(), 1);
+    
+    SET @IdTecnico = SCOPE_IDENTITY();
+    
+    INSERT INTO E_mail (Id_usuario, E_mail)
+    VALUES (@IdTecnico, 'vargasjuan8096@gmail.com');
+    
+    PRINT '✅ Técnico: vargasjuan8096@gmail.com / Senha: Tecnico123';
+END
+ELSE
+BEGIN
+    PRINT '⚠️ Email vargasjuan8096@gmail.com já existe';
+END
+
+PRINT '';
+
+-- USUARIO 3: Funcionário (Chris Camp)
+-- Email: chriscamplopes1@gmail.com
+-- Senha: Func123
+-- Hash SHA256: 4f7d8e9a6b5c3d2e1f0a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b9c8d7
+
+DECLARE @IdFunc INT;
+
+IF NOT EXISTS (SELECT 1 FROM E_mail WHERE E_mail = 'chriscamplopes1@gmail.com')
+BEGIN
+    INSERT INTO Usuario (nome, Cpf, senha, Acess_codigo, DataCadastro, Ativo)
+    VALUES ('Christopher Camp', '33333333333', 
+            '4f7d8e9a6b5c3d2e1f0a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b9c8d7', 
+            1, GETDATE(), 1);
+    
+    SET @IdFunc = SCOPE_IDENTITY();
+    
+    INSERT INTO E_mail (Id_usuario, E_mail)
+    VALUES (@IdFunc, 'chriscamplopes1@gmail.com');
+    
+    PRINT '✅ Funcionário: chriscamplopes1@gmail.com / Senha: Func123';
+END
+ELSE
+BEGIN
+    PRINT '⚠️ Email chriscamplopes1@gmail.com já existe';
+END
+
+PRINT '';
+
+-- VERIFICAÇÃO
+PRINT '============================================';
+PRINT 'VERIFICAÇÃO DE USUÁRIOS CRIADOS';
+PRINT '============================================';
 PRINT '';
 
 SELECT 
     u.Id_usuario,
-    u.nome,
-    e.E_mail,
-    LEFT(u.senha, 15) + '...' AS SenhaAtual,
-    LEN(u.senha) AS TamanhoAtual,
-    n.Nivel_acesso,
+    u.nome AS Nome,
+    e.E_mail AS Email,
+    CASE u.Acess_codigo
+        WHEN 1 THEN 'Funcionário'
+        WHEN 2 THEN 'Técnico'
+        WHEN 3 THEN 'Administrador'
+    END AS Tipo,
     u.Ativo
 FROM Usuario u
-LEFT JOIN E_mail e ON u.Id_usuario = e.Id_usuario
-LEFT JOIN Nivel_de_acesso n ON u.Acess_codigo = n.codigo
-ORDER BY u.Id_usuario;
+INNER JOIN E_mail e ON u.Id_usuario = e.Id_usuario
+WHERE e.E_mail IN ('Interfix851@gmail.com', 'vargasjuan8096@gmail.com', 'chriscamplopes1@gmail.com')
+ORDER BY u.Acess_codigo DESC;
 
 PRINT '';
+PRINT '============================================';
+PRINT '✅ CREDENCIAIS:';
+PRINT '============================================';
+PRINT 'Admin: Interfix851@gmail.com / Admin123';
+PRINT 'Técnico: vargasjuan8096@gmail.com / Tecnico123';
+PRINT 'Funcionário: chriscamplopes1@gmail.com / Func123';
+PRINT '============================================';
+
 GO
 
--- =====================================================
--- PASSO 4: ALTERAR ESTRUTURA (SE NECESSÁRIO)
--- =====================================================
-PRINT 'Verificando tamanho do campo senha...';
+-----------------------------------------------------------------------------------------------
 
-DECLARE @TamanhoAtual INT = (
-    SELECT CHARACTER_MAXIMUM_LENGTH 
-    FROM INFORMATION_SCHEMA.COLUMNS 
-    WHERE TABLE_NAME = 'Usuario' AND COLUMN_NAME = 'senha'
+-- ============================================
+-- SCRIPT FINAL: Limpieza Total y Recreación
+-- ============================================
+
+USE Suporte_Tecnico;
+GO
+
+PRINT '============================================';
+PRINT 'LIMPIEZA TOTAL DE USUARIOS';
+PRINT '============================================';
+PRINT '';
+
+-- ============================================
+-- PASO 1: ELIMINAR TODO EN ORDEN CORRECTO
+-- ============================================
+
+-- 1.1: Eliminar registros de chamados
+DELETE FROM registra;
+PRINT '✅ Tabla registra limpiada';
+
+-- 1.2: Eliminar todos los chamados (para evitar conflictos)
+DELETE FROM chamados;
+PRINT '✅ Tabla chamados limpiada';
+
+-- 1.3: Eliminar todos los emails
+DELETE FROM E_mail;
+PRINT '✅ Tabla E_mail limpiada';
+
+-- 1.4: Eliminar todos los usuarios
+DELETE FROM Usuario;
+PRINT '✅ Tabla Usuario limpiada';
+
+PRINT '';
+PRINT 'Todas las tablas limpiadas. Creando usuarios nuevos...';
+PRINT '';
+
+-- ============================================
+-- PASO 2: CREAR USUARIOS CON HASHES CORRECTOS
+-- ============================================
+
+-- USUARIO 1: Administrador
+DECLARE @HashAdmin VARBINARY(32) = HASHBYTES('SHA2_256', 'Admin123');
+DECLARE @HashAdminStr VARCHAR(64) = LOWER(CONVERT(VARCHAR(64), @HashAdmin, 2));
+
+INSERT INTO Usuario (nome, Cpf, senha, Acess_codigo, DataCadastro, Ativo)
+VALUES ('Administrador InterFix', '11111111111', @HashAdminStr, 3, GETDATE(), 1);
+
+DECLARE @IdAdmin INT = SCOPE_IDENTITY();
+
+INSERT INTO E_mail (Id_usuario, E_mail)
+VALUES (@IdAdmin, 'Interfix851@gmail.com');
+
+PRINT '✅ 1. ADMIN:';
+PRINT '   Email: Interfix851@gmail.com';
+PRINT '   Senha: Admin123';
+PRINT '   Hash: ' + @HashAdminStr;
+PRINT '';
+
+-- USUARIO 2: Técnico
+DECLARE @HashTec VARBINARY(32) = HASHBYTES('SHA2_256', 'Tecnico123');
+DECLARE @HashTecStr VARCHAR(64) = LOWER(CONVERT(VARCHAR(64), @HashTec, 2));
+
+INSERT INTO Usuario (nome, Cpf, senha, Acess_codigo, DataCadastro, Ativo)
+VALUES ('Juan Vargas', '22222222222', @HashTecStr, 2, GETDATE(), 1);
+
+DECLARE @IdTec INT = SCOPE_IDENTITY();
+
+INSERT INTO E_mail (Id_usuario, E_mail)
+VALUES (@IdTec, 'vargasjuan8096@gmail.com');
+
+PRINT '✅ 2. TÉCNICO:';
+PRINT '   Email: vargasjuan8096@gmail.com';
+PRINT '   Senha: Tecnico123';
+PRINT '   Hash: ' + @HashTecStr;
+PRINT '';
+
+-- USUARIO 3: Funcionário
+DECLARE @HashFunc VARBINARY(32) = HASHBYTES('SHA2_256', 'Func123');
+DECLARE @HashFuncStr VARCHAR(64) = LOWER(CONVERT(VARCHAR(64), @HashFunc, 2));
+
+INSERT INTO Usuario (nome, Cpf, senha, Acess_codigo, DataCadastro, Ativo)
+VALUES ('Christopher Camp', '33333333333', @HashFuncStr, 1, GETDATE(), 1);
+
+DECLARE @IdFunc INT = SCOPE_IDENTITY();
+
+INSERT INTO E_mail (Id_usuario, E_mail)
+VALUES (@IdFunc, 'chriscamplopes1@gmail.com');
+
+PRINT '✅ 3. FUNCIONÁRIO:';
+PRINT '   Email: chriscamplopes1@gmail.com';
+PRINT '   Senha: Func123';
+PRINT '   Hash: ' + @HashFuncStr;
+PRINT '';
+
+-- ============================================
+-- PASO 3: VERIFICACIÓN FINAL
+-- ============================================
+PRINT '============================================';
+PRINT 'VERIFICACIÓN DE USUARIOS CRIADOS';
+PRINT '============================================';
+PRINT '';
+
+SELECT 
+    u.Id_usuario AS ID,
+    u.nome AS Nome,
+    e.E_mail AS Email,
+    LEFT(u.senha, 20) + '...' AS Hash_Inicio,
+    LEN(u.senha) AS Tamanho,
+    CASE u.Acess_codigo
+        WHEN 1 THEN 'Funcionário'
+        WHEN 2 THEN 'Técnico'
+        WHEN 3 THEN 'Administrador'
+    END AS Tipo,
+    u.Ativo
+FROM Usuario u
+INNER JOIN E_mail e ON u.Id_usuario = e.Id_usuario
+ORDER BY u.Acess_codigo DESC;
+
+PRINT '';
+
+-- ============================================
+-- PASO 4: TEST DE HASH (CRÍTICO)
+-- ============================================
+PRINT '============================================';
+PRINT 'TEST DE VALIDACIÓN DE HASH';
+PRINT '============================================';
+PRINT '';
+
+-- Test Admin
+DECLARE @TestHashAdmin VARCHAR(64) = LOWER(CONVERT(VARCHAR(64), HASHBYTES('SHA2_256', 'Admin123'), 2));
+DECLARE @CountAdmin INT = (SELECT COUNT(*) FROM Usuario WHERE senha = @TestHashAdmin);
+
+PRINT 'TEST ADMIN:';
+PRINT '   Hash esperado: ' + @TestHashAdmin;
+IF @CountAdmin > 0
+    PRINT '   ✅ Hash ENCONTRADO no banco';
+ELSE
+    PRINT '   ❌ Hash NÃO encontrado no banco';
+PRINT '';
+
+-- Test Técnico
+DECLARE @TestHashTec VARCHAR(64) = LOWER(CONVERT(VARCHAR(64), HASHBYTES('SHA2_256', 'Tecnico123'), 2));
+DECLARE @CountTec INT = (SELECT COUNT(*) FROM Usuario WHERE senha = @TestHashTec);
+
+PRINT 'TEST TÉCNICO:';
+PRINT '   Hash esperado: ' + @TestHashTec;
+IF @CountTec > 0
+    PRINT '   ✅ Hash ENCONTRADO no banco';
+ELSE
+    PRINT '   ❌ Hash NÃO encontrado no banco';
+PRINT '';
+
+-- Test Funcionário
+DECLARE @TestHashFunc VARCHAR(64) = LOWER(CONVERT(VARCHAR(64), HASHBYTES('SHA2_256', 'Func123'), 2));
+DECLARE @CountFunc INT = (SELECT COUNT(*) FROM Usuario WHERE senha = @TestHashFunc);
+
+PRINT 'TEST FUNCIONÁRIO:';
+PRINT '   Hash esperado: ' + @TestHashFunc;
+IF @CountFunc > 0
+    PRINT '   ✅ Hash ENCONTRADO no banco';
+ELSE
+    PRINT '   ❌ Hash NÃO encontrado no banco';
+PRINT '';
+
+-- ============================================
+-- PASO 5: TEST DE LOGIN SIMULADO
+-- ============================================
+PRINT '============================================';
+PRINT 'TEST DE LOGIN SIMULADO (VIEW)';
+PRINT '============================================';
+PRINT '';
+
+-- Test login Admin
+DECLARE @TestEmailAdmin VARCHAR(100) = 'Interfix851@gmail.com';
+DECLARE @LoginTestAdmin INT = (
+    SELECT COUNT(*) 
+    FROM vw_LoginUsuarios 
+    WHERE Email = @TestEmailAdmin 
+    AND Senha = @TestHashAdmin 
+    AND Ativo = 1
 );
 
-PRINT CONCAT('Tamanho atual do campo senha: ', @TamanhoAtual);
-
-IF @TamanhoAtual < 64
-BEGIN
-    PRINT 'Alterando tamanho do campo senha para 100 caracteres...';
-    
-    ALTER TABLE Usuario
-    ALTER COLUMN senha VARCHAR(100) NOT NULL;
-    
-    PRINT '✅ Campo senha alterado para VARCHAR(100)';
-END
+PRINT 'LOGIN TEST - ADMIN:';
+PRINT '   Email: ' + @TestEmailAdmin;
+PRINT '   Senha: Admin123';
+IF @LoginTestAdmin > 0
+    PRINT '   ✅ LOGIN FUNCIONARÁ';
 ELSE
-BEGIN
-    PRINT '✅ Campo senha já possui tamanho adequado';
-END
-
-PRINT '';
-GO
-
--- =====================================================
--- PASSO 5: ATUALIZAR SENHAS PARA HASH
--- =====================================================
-PRINT '============================================================';
-PRINT 'ATUALIZANDO SENHAS PARA HASH SHA256';
-PRINT '============================================================';
-PRINT '';
-PRINT 'Usuários identificados no sistema:';
+    PRINT '   ❌ LOGIN NÃO FUNCIONARÁ';
 PRINT '';
 
--- Mostrar usuários atuais
-SELECT 
-    u.Id_usuario,
-    u.nome,
-    e.E_mail,
-    u.senha AS SenhaAtual,
-    n.Nivel_acesso
-FROM Usuario u
-LEFT JOIN E_mail e ON u.Id_usuario = e.Id_usuario
-LEFT JOIN Nivel_de_acesso n ON u.Acess_codigo = n.codigo
-ORDER BY u.Id_usuario;
+-- Test login Técnico
+DECLARE @TestEmailTec VARCHAR(100) = 'vargasjuan8096@gmail.com';
+DECLARE @LoginTestTec INT = (
+    SELECT COUNT(*) 
+    FROM vw_LoginUsuarios 
+    WHERE Email = @TestEmailTec 
+    AND Senha = @TestHashTec 
+    AND Ativo = 1
+);
 
-PRINT '';
-PRINT '⚠️ IMPORTANTE: Verifique os emails acima e execute os UPDATE abaixo!';
-PRINT '';
-
--- =====================================================
--- UPDATES COM OS HASHES FORNECIDOS
--- =====================================================
-
--- 1. ADMINISTRADOR (Chris)
-UPDATE u
-SET u.senha = 'ecf91daa4f7f26e51ab52fe4946c8afd5c81287c75dd118e67924ee2df11713d'
-FROM Usuario u
-INNER JOIN E_mail e ON u.Id_usuario = e.Id_usuario
-WHERE e.E_mail = 'chriscamplopes@gmail.com';
-
-IF @@ROWCOUNT > 0
-    PRINT '✅ Senha do ADMINISTRADOR (Chris) atualizada';
+PRINT 'LOGIN TEST - TÉCNICO:';
+PRINT '   Email: ' + @TestEmailTec;
+PRINT '   Senha: Tecnico123';
+IF @LoginTestTec > 0
+    PRINT '   ✅ LOGIN FUNCIONARÁ';
 ELSE
-    PRINT '❌ ERRO: Administrador não encontrado!';
+    PRINT '   ❌ LOGIN NÃO FUNCIONARÁ';
+PRINT '';
 
--- 2. TÉCNICO (Juan)
-UPDATE u
-SET u.senha = '96b3984481c494d898901c2a46c55a210a4c79e766edad69cc5cd54284b710d6'
-FROM Usuario u
-INNER JOIN E_mail e ON u.Id_usuario = e.Id_usuario
-WHERE e.E_mail = 'Juan@gmail.com';
+-- Test login Funcionário
+DECLARE @TestEmailFunc VARCHAR(100) = 'chriscamplopes1@gmail.com';
+DECLARE @LoginTestFunc INT = (
+    SELECT COUNT(*) 
+    FROM vw_LoginUsuarios 
+    WHERE Email = @TestEmailFunc 
+    AND Senha = @TestHashFunc 
+    AND Ativo = 1
+);
 
-IF @@ROWCOUNT > 0
-    PRINT '✅ Senha do TÉCNICO (Juan) atualizada';
+PRINT 'LOGIN TEST - FUNCIONÁRIO:';
+PRINT '   Email: ' + @TestEmailFunc;
+PRINT '   Senha: Func123';
+IF @LoginTestFunc > 0
+    PRINT '   ✅ LOGIN FUNCIONARÁ';
 ELSE
-    PRINT '❌ ERRO: Técnico Juan não encontrado!';
-
--- 3. FUNCIONÁRIO (Theo)
-UPDATE u
-SET u.senha = '1bc6757cf870d000fd8ba617a53655ae3a448fa2d199cfb29529c586d1cea8c5'
-FROM Usuario u
-INNER JOIN E_mail e ON u.Id_usuario = e.Id_usuario
-WHERE e.E_mail = 'theo@gmail.com';
-
-IF @@ROWCOUNT > 0
-    PRINT '✅ Senha do FUNCIONÁRIO (Theo) atualizada';
-ELSE
-    PRINT '❌ ERRO: Funcionário Theo não encontrado!';
-
--- 4. TÉCNICO (Nycolas)
-UPDATE u
-SET u.senha = 'd0c8c4f2cbc5bc15cdf852ce356735ddaaceabc1f3a25f7de270192df2c67eb5'
-FROM Usuario u
-INNER JOIN E_mail e ON u.Id_usuario = e.Id_usuario
-WHERE e.E_mail = 'nycolas@gmail.com';
-
-IF @@ROWCOUNT > 0
-    PRINT '✅ Senha do TÉCNICO (Nycolas) atualizada';
-ELSE
-    PRINT '❌ ERRO: Técnico Nycolas não encontrado!';
-
-PRINT '';
-GO
-
--- =====================================================
--- PASSO 6: VERIFICAR RESULTADO DA MIGRAÇÃO
--- =====================================================
-PRINT '============================================================';
-PRINT 'VERIFICANDO RESULTADO DA MIGRAÇÃO';
-PRINT '============================================================';
+    PRINT '   ❌ LOGIN NÃO FUNCIONARÁ';
 PRINT '';
 
-SELECT 
-    u.Id_usuario,
-    u.nome,
-    e.E_mail,
-    n.Nivel_acesso,
-    CASE 
-        WHEN LEN(u.senha) = 64 THEN '✅ Hash OK (64 caracteres)'
-        WHEN LEN(u.senha) > 64 THEN '⚠️ Hash muito longo (' + CAST(LEN(u.senha) AS VARCHAR) + ' caracteres)'
-        ELSE '❌ SENHA NÃO MIGRADA! (' + CAST(LEN(u.senha) AS VARCHAR) + ' caracteres)'
-    END AS StatusMigracao,
-    LEN(u.senha) AS TamanhoSenha,
-    u.Ativo AS Status
-FROM Usuario u
-LEFT JOIN E_mail e ON u.Id_usuario = e.Id_usuario
-LEFT JOIN Nivel_de_acesso n ON u.Acess_codigo = n.codigo
-ORDER BY u.Id_usuario;
-
-PRINT '';
-
--- Estatísticas
-DECLARE @TotalUsuarios INT = (SELECT COUNT(*) FROM Usuario);
-DECLARE @Migradas INT = (SELECT COUNT(*) FROM Usuario WHERE LEN(senha) = 64);
-DECLARE @NaoMigradas INT = @TotalUsuarios - @Migradas;
-
-PRINT CONCAT('Total de usuários: ', @TotalUsuarios);
-PRINT CONCAT('✅ Senhas migradas corretamente: ', @Migradas);
-PRINT CONCAT('❌ Senhas NÃO migradas: ', @NaoMigradas);
-PRINT '';
-
-IF @NaoMigradas > 0
-BEGIN
-    PRINT '⚠️⚠️⚠️ ATENÇÃO! ⚠️⚠️⚠️';
-    PRINT 'Ainda existem senhas não migradas!';
-    PRINT 'Verifique os emails e IDs acima.';
-    PRINT '';
-    
-    -- Mostrar quais não foram migrados
-    SELECT 
-        u.Id_usuario,
-        u.nome,
-        e.E_mail,
-        u.senha AS SenhaProblematica,
-        LEN(u.senha) AS Tamanho
-    FROM Usuario u
-    LEFT JOIN E_mail e ON u.Id_usuario = e.Id_usuario
-    WHERE LEN(u.senha) != 64;
-    
-    PRINT '';
-    PRINT 'NÃO prossiga até corrigir todos os registros!';
-END
-ELSE
-BEGIN
-    PRINT '✅✅✅ SUCESSO TOTAL! ✅✅✅';
-    PRINT 'Todas as senhas foram migradas corretamente!';
-    PRINT 'Você pode prosseguir com os testes da aplicação.';
-END
-
-PRINT '';
-GO
-
--- =====================================================
--- PASSO 7: COMPARAÇÃO ANTES/DEPOIS
--- =====================================================
-PRINT '============================================================';
-PRINT 'COMPARAÇÃO: ANTES vs DEPOIS';
-PRINT '============================================================';
-PRINT '';
-
-SELECT 
-    'ANTES (Backup)' AS Momento,
-    b.Id_usuario,
-    b.nome,
-    LEFT(b.senha, 20) + '...' AS Senha,
-    LEN(b.senha) AS Tamanho
-FROM Usuario_Backup_PreHash b
-ORDER BY b.Id_usuario;
-
-PRINT '';
-
-SELECT 
-    'DEPOIS (Atual)' AS Momento,
-    u.Id_usuario,
-    u.nome,
-    LEFT(u.senha, 20) + '...' AS Senha,
-    LEN(u.senha) AS Tamanho
-FROM Usuario u
-ORDER BY u.Id_usuario;
-
-PRINT '';
-GO
-
--- =====================================================
--- PASSO 8: TESTE DE VALIDAÇÃO
--- =====================================================
-PRINT '============================================================';
-PRINT 'TESTE DE VALIDAÇÃO';
-PRINT '============================================================';
-PRINT '';
-PRINT 'Testando se é possível fazer "login" com os hashes:';
-PRINT '';
-
--- Teste Admin
-DECLARE @TestHashAdmin VARCHAR(64) = 'ecf91daa4f7f26e51ab52fe4946c8afd5c81287c75dd118e67924ee2df11713d';
-IF EXISTS (
-    SELECT 1 FROM Usuario u
-    INNER JOIN E_mail e ON u.Id_usuario = e.Id_usuario
-    WHERE e.E_mail = 'chriscamplopes@gmail.com' 
-    AND u.senha = @TestHashAdmin
-)
-    PRINT '✅ Admin: Login funcionará';
-ELSE
-    PRINT '❌ Admin: Login NÃO funcionará!';
-
--- Teste Juan
-DECLARE @TestHashJuan VARCHAR(64) = '96b3984481c494d898901c2a46c55a210a4c79e766edad69cc5cd54284b710d6';
-IF EXISTS (
-    SELECT 1 FROM Usuario u
-    INNER JOIN E_mail e ON u.Id_usuario = e.Id_usuario
-    WHERE e.E_mail = 'Juan@gmail.com' 
-    AND u.senha = @TestHashJuan
-)
-    PRINT '✅ Juan: Login funcionará';
-ELSE
-    PRINT '❌ Juan: Login NÃO funcionará!';
-
--- Teste Theo
-DECLARE @TestHashTheo VARCHAR(64) = '1bc6757cf870d000fd8ba617a53655ae3a448fa2d199cfb29529c586d1cea8c5';
-IF EXISTS (
-    SELECT 1 FROM Usuario u
-    INNER JOIN E_mail e ON u.Id_usuario = e.Id_usuario
-    WHERE e.E_mail = 'theo@gmail.com' 
-    AND u.senha = @TestHashTheo
-)
-    PRINT '✅ Theo: Login funcionará';
-ELSE
-    PRINT '❌ Theo: Login NÃO funcionará!';
-
--- Teste Nycolas
-DECLARE @TestHashNycolas VARCHAR(64) = 'd0c8c4f2cbc5bc15cdf852ce356735ddaaceabc1f3a25f7de270192df2c67eb5';
-IF EXISTS (
-    SELECT 1 FROM Usuario u
-    INNER JOIN E_mail e ON u.Id_usuario = e.Id_usuario
-    WHERE e.E_mail = 'nycolas@gmail.com' 
-    AND u.senha = @TestHashNycolas
-)
-    PRINT '✅ Nycolas: Login funcionará';
-ELSE
-    PRINT '❌ Nycolas: Login NÃO funcionará!';
-
-PRINT '';
-GO
-
--- =====================================================
--- OPCIONAL: REVERTER MIGRAÇÃO (SE ALGO DEU ERRADO)
--- =====================================================
-/*
--- ⚠️ DESCOMENTE APENAS SE PRECISAR REVERTER!
-
-PRINT 'Revertendo migração...';
-
-UPDATE u
-SET u.senha = b.senha
-FROM Usuario u
-INNER JOIN Usuario_Backup_PreHash b ON u.Id_usuario = b.Id_usuario;
-
-PRINT '✅ Senhas revertidas para valores originais!';
-GO
-*/
-
--- =====================================================
--- OPCIONAL: EXCLUIR BACKUP (DEPOIS DE CONFIRMAR)
--- =====================================================
-/*
--- ⚠️ DESCOMENTE APENAS DEPOIS DE TESTAR TUDO!
-
-PRINT 'Excluindo backup...';
-DROP TABLE Usuario_Backup_PreHash;
-PRINT '✅ Backup excluído!';
-GO
-*/
-
--- =====================================================
--- FIM DO SCRIPT
--- =====================================================
-PRINT '';
-PRINT '============================================================';
+PRINT '============================================';
 PRINT '✅ SCRIPT CONCLUÍDO COM SUCESSO!';
-PRINT '============================================================';
+PRINT '============================================';
 PRINT '';
-PRINT 'PRÓXIMOS PASSOS:';
-PRINT '1. Verifique que todos os usuários têm senha com 64 caracteres';
-PRINT '2. Atualize o código C# (se ainda não fez)';
-PRINT '3. Teste o login com cada usuário:';
-PRINT '   - chriscamplopes@gmail.com / MinhaSenha';
-PRINT '   - Juan@gmail.com / senhaJuan';
-PRINT '   - theo@gmail.com / senhaTheo';
-PRINT '   - nycolas@gmail.com / senhaNycolas';
-PRINT '4. Teste criar novo usuário';
-PRINT '5. Teste alterar senha';
-PRINT '6. Após confirmar que tudo funciona, exclua o backup';
+PRINT 'CREDENCIAIS PARA LOGIN:';
 PRINT '';
-PRINT '⚠️ IMPORTANTE: As senhas acima são as ORIGINAIS!';
-PRINT 'O sistema agora usa os HASHES internamente.';
+PRINT '1. ADMIN: Interfix851@gmail.com / Admin123';
+PRINT '2. TÉCNICO: vargasjuan8096@gmail.com / Tecnico123';
+PRINT '3. FUNCIONÁRIO: chriscamplopes1@gmail.com / Func123';
 PRINT '';
+PRINT '============================================';
+
+GO
+```
+✅ 1. ADMIN:
+   Email: Interfix851@gmail.com
+   Senha: Admin123
+   Hash: 8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918
+
+✅ 2. TÉCNICO:
+   Email: vargasjuan8096@gmail.com
+   Senha: Tecnico123
+   Hash: ...
+
+✅ 3. FUNCIONÁRIO:
+   Email: chriscamplopes1@gmail.com
+   Senha: Func123
+   Hash: ...
 
 
+
+  

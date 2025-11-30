@@ -18,6 +18,7 @@ namespace SistemaChamados.Forms
         private Label lblTituloChamado; 
         private Button btnFechar;
         private Button btnAlterar;
+        private Button btnVerHistorico;
         private Panel panelHeader;
         private Panel panelInfo;
         private GroupBox gbDescricao;
@@ -137,6 +138,8 @@ namespace SistemaChamados.Forms
                 this.lblStatus, this.lblSolicitante, this.lblTecnico, this.lblData
             });
 
+
+
             // GROUPBOX DESCRIÇÃO 
             this.gbDescricao = new GroupBox
             {
@@ -157,7 +160,7 @@ namespace SistemaChamados.Forms
                 BackColor = Color.White,
                 Font = new Font("Segoe UI", 9F),
                 BorderStyle = BorderStyle.FixedSingle,
-                WordWrap = true, // ← IMPORTANTE: Wrap de palabras
+                WordWrap = true, 
                 AcceptsTab = false,
                 //AcceptsReturn = true 
             };
@@ -169,10 +172,14 @@ namespace SistemaChamados.Forms
             {
                 Text = "⚠️ CONTESTAÇÕES",
                 Font = new Font("Segoe UI", 10F, FontStyle.Bold),
-                Location = new Point(12, 410), // ← Ajustado (era 370)
-                Size = new Size(660, 140),
+                Location = new Point(12, 410), 
+                Size = new Size(660, 150),
                 ForeColor = Color.FromArgb(220, 53, 69)
             };
+            this.gbContestacoes.Controls.Add(this.btnVerHistorico);
+            this.gbContestacoes.Controls.Add(this.txtContestacoes);
+            this.gbContestacoes.Size = new Size(660, 150);
+
 
             this.txtContestacoes = new RichTextBox
             {
@@ -189,13 +196,25 @@ namespace SistemaChamados.Forms
                 //AcceptsReturn = true
             };
 
-            this.gbContestacoes.Controls.Add(this.txtContestacoes);
 
-            // BOTÕES 
+            // BOTÕES
+            this.btnVerHistorico = new Button
+            {
+                Text = "Ver Histórico Completo",
+                Location = new Point(332, 570),
+                Size = new Size(150, 30),
+                BackColor = Color.FromArgb(23, 162, 184), 
+                ForeColor = Color.White,
+                FlatStyle = FlatStyle.Flat,
+                Font = new Font("Segoe UI", 9F, FontStyle.Bold)
+            };
+            this.btnVerHistorico.FlatAppearance.BorderSize = 0;
+            this.btnVerHistorico.Click += BtnVerHistorico_Click;
+
             this.btnAlterar = new Button
             {
                 Text = "Alterar Status",
-                Location = new Point(487, 565), // ← Ajustado (era 525)
+                Location = new Point(487, 565), 
                 Size = new Size(90, 35),
                 BackColor = Color.FromArgb(40, 167, 69),
                 ForeColor = Color.White,
@@ -209,7 +228,7 @@ namespace SistemaChamados.Forms
             this.btnFechar = new Button
             {
                 Text = "Fechar",
-                Location = new Point(582, 565), // ← Ajustado (era 525)
+                Location = new Point(582, 565), 
                 Size = new Size(90, 35),
                 BackColor = Color.FromArgb(108, 117, 125),
                 ForeColor = Color.White,
@@ -234,6 +253,7 @@ namespace SistemaChamados.Forms
                 this.gbDescricao,
                 this.gbContestacoes,
                 this.btnAlterar,
+                this.btnVerHistorico,
                 this.btnFechar
             });
         }
@@ -530,6 +550,15 @@ namespace SistemaChamados.Forms
         private void BtnFechar_Click(object sender, EventArgs e)
         {
             this.Close();
+        }
+
+        private void BtnVerHistorico_Click(object sender, EventArgs e)
+        {
+            var formHistorico = new ContestacaoForm(_chamado, _funcionarioLogado);
+            formHistorico.ShowDialog();
+
+            // _chamado = _controller.BuscarPorId(_chamado.IdChamado);
+            // PreencherDados();
         }
     }
 }

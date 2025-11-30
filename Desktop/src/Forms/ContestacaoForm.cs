@@ -16,7 +16,6 @@ namespace SistemaChamados.Forms
         // Controles
         private ListView lstHistorial;
         private TextBox txtNovaContestacao;
-        private ComboBox cmbTipo;
         private Button btnAdicionar;
         private Button btnFechar;
         private Label lblChamadoInfo;
@@ -36,7 +35,6 @@ namespace SistemaChamados.Forms
         {
             this.lstHistorial = new ListView();
             this.txtNovaContestacao = new TextBox();
-            this.cmbTipo = new ComboBox();
             this.btnAdicionar = new Button();
             this.btnFechar = new Button();
             this.lblChamadoInfo = new Label();
@@ -102,10 +100,10 @@ namespace SistemaChamados.Forms
             this.lstHistorial.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Bottom;
 
             // Colunas do ListView
-            this.lstHistorial.Columns.Add("Data/Hora", 130);
-            this.lstHistorial.Columns.Add("Usuário", 150);
-            this.lstHistorial.Columns.Add("Tipo", 100);
-            this.lstHistorial.Columns.Add("Contestação", 360);
+            this.lstHistorial.Columns.Clear();
+            this.lstHistorial.Columns.Add("Data/Hora", 150);
+            this.lstHistorial.Columns.Add("Usuário", 200);
+            this.lstHistorial.Columns.Add("Justificativa", 390);
 
             // ===========================================
             // SEÇÃO 3: NOVA CONTESTAÇÃO
@@ -118,46 +116,34 @@ namespace SistemaChamados.Forms
                 Anchor = AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Bottom
             };
 
-            var lblTipo = new Label
-            {
-                Text = "Tipo:",
-                Location = new Point(10, 25),
-                Size = new Size(40, 20)
-            };
-
-            this.cmbTipo.Location = new Point(55, 22);
-            this.cmbTipo.Size = new Size(150, 25);
-            this.cmbTipo.DropDownStyle = ComboBoxStyle.DropDownList;
-            this.cmbTipo.Items.AddRange(new object[] {
-                "Contestação",
-                "Resposta",
-                "Observação"
-            });
-            this.cmbTipo.SelectedIndex = 0;
-
             var lblTexto = new Label
             {
-                Text = "Texto:",
-                Location = new Point(220, 25),
-                Size = new Size(50, 20)
+                Text = "Justificativa:",
+                Location = new Point(10, 25),
+                Size = new Size(100, 20),
+                Font = new Font("Segoe UI", 9F, FontStyle.Bold)
             };
 
-            this.txtNovaContestacao.Location = new Point(275, 22);
-            this.txtNovaContestacao.Size = new Size(360, 60);
+            this.txtNovaContestacao.Location = new Point(10, 50);
+            this.txtNovaContestacao.Size = new Size(635, 60);  // ✅ Más ancho
             this.txtNovaContestacao.Multiline = true;
             this.txtNovaContestacao.ScrollBars = ScrollBars.Vertical;
             this.txtNovaContestacao.MaxLength = 1000;
             this.txtNovaContestacao.Anchor = AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Bottom;
 
             this.btnAdicionar.Text = "✓ Adicionar";
-            this.btnAdicionar.Location = new Point(645, 22);
-            this.btnAdicionar.Size = new Size(100, 60);
+            this.btnAdicionar.Location = new Point(655, 50);  // ✅ Ajustado
+            this.btnAdicionar.Size = new Size(90, 60);
             this.btnAdicionar.BackColor = Color.FromArgb(40, 167, 69);
             this.btnAdicionar.ForeColor = Color.White;
             this.btnAdicionar.FlatStyle = FlatStyle.Flat;
             this.btnAdicionar.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
             this.btnAdicionar.Anchor = AnchorStyles.Right | AnchorStyles.Bottom;
             this.btnAdicionar.Click += BtnAdicionar_Click;
+
+            panelNova.Controls.AddRange(new Control[] {
+        lblTexto, this.txtNovaContestacao, this.btnAdicionar
+    });
 
             var lblContador = new Label
             {
@@ -176,7 +162,7 @@ namespace SistemaChamados.Forms
             };
 
             panelNova.Controls.AddRange(new Control[] {
-                lblTipo, this.cmbTipo, lblTexto, this.txtNovaContestacao,
+                lblTexto, this.txtNovaContestacao,
                 this.btnAdicionar, lblContador
             });
 
@@ -204,38 +190,22 @@ namespace SistemaChamados.Forms
             try
             {
                 lstHistorial.Items.Clear();
-
                 var contestacoes = _repository.ListarPorChamado(_chamado.IdChamado);
 
                 foreach (var contestacao in contestacoes)
                 {
                     var item = new ListViewItem(contestacao.DataContestacao.ToString("dd/MM/yyyy HH:mm"));
                     item.SubItems.Add(contestacao.NomeUsuario);
-                    item.SubItems.Add(contestacao.ObterDescricaoTipo());
-                    item.SubItems.Add(contestacao.Justificativa);
-                    item.Tag = contestacao; // Guardar objeto completo
+                    item.SubItems.Add(contestacao.Justificativa);  // ✅ SIN columna Tipo
+                    item.Tag = contestacao;
 
-                    // Colorir por tipo
-                    switch (contestacao.Tipo)
-                    {
-                        case TipoContestacao.Contestacao:
-                            item.BackColor = Color.FromArgb(255, 243, 205); // Amarelo claro
-                            break;
-                        case TipoContestacao.Resposta:
-                            item.BackColor = Color.FromArgb(209, 231, 221); // Verde claro
-                            break;
-                        case TipoContestacao.Observacao:
-                            item.BackColor = Color.FromArgb(217, 237, 247); // Azul claro
-                            break;
-                    }
+                    // ✅ Color único para todas
+                    item.BackColor = Color.FromArgb(255, 250, 240);
 
                     lstHistorial.Items.Add(item);
                 }
 
-                // Atualizar contador
-                lblTotalContestacoes.Text = $"{contestacoes.Count} contestaç{(contestacoes.Count == 1 ? "ão" : "ões")}";
-
-                System.Diagnostics.Debug.WriteLine($"Historial carregado: {contestacoes.Count} contestações");
+                lblTotalContestacoes.Text = $"{contestacoes.Count} contestação{(contestacoes.Count == 1 ? "" : "ões")}";
             }
             catch (Exception ex)
             {
@@ -251,35 +221,20 @@ namespace SistemaChamados.Forms
         {
             try
             {
-                // Validar entrada
                 if (string.IsNullOrWhiteSpace(txtNovaContestacao.Text))
                 {
-                    MessageBox.Show("Digite o texto da contestação.", "Campo Obrigatório",
+                    MessageBox.Show("Digite a justificativa da contestação.", "Campo Obrigatório",
                         MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     txtNovaContestacao.Focus();
                     return;
                 }
 
-                // Mapear tipo selecionado
-                TipoContestacao tipo;
-                if ( cmbTipo.SelectedIndex == 0)
-                    tipo = TipoContestacao.Contestacao;
-                else if (cmbTipo.SelectedIndex == 1)
-                    tipo = TipoContestacao.Resposta;
-                else if (cmbTipo.SelectedIndex == 2)
-                    tipo = TipoContestacao.Observacao;
-                else
-                    tipo = TipoContestacao.Contestacao;
-
-                // Criar nova contestação
                 var novaContestacao = new Contestacao(
                     _chamado.IdChamado,
                     _usuarioLogado.Id,
-                    txtNovaContestacao.Text.Trim(),
-                    tipo
+                    txtNovaContestacao.Text.Trim()
                 );
 
-                // Inserir no banco de dados
                 int novoId = _repository.Inserir(novaContestacao);
 
                 if (novoId > 0)
@@ -287,23 +242,18 @@ namespace SistemaChamados.Forms
                     MessageBox.Show("Contestação adicionada com sucesso!", "Sucesso",
                         MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-                    // Limpar campos
                     txtNovaContestacao.Clear();
-                    cmbTipo.SelectedIndex = 0;
-
-                    // Recarregar historial
                     CarregarHistorial();
                 }
                 else
                 {
-                    throw new Exception("Falha ao inserir contestação no banco de dados.");
+                    throw new Exception("Falha ao inserir contestação.");
                 }
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Erro ao adicionar contestação:\n{ex.Message}", "Erro",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
-                System.Diagnostics.Debug.WriteLine($"Erro: {ex.StackTrace}");
             }
         }
     }

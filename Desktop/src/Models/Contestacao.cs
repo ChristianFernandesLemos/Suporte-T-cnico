@@ -14,7 +14,6 @@ namespace SistemaChamados.Models
         public int IdUsuario { get; set; }
         public string Justificativa { get; set; }
         public DateTime DataContestacao { get; set; }
-        public TipoContestacao Tipo { get; set; }
 
         // Propriedades de navegação (carregadas do banco)
         public string NomeUsuario { get; set; }
@@ -25,17 +24,15 @@ namespace SistemaChamados.Models
         public Contestacao()
         {
             DataContestacao = DateTime.Now;
-            Tipo = TipoContestacao.Contestacao;
         }
 
         // Construtor com parâmetros
-        public Contestacao(int idChamado, int idUsuario, string justificativa, TipoContestacao tipo = TipoContestacao.Contestacao)
+        public Contestacao(int idChamado, int idUsuario, string justificativa)
         {
             IdChamado = idChamado;
             IdUsuario = idUsuario;
             Justificativa = justificativa;
             DataContestacao = DateTime.Now;
-            Tipo = tipo;
         }
 
         // Método para validar
@@ -56,32 +53,11 @@ namespace SistemaChamados.Models
             return true;
         }
 
-        // Método para obter descrição do tipo
-        public string ObterDescricaoTipo()
-        {
-            return Tipo switch
-            {
-                TipoContestacao.Contestacao => "Contestação",
-                TipoContestacao.Resposta => "Resposta",
-                TipoContestacao.Observacao => "Observação",
-                _ => "Desconhecido"
-            };
-        }
 
         // Override ToString para debug
         public override string ToString()
         {
             return $"[{DataContestacao:dd/MM/yyyy HH:mm}] {NomeUsuario ?? $"Usuário {IdUsuario}"}: {Justificativa}";
         }
-    }
-
-    /// <summary>
-    /// Tipos de contestação
-    /// </summary>
-    public enum TipoContestacao
-    {
-        Contestacao = 1,  // Contestação inicial
-        Resposta = 2,     // Resposta a uma contestação
-        Observacao = 3    // Observação adicional
     }
 }

@@ -4,6 +4,8 @@ using System.Windows.Forms;
 using SistemaChamados.Controllers;
 using SistemaChamados.Models;
 using SistemaChamados.Helpers;
+using SistemaChamados.Services;
+using System.Threading.Tasks;
 
 namespace SistemaChamados.Forms
 {
@@ -53,7 +55,6 @@ namespace SistemaChamados.Forms
         private Label lblRevisaoChamado;
         private Panel pnlResumo;
         private Label lblPrioridadeCalculada;
-        private Label lblPrioridadeDestaque;  // NOVO: Label de destaque para prioridade
         private Label lblPerguntaContestacao;
         private RadioButton rbConcordoPrioridade;
         private RadioButton rbContestoPrioridade;
@@ -69,9 +70,18 @@ namespace SistemaChamados.Forms
         private string descricao;
         private string afetado;
         private bool impedeTrabalho;
-        private int prioridadeCalculada;
         private bool contestaPrioridade = false;
         private string justificativaContestacao = "";
+        private bool _criandoChamado = false;
+
+        // IA Service
+        private IAResponse analiseIA = null;
+        private bool analisandoComIA = false;
+        private Label lblAnalisandoIA;
+        private Panel pnlResultadoIA;
+        private Label lblPrioridadeIA;
+        private Label lblJustificativaIA;
+
 
         public CriarChamadoForm(Funcionarios funcionario, ChamadosController chamadosController)
         {
@@ -79,6 +89,8 @@ namespace SistemaChamados.Forms
             _chamadosController = chamadosController;
             InitializeComponent();
             ConfigurarFormulario();
+            this.FormClosing += CriarChamadoForm_FormClosing;
+
         }
 
         private void InitializeComponent()
@@ -418,7 +430,7 @@ namespace SistemaChamados.Forms
                 BackColor = Color.White,
                 Padding = new Padding(20),
                 Visible = false,
-                AutoScroll = true  // Habilitar scroll se necessário
+                AutoScroll = true  // Importante para cuando el contenido sea grande
             };
 
             lblRevisaoChamado = new Label
@@ -430,11 +442,11 @@ namespace SistemaChamados.Forms
                 TextAlign = ContentAlignment.MiddleCenter
             };
 
-            // Painel de resumo - ajustado para ficar dentro dos limites
+            // ====== PAINEL DE RESUMO (SEM PRIORIDADE CALCULADA) ======
             pnlResumo = new Panel
             {
                 Location = new Point(50, 50),
-                Size = new Size(600, 130),  // Aumentado para incluir o destaque
+                Size = new Size(600, 100),  // Reducido porque ya no hay prioridad calculada
                 BackColor = Color.FromArgb(245, 245, 245),
                 BorderStyle = BorderStyle.FixedSingle
             };
@@ -449,44 +461,102 @@ namespace SistemaChamados.Forms
                 TextAlign = ContentAlignment.TopLeft
             };
 
-            // NOVO: Label de destaque para a prioridade
-            lblPrioridadeDestaque = new Label
+            pnlResumo.Controls.Add(lblPrioridadeCalculada);
+            // ❌ NO agregar lblPrioridadeDestaque (eliminado)
+
+            // ====== LABEL "ANALISANDO COM IA" ======
+            lblAnalisandoIA = new Label
             {
-                Location = new Point(10, 75),
-                Size = new Size(580, 50),
+                Location = new Point(50, 165),  // Ajustado
+                Size = new Size(600, 40),
                 Font = new Font("Segoe UI", 12F, FontStyle.Bold),
-                ForeColor = Color.White,
-                BackColor = Color.FromArgb(0, 123, 255),
+                ForeColor = Color.FromArgb(0, 123, 255),
                 TextAlign = ContentAlignment.MiddleCenter,
-                Text = "⚡ PRIORIDADE: MÉDIA"
+                Text = "🤖 Analisando com Inteligência Artificial...\nAguarde alguns segundos",
+                Visible = false
             };
 
-            pnlResumo.Controls.Add(lblPrioridadeCalculada);
-            pnlResumo.Controls.Add(lblPrioridadeDestaque);
+            // ====== PAINEL DE RESULTADO DA IA - AUMENTADO ======
+            pnlResultadoIA = new Panel
+            {
+                Location = new Point(50, 165),  // Ajustado
+                Size = new Size(600, 180),  // ✅ AUMENTADO de 100 para 180
+                BackColor = Color.FromArgb(225, 245, 254),
+                BorderStyle = BorderStyle.FixedSingle,
+                Visible = false,
+                AutoScroll = false  
+            };
 
-            // Pergunta sobre contestação - ajustada posição
+            Label lblTituloIA = new Label
+            {
+                Text = "🤖 Análise da Inteligência Artificial",
+                Font = new Font("Segoe UI", 10F, FontStyle.Bold),
+                Location = new Point(10, 10),
+                Size = new Size(580, 25),
+                ForeColor = Color.FromArgb(0, 123, 255),
+                TextAlign = ContentAlignment.MiddleLeft
+            };
+
+            lblPrioridadeIA = new Label
+            {
+                Location = new Point(10, 40),
+                Size = new Size(580, 30),
+                Font = new Font("Segoe UI", 11F, FontStyle.Bold),
+                ForeColor = Color.FromArgb(33, 37, 41),
+                Text = "⚡ Prioridade Sugerida: Carregando...",
+                TextAlign = ContentAlignment.MiddleLeft
+            };
+
+            Label lblTituloJustificativa = new Label
+            {
+                Text = "📝 Justificativa:",
+                Font = new Font("Segoe UI", 9F, FontStyle.Bold),
+                Location = new Point(10, 75),
+                Size = new Size(580, 20),
+                ForeColor = Color.FromArgb(50, 50, 50)
+            };
+
+            RichTextBox rtbJustificativaIA = new RichTextBox
+            {
+                Name = "rtbJustificativaIA", 
+                Location = new Point(10, 100),
+                Size = new Size(580, 70),  
+                Font = new Font("Segoe UI", 9F),
+                ReadOnly = true,
+                BorderStyle = BorderStyle.None,
+                BackColor = Color.FromArgb(225, 245, 254),
+                ScrollBars = RichTextBoxScrollBars.Vertical,
+                Text = "Aguardando análise..."
+            };
+
+            pnlResultadoIA.Controls.Add(lblTituloIA);
+            pnlResultadoIA.Controls.Add(lblPrioridadeIA);
+            pnlResultadoIA.Controls.Add(lblTituloJustificativa);
+            pnlResultadoIA.Controls.Add(rtbJustificativaIA);
+
+            // ====== PERGUNTA SOBRE CONTESTAÇÃO - AJUSTADA ======
             lblPerguntaContestacao = new Label
             {
-                Text = "Você concorda com a prioridade calculada?",
+                Text = "Você concorda com a prioridade sugerida pela IA?",
                 Font = new Font("Segoe UI", 11F, FontStyle.Bold),
-                Location = new Point(20, 195),  // Ajustado
+                Location = new Point(20, 360),  // Ajustado
                 Size = new Size(600, 25),
                 TextAlign = ContentAlignment.MiddleCenter
             };
 
             pnlRadioContestacao = new Panel
             {
-                Location = new Point(150, 230),  // Ajustado
+                Location = new Point(150, 395),  // Ajustado
                 Size = new Size(400, 80),
                 BackColor = Color.White
             };
 
             rbConcordoPrioridade = new RadioButton
             {
-                Text = "Sim, concordo com a prioridade",
+                Text = "✅ Sim, concordo com a prioridade da IA",
                 Font = new Font("Segoe UI", 10F),
                 Location = new Point(50, 10),
-                Size = new Size(300, 30),
+                Size = new Size(320, 30),
                 Checked = true,
                 Cursor = Cursors.Hand
             };
@@ -494,10 +564,10 @@ namespace SistemaChamados.Forms
 
             rbContestoPrioridade = new RadioButton
             {
-                Text = "Não, desejo contestar a prioridade",
+                Text = "⚠️ Não, desejo contestar a prioridade",
                 Font = new Font("Segoe UI", 10F),
                 Location = new Point(50, 45),
-                Size = new Size(300, 30),
+                Size = new Size(320, 30),
                 Cursor = Cursors.Hand,
                 ForeColor = Color.FromArgb(220, 53, 69)
             };
@@ -506,11 +576,11 @@ namespace SistemaChamados.Forms
             pnlRadioContestacao.Controls.Add(rbConcordoPrioridade);
             pnlRadioContestacao.Controls.Add(rbContestoPrioridade);
 
-            // Painel de contestação - ajustado para caber
+            // ====== PAINEL DE CONTESTAÇÃO ======
             pnlContestacaoTexto = new Panel
             {
-                Location = new Point(50, 325),  // Ajustado
-                Size = new Size(600, 140),
+                Location = new Point(50, 490),
+                Size = new Size(600, 150),  // ✅ Simplificado
                 BackColor = Color.FromArgb(255, 243, 205),
                 BorderStyle = BorderStyle.FixedSingle,
                 Visible = false
@@ -518,7 +588,7 @@ namespace SistemaChamados.Forms
 
             lblJustificativaContestacao = new Label
             {
-                Text = "⚠️ Justifique por que você contesta a prioridade:",
+                Text = "⚠️ Justifique por que você contesta a prioridade sugerida pela IA:",
                 Font = new Font("Segoe UI", 9F, FontStyle.Bold),
                 Location = new Point(10, 10),
                 Size = new Size(580, 20),
@@ -528,7 +598,7 @@ namespace SistemaChamados.Forms
             rtbJustificativaContestacao = new RichTextBox
             {
                 Location = new Point(10, 35),
-                Size = new Size(580, 95),
+                Size = new Size(580, 105),  // ✅ Más grande sin el combo
                 Font = new Font("Segoe UI", 9F),
                 ScrollBars = RichTextBoxScrollBars.Vertical
             };
@@ -536,12 +606,17 @@ namespace SistemaChamados.Forms
             pnlContestacaoTexto.Controls.Add(lblJustificativaContestacao);
             pnlContestacaoTexto.Controls.Add(rtbJustificativaContestacao);
 
+
+            // ====== AGREGAR TODOS LOS CONTROLES AL PANEL ======
             pnlEtapa4.Controls.Add(lblRevisaoChamado);
             pnlEtapa4.Controls.Add(pnlResumo);
+            pnlEtapa4.Controls.Add(lblAnalisandoIA);
+            pnlEtapa4.Controls.Add(pnlResultadoIA);
             pnlEtapa4.Controls.Add(lblPerguntaContestacao);
             pnlEtapa4.Controls.Add(pnlRadioContestacao);
             pnlEtapa4.Controls.Add(pnlContestacaoTexto);
         }
+
 
         private void RbContestacao_CheckedChanged(object sender, EventArgs e)
         {
@@ -555,20 +630,11 @@ namespace SistemaChamados.Forms
 
         private void AtualizarRevisao()
         {
-            string textoPrioridade = ObterTextoPrioridade(prioridadeCalculada);
-            Color corPrioridade = ObterCorPrioridade(prioridadeCalculada);
-
-            // Atualizar o resumo básico
             lblPrioridadeCalculada.Text =
                 $"📋 Título: {tituloChamado}\n" +
                 $"📁 Categoria: {categoria}\n" +
                 $"👥 Afetados: {ObterTextoAfetado()}\n" +
                 $"🚨 Impede trabalho: {(impedeTrabalho ? "Sim" : "Não")}";
-
-            // Atualizar o destaque da prioridade
-            lblPrioridadeDestaque.Text = $"⚡ PRIORIDADE CALCULADA: {textoPrioridade.ToUpper()}";
-            lblPrioridadeDestaque.BackColor = corPrioridade;
-            lblPrioridadeDestaque.ForeColor = Color.White;
         }
 
         private Color ObterCorPrioridade(int prioridade)
@@ -619,14 +685,235 @@ namespace SistemaChamados.Forms
 
                 case 4:
                     lblTitulo.Text = "Revisão e Confirmação";
-                    prioridadeCalculada = CalcularPrioridade();
-                    AtualizarRevisao();
+                    AtualizarRevisao();  // ✅ Sin calcular prioridad
                     pnlConteudo.Controls.Add(pnlEtapa4);
                     pnlEtapa4.Visible = true;
                     btnVoltar.Visible = true;
                     btnProximo.Text = "Concluir";
+
+                    _ = AnalisarComIAAsync();
+
                     rbConcordoPrioridade.Focus();
                     break;
+            }
+        }
+
+        private async Task AnalisarComIAAsync()
+        {
+            if (analisandoComIA) return;
+
+            try
+            {
+                analisandoComIA = true;
+                lblAnalisandoIA.Visible = true;
+                pnlResultadoIA.Visible = false;
+                btnProximo.Enabled = false;
+
+                Console.WriteLine("═══════════════════════════════════════");
+                Console.WriteLine("🤖 Iniciando análise com IA...");
+                Console.WriteLine($"Título: {tituloChamado}");
+                Console.WriteLine($"Categoria: {categoria}");
+                Console.WriteLine($"Afetado: {afetado}");
+                Console.WriteLine($"Bloqueia: {impedeTrabalho}");
+                Console.WriteLine("═══════════════════════════════════════");
+
+                string pessoasAfetadasTexto = afetado;
+                string bloqueiaTrabalhoTexto = impedeTrabalho ? "sim" : "não";
+                string prioridadeUsuario = "";
+                string justificativaPrioridade = "";
+
+                // Chamar IA
+                analiseIA = await IAService.SendToN8nToIa(
+                    _funcionarioLogado.Id.ToString(),
+                    tituloChamado,
+                    _funcionarioLogado.Nome,
+                    _funcionarioLogado.Email ?? "sem-email@empresa.com",
+                    categoria,
+                    descricao,
+                    pessoasAfetadasTexto,
+                    bloqueiaTrabalhoTexto,
+                    prioridadeUsuario,
+                    justificativaPrioridade,
+                    1
+                );
+
+                lblAnalisandoIA.Visible = false;
+
+                Console.WriteLine("═══════════════════════════════════════");
+                if (analiseIA != null && analiseIA.Success)
+                {
+                    Console.WriteLine("✅ IA RESPONDEU COM SUCESSO");
+                    Console.WriteLine($"Prioridade retornada: '{analiseIA.Prioridade}'");
+                    Console.WriteLine($"Justificativa retornada: '{analiseIA.Justificativa?.Substring(0, Math.Min(100, analiseIA.Justificativa?.Length ?? 0))}'");
+                    Console.WriteLine("═══════════════════════════════════════");
+
+                    ExibirResultadoIA(analiseIA);
+                }
+                else
+                {
+                    Console.WriteLine("❌ IA NÃO RESPONDEU OU FALHOU");
+                    Console.WriteLine($"analiseIA null? {analiseIA == null}");
+                    if (analiseIA != null)
+                    {
+                        Console.WriteLine($"Success: {analiseIA.Success}");
+                        Console.WriteLine($"Prioridade: '{analiseIA.Prioridade}'");
+                        Console.WriteLine($"Justificativa: '{analiseIA.Justificativa}'");
+                    }
+                    Console.WriteLine("═══════════════════════════════════════");
+
+                    MessageBox.Show(
+                        "⚠️ Não foi possível obter análise da IA.\n\n" +
+                        "Por favor, verifique sua conexão e tente novamente.\n" +
+                        "Você pode clicar em 'Voltar' e depois 'Próximo' para tentar novamente.",
+                        "Atenção",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning
+                    );
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("═══════════════════════════════════════");
+                Console.WriteLine($"❌ EXCEÇÃO na análise IA: {ex.Message}");
+                Console.WriteLine($"Stack: {ex.StackTrace}");
+                Console.WriteLine("═══════════════════════════════════════");
+
+                lblAnalisandoIA.Visible = false;
+
+                MessageBox.Show(
+                    $"❌ Erro ao conectar com a IA:\n\n{ex.Message}\n\n" +
+                    "Você pode voltar e tentar novamente.",
+                    "Erro",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error
+                );
+            }
+            finally
+            {
+                analisandoComIA = false;
+                btnProximo.Enabled = true;
+            }
+        }
+
+
+
+        private void ExibirResultadoIA(IAResponse analise)
+        {
+            // ✅ FIX: Se a IA não retornou prioridade, calcular localmente
+            if (string.IsNullOrEmpty(analise.Prioridade) || analise.Prioridade.Trim() == "")
+            {
+                Console.WriteLine("⚠️ ATENÇÃO: N8N não retornou prioridade! Calculando localmente...");
+
+                // Calcular prioridade baseada nas respostas do usuário
+                string prioridadeCalculada = CalcularPrioridadeLocal();
+                analise.Prioridade = prioridadeCalculada;
+
+                Console.WriteLine($"✅ Prioridade calculada localmente: {prioridadeCalculada}");
+
+                lblPrioridadeIA.Text = $"⚡ Prioridade Sugerida: {prioridadeCalculada} (calculada automaticamente)";
+            }
+            else
+            {
+                lblPrioridadeIA.Text = $"⚡ Prioridade Sugerida: {analise.Prioridade}";
+                Console.WriteLine($"✅ Prioridade da IA: {analise.Prioridade}");
+            }
+
+            // Buscar el RichTextBox por nombre
+            RichTextBox rtbJustificativa = pnlResultadoIA.Controls["rtbJustificativaIA"] as RichTextBox;
+
+            if (rtbJustificativa != null)
+            {
+                if (string.IsNullOrEmpty(analise.Justificativa))
+                {
+                    Console.WriteLine("⚠️ ATENÇÃO: IA não retornou justificativa!");
+                    rtbJustificativa.Text = "Sem justificativa disponível";
+                }
+                else
+                {
+                    rtbJustificativa.Text = analise.Justificativa;
+                }
+            }
+
+            // Colorir baseado na prioridade
+            Color corIA = ObterCorPorPrioridadeTexto(analise.Prioridade);
+            lblPrioridadeIA.ForeColor = corIA;
+
+            pnlResultadoIA.Visible = true;
+        }
+
+        private string CalcularPrioridadeLocal()
+        {
+            Console.WriteLine("🔢 Calculando prioridade baseada em:");
+            Console.WriteLine($"   Afetado: {afetado}");
+            Console.WriteLine($"   Impede trabalho: {impedeTrabalho}");
+
+            if (impedeTrabalho)
+            {
+                if (afetado == "empresa")
+                {
+                    Console.WriteLine("   → Crítica (bloqueia + empresa toda)");
+                    return "Crítica";
+                }
+                else if (afetado == "departamento")
+                {
+                    Console.WriteLine("   → Alta (bloqueia + departamento)");
+                    return "Alta";
+                }
+                else // "eu"
+                {
+                    Console.WriteLine("   → Média (bloqueia + só eu)");
+                    return "Média";
+                }
+            }
+            else
+            {
+                Console.WriteLine("   → Baixa (não bloqueia)");
+                return "Baixa";
+            }
+        }
+
+        private Color ObterCorPorPrioridadeTexto(string prioridade)
+        {
+            if (string.IsNullOrEmpty(prioridade)) return Color.FromArgb(0, 123, 255);
+
+            string prioridadeLower = prioridade.ToLower();
+
+            if (prioridadeLower.Contains("baixa") || prioridadeLower.Contains("low"))
+                return Color.FromArgb(40, 167, 69);   // Verde
+            else if (prioridadeLower.Contains("média") || prioridadeLower.Contains("media") || prioridadeLower.Contains("medium"))
+                return Color.FromArgb(0, 123, 255);   // Azul
+            else if (prioridadeLower.Contains("alta") || prioridadeLower.Contains("high"))
+                return Color.FromArgb(255, 193, 7);   // Amarelo
+            else if (prioridadeLower.Contains("crítica") || prioridadeLower.Contains("critica") || prioridadeLower.Contains("urgent"))
+                return Color.FromArgb(220, 53, 69);   // Vermelho
+
+            return Color.FromArgb(0, 123, 255);  // Padrão: Azul
+        }
+
+        private void MostrarConfirmacaoComIA()
+        {
+            string mensagem = $"Deseja concluir a criação do chamado?\n\n" +
+                            $"📋 Título: {tituloChamado}\n" +
+                            $"📁 Categoria: {categoria}\n" +
+                            $"👥 Afetados: {ObterTextoAfetado()}\n" +
+                            $"🚨 Impede trabalho: {(impedeTrabalho ? "Sim" : "Não")}\n" +
+                            $"⚡ Prioridade (IA): {analiseIA.Prioridade}";
+
+            if (contestaPrioridade)
+            {
+                mensagem += $"\n\n⚠️ CONTESTAÇÃO REGISTRADA\nUm técnico revisará sua solicitação.";
+            }
+
+            var result = MessageBox.Show(mensagem, "Confirmar Criação do Chamado",
+                MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+            if (result == DialogResult.Yes)
+            {
+                CriarChamadoComIA();  // ✅ Novo método
+            }
+            else
+            {
+                MostrarEtapa(4);
             }
         }
 
@@ -650,9 +937,22 @@ namespace SistemaChamados.Forms
             }
             else if (etapaAtual == 4)
             {
+                // Validar que la IA haya respondido
+                if (analiseIA == null || !analiseIA.Success)
+                {
+                    MessageBox.Show(
+                        "⚠️ A análise da IA não foi concluída.\n\n" +
+                        "Por favor, aguarde a análise ou volte e tente novamente.",
+                        "Análise Pendente",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning
+                    );
+                    return;
+                }
+
                 if (!ValidarEtapa4()) return;
                 SalvarDadosEtapa4();
-                MostrarConfirmacao();
+                MostrarConfirmacaoComIA();  // ✅ Novo método
             }
         }
 
@@ -821,45 +1121,6 @@ namespace SistemaChamados.Forms
             }
         }
 
-        private void MostrarConfirmacao()
-        {
-            string textoPrioridade = ObterTextoPrioridade(prioridadeCalculada);
-
-            string mensagem = $"Deseja concluir a criação do chamado?\n\n" +
-                            $"📋 Título: {tituloChamado}\n" +
-                            $"📁 Categoria: {categoria}\n" +
-                            $"👥 Afetados: {ObterTextoAfetado()}\n" +
-                            $"🚨 Impede trabalho: {(impedeTrabalho ? "Sim" : "Não")}\n" +
-                            $"⚡ Prioridade: {textoPrioridade}";
-
-            if (contestaPrioridade)
-            {
-                mensagem += $"\n\n⚠️ CONTESTAÇÃO REGISTRADA\nO técnico revisará a prioridade.";
-            }
-
-            var result = MessageBox.Show(mensagem, "Confirmar Criação do Chamado",
-                MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-
-            if (result == DialogResult.Yes)
-            {
-                CriarChamado(prioridadeCalculada);
-            }
-            else
-            {
-                MostrarEtapa(4);
-            }
-        }
-
-        private int CalcularPrioridade()
-        {
-            if (impedeTrabalho)
-            {
-                if (afetado == "empresa") return 4;
-                if (afetado == "departamento") return 3;
-                return 2;
-            }
-            return 1;
-        }
 
         private string ObterTextoPrioridade(int prioridade)
         {
@@ -884,39 +1145,125 @@ namespace SistemaChamados.Forms
             }
         }
 
-        private void CriarChamado(int prioridade)
+        private async void CriarChamadoComIA()
         {
+            if (_criandoChamado)
+            {
+                Console.WriteLine("⚠️ Criação já em andamento");
+                return;
+            }
+
             try
             {
-                btnProximo.Enabled = false;
-                btnProximo.Text = "Criando...";
+                _criandoChamado = true;
 
-                // ⭐ Descripción SIN título (ya está en campo separado)
+                btnProximo.Enabled = false;
+                btnVoltar.Enabled = false;
+                btnCancelar.Enabled = false;
+                btnProximo.Text = "Salvando na nuvem...";
+
+                Console.WriteLine("☁️ Salvando chamado na nuvem via IA...");
+
+                string pessoasAfetadasTexto = afetado;
+                string bloqueiaTrabalhoTexto = impedeTrabalho ? "sim" : "não";
+
+                // --- CORREÇÃO AQUI ---
+                string userPriorityReason = "";
+                string prioridadeParaEnviar = ""; // Nova variável
+
+                if (contestaPrioridade)
+                {
+                    // Se contesta, envia a justificativa e prioridade vazia (para análise humana/técnica)
+                    userPriorityReason = justificativaContestacao;
+                    prioridadeParaEnviar = "";
+                    Console.WriteLine($"⚠️ Usuário contesta: {userPriorityReason}");
+                }
+                else
+                {
+                    // Se aceita, ENVIA A PRIORIDADE DA IA explicitamente
+                    userPriorityReason = "";
+                    prioridadeParaEnviar = analiseIA.Prioridade; // Envia "Média", "Baixa", etc.
+                    Console.WriteLine($"✅ Usuário aceita prioridade da IA: {prioridadeParaEnviar}");
+                }
+
+                IAResponse resultadoSalvar = await IAService.SendToN8nToIa(
+                    _funcionarioLogado.Id.ToString(),
+                    tituloChamado,
+                    _funcionarioLogado.Nome,
+                    _funcionarioLogado.Email ?? "sem-email@empresa.com",
+                    categoria,
+                    descricao,
+                    pessoasAfetadasTexto,
+                    bloqueiaTrabalhoTexto,
+                    prioridadeParaEnviar,   
+                    userPriorityReason,
+                    2
+                );
+
+                if (resultadoSalvar != null && resultadoSalvar.Success)
+                {
+                    Console.WriteLine("✅ Chamado salvo na nuvem com sucesso!");
+
+                    string mensagemSucesso = $"✅ Chamado salvo na nuvem!\n\n" +
+                                            $"Título: {tituloChamado}\n" +
+                                            $"Prioridade: {analiseIA.Prioridade}";
+
+                    if (contestaPrioridade)
+                    {
+                        mensagemSucesso += $"\n\n⚠️ CONTESTAÇÃO REGISTRADA\n" +
+                                          $"Um técnico revisará sua solicitação.";
+                    }
+                    else
+                    {
+                        mensagemSucesso += "\n\n🔧 Técnico atribuído automaticamente pelo N8N\n" +
+                                          "📊 Sincronização automática com banco local.";
+                    }
+
+                    MessageBox.Show(mensagemSucesso, "Sucesso!", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                    this.DialogResult = DialogResult.OK;
+                    this.FormClosing -= CriarChamadoForm_FormClosing;
+                    this.Close();
+                    return;
+                }
+
+                // FALLBACK: Salvar localmente
+                Console.WriteLine("⚠️ Salvamento na nuvem falhou, salvando localmente...");
+                btnProximo.Text = "Criando localmente...";
+
+                // Prioridade final = sempre da IA
+                int prioridadeFinal = ConverterPrioridadeTextoParaNumero(analiseIA.Prioridade);
+
                 string descricaoCompleta = $"DESCRIÇÃO:\n{descricao}\n\n" +
                                           $"AFETADOS: {ObterTextoAfetado()}\n" +
-                                          $"IMPEDE TRABALHO: {(impedeTrabalho ? "Sim" : "Não")}";
+                                          $"IMPEDE TRABALHO: {(impedeTrabalho ? "Sim" : "Não")}\n" +
+                                          $"PRIORIDADE IA: {analiseIA.Prioridade}\n" +
+                                          $"JUSTIFICATIVA IA: {analiseIA.Justificativa}";
 
-                // ⭐ Crear chamado CON título separado
+                if (contestaPrioridade)
+                {
+                    descricaoCompleta += $"\n\nCONTESTAÇÃO:\n{userPriorityReason}";
+                }
+
                 var chamado = new Chamados
                 {
-                    Titulo = tituloChamado,  // ⭐ NUEVO: Título en campo separado
+                    Titulo = tituloChamado,
                     Categoria = categoria,
-                    Prioridade = prioridade,
+                    Prioridade = prioridadeFinal,
                     Descricao = descricaoCompleta,
                     Afetado = _funcionarioLogado.Id,
                     DataChamado = DateTime.Now,
-                    Status = StatusChamado.Aberto
+                    Status = StatusChamado.Aberto,
+                    TecnicoResponsavel = null
                 };
 
-                // Se há contestação, adicionar ao chamado
                 if (contestaPrioridade)
                 {
                     string contestacao = $"[CONTESTAÇÃO DE PRIORIDADE - {DateTime.Now:dd/MM/yyyy HH:mm}]\n" +
                                        $"Funcionário: {_funcionarioLogado.Nome}\n" +
-                                       $"Prioridade Calculada: {ObterTextoPrioridade(prioridade)}\n" +
+                                       $"Prioridade IA: {analiseIA.Prioridade}\n" +
                                        $"Justificativa:\n{justificativaContestacao}\n" +
-                                       $"---\n" +
-                                       $"Status: Aguardando revisão do técnico";
+                                       $"Status: Aguardando revisão";
 
                     chamado.Contestacoes = contestacao;
                 }
@@ -925,54 +1272,81 @@ namespace SistemaChamados.Forms
 
                 if (idChamado > 0)
                 {
-                    string mensagemSucesso = $"✅ Chamado criado com sucesso!\n\n" +
-                                            $"Número do chamado: #{idChamado}\n" +
-                                            $"Título: {tituloChamado}\n" +  // ⭐ Mostrar título
-                                            $"Prioridade: {ObterTextoPrioridade(prioridade)}\n\n";
-
-                    if (contestaPrioridade)
-                    {
-                        mensagemSucesso += "⚠️ Sua contestação foi registrada.\n" +
-                                         "Um técnico revisará a prioridade em breve.\n\n";
-                    }
-
-                    mensagemSucesso += "Você receberá atualizações sobre o andamento.";
+                    Console.WriteLine($"✅ Chamado #{idChamado} criado localmente");
 
                     MessageBox.Show(
-                        mensagemSucesso,
+                        $"✅ Chamado criado localmente!\n\nNúmero: #{idChamado}\n\n" +
+                        $"⚠️ Será sincronizado com a nuvem em breve.",
                         "Chamado Criado",
                         MessageBoxButtons.OK,
                         MessageBoxIcon.Information);
 
                     this.DialogResult = DialogResult.OK;
+                    this.FormClosing -= CriarChamadoForm_FormClosing;
                     this.Close();
                 }
                 else
                 {
-                    MessageBox.Show(
-                        "Erro ao criar o chamado. Por favor, tente novamente.",
-                        "Erro",
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Error);
+                    MessageBox.Show("Erro ao criar o chamado.", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
-                    MostrarEtapa(4);
+                    _criandoChamado = false;
+                    btnProximo.Enabled = true;
+                    btnVoltar.Enabled = true;
+                    btnCancelar.Enabled = true;
+                    btnProximo.Text = "Concluir";
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show(
-                    $"Erro ao criar chamado: {ex.Message}",
-                    "Erro",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Error);
+                Console.WriteLine($"❌ Erro crítico: {ex.Message}");
+                MessageBox.Show($"Erro: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
-                MostrarEtapa(4);
-            }
-            finally
-            {
+                _criandoChamado = false;
                 btnProximo.Enabled = true;
+                btnVoltar.Enabled = true;
+                btnCancelar.Enabled = true;
                 btnProximo.Text = "Concluir";
             }
         }
+
+
+        private int ConverterPrioridadeTextoParaNumero(string prioridade)
+        {
+            if (string.IsNullOrEmpty(prioridade)) return 2; // Padrão: Média
+
+            string prioridadeLower = prioridade.ToLower();
+
+            if (prioridadeLower.Contains("baixa") || prioridadeLower.Contains("low"))
+                return 1;
+            else if (prioridadeLower.Contains("média") || prioridadeLower.Contains("media") || prioridadeLower.Contains("medium"))
+                return 2;
+            else if (prioridadeLower.Contains("alta") || prioridadeLower.Contains("high"))
+                return 3;
+            else if (prioridadeLower.Contains("crítica") || prioridadeLower.Contains("critica") || prioridadeLower.Contains("urgent"))
+                return 4;
+
+            return 2; // Padrão: Média
+        }
+
+        private void CriarChamadoForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            // Se está criando um chamado, prevenir cierre accidental
+            if (_criandoChamado && e.CloseReason == CloseReason.UserClosing)
+            {
+                var resultado = MessageBox.Show(
+                    "Um chamado está sendo criado. Deseja realmente cancelar?\n\n" +
+                    "⚠️ Isso pode resultar em dados inconsistentes.",
+                    "Criação em Andamento",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Warning
+                );
+
+                if (resultado == DialogResult.No)
+                {
+                    e.Cancel = true; // Cancelar o fechamento
+                }
+            }
+        }
+
     }
 }

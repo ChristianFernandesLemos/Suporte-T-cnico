@@ -3230,12 +3230,6 @@
             <param name = "remover">The remove method.</param>
             <param name = "attributes">The attributes.</param>
         </member>
-        <member name="T:Castle.DynamicProxy.Generators.MethodFinder">
-            <summary>
-              Returns the methods implemented by a type. Use this instead of Type.GetMethods() to work around a CLR issue
-              where duplicate MethodInfos are returned by Type.GetMethods() after a token of a generic type's method was loaded.
-            </summary>
-        </member>
         <member name="T:Castle.DynamicProxy.IChangeProxyTarget">
             <summary>
               Exposes means to change target objects of proxies and invocations.
@@ -3434,6 +3428,12 @@
               Attributes should be replicated if they are non-inheritable,
               but there are some special cases where the attributes means
               something to the CLR, where they should be skipped.
+            </summary>
+        </member>
+        <member name="M:Castle.DynamicProxy.Internal.TypeUtil.GetAllInstanceMethods(System.Type)">
+            <summary>
+              Returns the methods implemented by a type. Use this instead of Type.GetMethods to filter out duplicate MethodInfos
+              sometimes reported by the latter. The test suite documents cases where such duplicates may occur.
             </summary>
         </member>
         <member name="M:Castle.DynamicProxy.Internal.TypeUtil.GetAllInterfaces(System.Type[])">
@@ -3788,7 +3788,6 @@
               Object proxying calls to members of <paramref name = "interfaceToProxy" /> type on <paramref name = "target" /> object or alternative implementation swapped at runtime by an interceptor.
             </returns>
             <exception cref = "T:System.ArgumentNullException">Thrown when given <paramref name = "interfaceToProxy" /> object is a null reference (Nothing in Visual Basic).</exception>
-            <exception cref = "T:System.ArgumentNullException">Thrown when given <paramref name = "target" /> object is a null reference (Nothing in Visual Basic).</exception>
             <exception cref = "T:System.ArgumentNullException">Thrown when given <paramref name = "interceptors" /> array is a null reference (Nothing in Visual Basic).</exception>
             <exception cref = "T:System.ArgumentException">Thrown when given <paramref name = "interfaceToProxy" /> is a generic type definition.</exception>
             <exception cref = "T:System.ArgumentException">Thrown when given <paramref name = "interfaceToProxy" /> is not an interface type.</exception>
@@ -3816,7 +3815,6 @@
             <returns>
               Object proxying calls to members of <typeparamref name = "TInterface" /> type on <paramref name = "target" /> object or alternative implementation swapped at runtime by an interceptor.
             </returns>
-            <exception cref = "T:System.ArgumentNullException">Thrown when given <paramref name = "target" /> object is a null reference (Nothing in Visual Basic).</exception>
             <exception cref = "T:System.ArgumentNullException">Thrown when given <paramref name = "interceptors" /> array is a null reference (Nothing in Visual Basic).</exception>
             <exception cref = "T:System.ArgumentException">Thrown when given <typeparamref name = "TInterface" /> is not an interface type.</exception>
             <exception cref = "T:System.MissingMethodException">Thrown when no default constructor exists on actual type of <paramref
@@ -3842,7 +3840,6 @@
             <returns>
               Object proxying calls to members of <typeparamref name = "TInterface" /> type on <paramref name = "target" /> object or alternative implementation swapped at runtime by an interceptor.
             </returns>
-            <exception cref = "T:System.ArgumentNullException">Thrown when given <paramref name = "target" /> object is a null reference (Nothing in Visual Basic).</exception>
             <exception cref = "T:System.ArgumentNullException">Thrown when given <paramref name = "interceptors" /> array is a null reference (Nothing in Visual Basic).</exception>
             <exception cref = "T:System.ArgumentException">Thrown when given <typeparamref name = "TInterface" /> is not an interface type.</exception>
             <exception cref = "T:System.MissingMethodException">Thrown when no default constructor exists on actual type of <paramref
@@ -3870,7 +3867,6 @@
                name = "additionalInterfacesToProxy" /> types on <paramref name = "target" /> object or alternative implementation swapped at runtime by an interceptor.
             </returns>
             <exception cref = "T:System.ArgumentNullException">Thrown when given <paramref name = "interfaceToProxy" /> object is a null reference (Nothing in Visual Basic).</exception>
-            <exception cref = "T:System.ArgumentNullException">Thrown when given <paramref name = "target" /> object is a null reference (Nothing in Visual Basic).</exception>
             <exception cref = "T:System.ArgumentNullException">Thrown when given <paramref name = "interceptors" /> array is a null reference (Nothing in Visual Basic).</exception>
             <exception cref = "T:System.ArgumentException">Thrown when given <paramref name = "interfaceToProxy" /> or any of <paramref
                name = "additionalInterfacesToProxy" /> is a generic type definition.</exception>
@@ -3901,7 +3897,6 @@
               Object proxying calls to members of <paramref name = "interfaceToProxy" /> type on <paramref name = "target" /> object or alternative implementation swapped at runtime by an interceptor.
             </returns>
             <exception cref = "T:System.ArgumentNullException">Thrown when given <paramref name = "interfaceToProxy" /> object is a null reference (Nothing in Visual Basic).</exception>
-            <exception cref = "T:System.ArgumentNullException">Thrown when given <paramref name = "target" /> object is a null reference (Nothing in Visual Basic).</exception>
             <exception cref = "T:System.ArgumentNullException">Thrown when given <paramref name = "interceptors" /> array is a null reference (Nothing in Visual Basic).</exception>
             <exception cref = "T:System.ArgumentException">Thrown when given <paramref name = "interfaceToProxy" /> is a generic type definition.</exception>
             <exception cref = "T:System.ArgumentException">Thrown when given <paramref name = "interfaceToProxy" /> is not an interface type.</exception>
@@ -3930,7 +3925,6 @@
               Object proxying calls to members of <paramref name = "interfaceToProxy" /> and <paramref name = "additionalInterfacesToProxy" /> types on <paramref name = "target" /> object or alternative implementation swapped at runtime by an interceptor.
             </returns>
             <exception cref = "T:System.ArgumentNullException">Thrown when given <paramref name = "interfaceToProxy" /> object is a null reference (Nothing in Visual Basic).</exception>
-            <exception cref = "T:System.ArgumentNullException">Thrown when given <paramref name = "target" /> object is a null reference (Nothing in Visual Basic).</exception>
             <exception cref = "T:System.ArgumentNullException">Thrown when given <paramref name = "interceptors" /> array is a null reference (Nothing in Visual Basic).</exception>
             <exception cref = "T:System.ArgumentException">Thrown when given <paramref name = "interfaceToProxy" /> or any of <paramref name = "additionalInterfacesToProxy" /> is a generic type definition.</exception>
             <exception cref = "T:System.ArgumentException">Thrown when given <paramref name = "interfaceToProxy" /> is not an interface type.</exception>
@@ -4551,6 +4545,51 @@
               As such caller should expect any type of exception that given <see cref = "T:Castle.DynamicProxy.IProxyBuilder" /> implementation may throw.
             </remarks>
         </member>
+        <member name="M:Castle.DynamicProxy.IProxyGenerator.CreateClassProxy``1(Castle.DynamicProxy.ProxyGenerationOptions,System.Object[],Castle.DynamicProxy.IInterceptor[])">
+            <summary>
+              Creates proxy object intercepting calls to virtual members of type <typeparamref name = "TClass" /> on newly created instance of that type with given <paramref
+               name = "interceptors" />.
+            </summary>
+            <typeparam name = "TClass">Type of class which will be proxied.</typeparam>
+            <param name = "options">The proxy generation options used to influence generated proxy type and object.</param>
+            <param name = "constructorArguments">Arguments of constructor of type <typeparamref name = "TClass" /> which should be used to create a new instance of that type.</param>
+            <param name = "interceptors">The interceptors called during the invocation of proxied methods.</param>
+            <returns>
+              New object of type <typeparamref name = "TClass" /> proxying calls to virtual members of <typeparamref name = "TClass" /> type.
+            </returns>
+            <exception cref = "T:System.ArgumentNullException">Thrown when given <typeparamref name = "TClass" /> object is a null reference (Nothing in Visual Basic).</exception>
+            <exception cref = "T:System.ArgumentException">Thrown when given <typeparamref name = "TClass" /> is a generic type definition.</exception>
+            <exception cref = "T:System.ArgumentException">Thrown when given <typeparamref name = "TClass" /> is not a class type.</exception>
+            <exception cref = "T:System.ArgumentException">Thrown when no constructor exists on type <typeparamref name = "TClass" /> with parameters matching <paramref
+               name = "constructorArguments" />.</exception>
+            <exception cref = "T:System.Reflection.TargetInvocationException">Thrown when constructor of type <typeparamref name = "TClass" /> throws an exception.</exception>
+            <remarks>
+              This method uses <see cref = "T:Castle.DynamicProxy.IProxyBuilder" /> implementation to generate a proxy type.
+              As such caller should expect any type of exception that given <see cref = "T:Castle.DynamicProxy.IProxyBuilder" /> implementation may throw.
+            </remarks>
+        </member>
+        <member name="M:Castle.DynamicProxy.IProxyGenerator.CreateClassProxy``1(System.Object[],Castle.DynamicProxy.IInterceptor[])">
+            <summary>
+              Creates proxy object intercepting calls to virtual members of type <typeparamref name = "TClass" /> on newly created instance of that type with given <paramref
+               name = "interceptors" />.
+            </summary>
+            <typeparam name = "TClass">Type of class which will be proxied.</typeparam>
+            <param name = "constructorArguments">Arguments of constructor of type <typeparamref name = "TClass" /> which should be used to create a new instance of that type.</param>
+            <param name = "interceptors">The interceptors called during the invocation of proxied methods.</param>
+            <returns>
+              New object of type <typeparamref name = "TClass" /> proxying calls to virtual members of <typeparamref name = "TClass" /> type.
+            </returns>
+            <exception cref = "T:System.ArgumentNullException">Thrown when given <typeparamref name = "TClass" /> object is a null reference (Nothing in Visual Basic).</exception>
+            <exception cref = "T:System.ArgumentException">Thrown when given <typeparamref name = "TClass" /> is a generic type definition.</exception>
+            <exception cref = "T:System.ArgumentException">Thrown when given <typeparamref name = "TClass" /> is not a class type.</exception>
+            <exception cref = "T:System.ArgumentException">Thrown when no constructor exists on type <typeparamref name = "TClass" /> with parameters matching <paramref
+               name = "constructorArguments" />.</exception>
+            <exception cref = "T:System.Reflection.TargetInvocationException">Thrown when constructor of type <typeparamref name = "TClass" /> throws an exception.</exception>
+            <remarks>
+              This method uses <see cref = "T:Castle.DynamicProxy.IProxyBuilder" /> implementation to generate a proxy type.
+              As such caller should expect any type of exception that given <see cref = "T:Castle.DynamicProxy.IProxyBuilder" /> implementation may throw.
+            </remarks>
+        </member>
         <member name="T:Castle.DynamicProxy.IProxyTargetAccessor">
             <summary>
               Exposes access to the target object and interceptors of proxy objects.
@@ -5111,7 +5150,6 @@
               Object proxying calls to members of <paramref name = "interfaceToProxy" /> type on <paramref name = "target" /> object or alternative implementation swapped at runtime by an interceptor.
             </returns>
             <exception cref = "T:System.ArgumentNullException">Thrown when given <paramref name = "interfaceToProxy" /> object is a null reference (Nothing in Visual Basic).</exception>
-            <exception cref = "T:System.ArgumentNullException">Thrown when given <paramref name = "target" /> object is a null reference (Nothing in Visual Basic).</exception>
             <exception cref = "T:System.ArgumentNullException">Thrown when given <paramref name = "interceptors" /> array is a null reference (Nothing in Visual Basic).</exception>
             <exception cref = "T:System.ArgumentException">Thrown when given <paramref name = "interfaceToProxy" /> is a generic type definition.</exception>
             <exception cref = "T:System.ArgumentException">Thrown when given <paramref name = "interfaceToProxy" /> is not an interface type.</exception>
@@ -5139,7 +5177,6 @@
             <returns>
               Object proxying calls to members of <typeparamref name = "TInterface" /> type on <paramref name = "target" /> object or alternative implementation swapped at runtime by an interceptor.
             </returns>
-            <exception cref = "T:System.ArgumentNullException">Thrown when given <paramref name = "target" /> object is a null reference (Nothing in Visual Basic).</exception>
             <exception cref = "T:System.ArgumentNullException">Thrown when given <paramref name = "interceptors" /> array is a null reference (Nothing in Visual Basic).</exception>
             <exception cref = "T:System.ArgumentException">Thrown when given <typeparamref name = "TInterface" /> is not an interface type.</exception>
             <exception cref = "T:System.MissingMethodException">Thrown when no default constructor exists on actual type of <paramref
@@ -5165,7 +5202,6 @@
             <returns>
               Object proxying calls to members of <typeparamref name = "TInterface" /> type on <paramref name = "target" /> object or alternative implementation swapped at runtime by an interceptor.
             </returns>
-            <exception cref = "T:System.ArgumentNullException">Thrown when given <paramref name = "target" /> object is a null reference (Nothing in Visual Basic).</exception>
             <exception cref = "T:System.ArgumentNullException">Thrown when given <paramref name = "interceptors" /> array is a null reference (Nothing in Visual Basic).</exception>
             <exception cref = "T:System.ArgumentException">Thrown when given <typeparamref name = "TInterface" /> is not an interface type.</exception>
             <exception cref = "T:System.MissingMethodException">Thrown when no default constructor exists on actual type of <paramref
@@ -5193,7 +5229,6 @@
                name = "additionalInterfacesToProxy" /> types on <paramref name = "target" /> object or alternative implementation swapped at runtime by an interceptor.
             </returns>
             <exception cref = "T:System.ArgumentNullException">Thrown when given <paramref name = "interfaceToProxy" /> object is a null reference (Nothing in Visual Basic).</exception>
-            <exception cref = "T:System.ArgumentNullException">Thrown when given <paramref name = "target" /> object is a null reference (Nothing in Visual Basic).</exception>
             <exception cref = "T:System.ArgumentNullException">Thrown when given <paramref name = "interceptors" /> array is a null reference (Nothing in Visual Basic).</exception>
             <exception cref = "T:System.ArgumentException">Thrown when given <paramref name = "interfaceToProxy" /> or any of <paramref
                name = "additionalInterfacesToProxy" /> is a generic type definition.</exception>
@@ -5224,7 +5259,6 @@
               Object proxying calls to members of <paramref name = "interfaceToProxy" /> type on <paramref name = "target" /> object or alternative implementation swapped at runtime by an interceptor.
             </returns>
             <exception cref = "T:System.ArgumentNullException">Thrown when given <paramref name = "interfaceToProxy" /> object is a null reference (Nothing in Visual Basic).</exception>
-            <exception cref = "T:System.ArgumentNullException">Thrown when given <paramref name = "target" /> object is a null reference (Nothing in Visual Basic).</exception>
             <exception cref = "T:System.ArgumentNullException">Thrown when given <paramref name = "interceptors" /> array is a null reference (Nothing in Visual Basic).</exception>
             <exception cref = "T:System.ArgumentException">Thrown when given <paramref name = "interfaceToProxy" /> is a generic type definition.</exception>
             <exception cref = "T:System.ArgumentException">Thrown when given <paramref name = "interfaceToProxy" /> is not an interface type.</exception>
@@ -5253,7 +5287,6 @@
               Object proxying calls to members of <paramref name = "interfaceToProxy" /> and <paramref name = "additionalInterfacesToProxy" /> types on <paramref name = "target" /> object or alternative implementation swapped at runtime by an interceptor.
             </returns>
             <exception cref = "T:System.ArgumentNullException">Thrown when given <paramref name = "interfaceToProxy" /> object is a null reference (Nothing in Visual Basic).</exception>
-            <exception cref = "T:System.ArgumentNullException">Thrown when given <paramref name = "target" /> object is a null reference (Nothing in Visual Basic).</exception>
             <exception cref = "T:System.ArgumentNullException">Thrown when given <paramref name = "interceptors" /> array is a null reference (Nothing in Visual Basic).</exception>
             <exception cref = "T:System.ArgumentException">Thrown when given <paramref name = "interfaceToProxy" /> or any of <paramref name = "additionalInterfacesToProxy" /> is a generic type definition.</exception>
             <exception cref = "T:System.ArgumentException">Thrown when given <paramref name = "interfaceToProxy" /> is not an interface type.</exception>
@@ -5702,6 +5735,51 @@
             <exception cref = "T:System.ArgumentException">Thrown when given <typeparamref name = "TClass" /> is not a class type.</exception>
             <exception cref = "T:System.ArgumentException">Thrown when no default constructor exists on type <typeparamref name = "TClass" />.</exception>
             <exception cref = "T:System.Reflection.TargetInvocationException">Thrown when default constructor of type <typeparamref name = "TClass" /> throws an exception.</exception>
+            <remarks>
+              This method uses <see cref = "T:Castle.DynamicProxy.IProxyBuilder" /> implementation to generate a proxy type.
+              As such caller should expect any type of exception that given <see cref = "T:Castle.DynamicProxy.IProxyBuilder" /> implementation may throw.
+            </remarks>
+        </member>
+        <member name="M:Castle.DynamicProxy.ProxyGenerator.CreateClassProxy``1(Castle.DynamicProxy.ProxyGenerationOptions,System.Object[],Castle.DynamicProxy.IInterceptor[])">
+            <summary>
+              Creates proxy object intercepting calls to virtual members of type <typeparamref name = "TClass" /> on newly created instance of that type with given <paramref
+               name = "interceptors" />.
+            </summary>
+            <typeparam name = "TClass">Type of class which will be proxied.</typeparam>
+            <param name = "options">The proxy generation options used to influence generated proxy type and object.</param>
+            <param name = "constructorArguments">Arguments of constructor of type <typeparamref name = "TClass" /> which should be used to create a new instance of that type.</param>
+            <param name = "interceptors">The interceptors called during the invocation of proxied methods.</param>
+            <returns>
+              New object of type <typeparamref name = "TClass" /> proxying calls to virtual members of <typeparamref name = "TClass" /> type.
+            </returns>
+            <exception cref = "T:System.ArgumentNullException">Thrown when given <typeparamref name = "TClass" /> object is a null reference (Nothing in Visual Basic).</exception>
+            <exception cref = "T:System.ArgumentException">Thrown when given <typeparamref name = "TClass" /> is a generic type definition.</exception>
+            <exception cref = "T:System.ArgumentException">Thrown when given <typeparamref name = "TClass" /> is not a class type.</exception>
+            <exception cref = "T:System.ArgumentException">Thrown when no constructor exists on type <typeparamref name = "TClass" /> with parameters matching <paramref
+               name = "constructorArguments" />.</exception>
+            <exception cref = "T:System.Reflection.TargetInvocationException">Thrown when constructor of type <typeparamref name = "TClass" /> throws an exception.</exception>
+            <remarks>
+              This method uses <see cref = "T:Castle.DynamicProxy.IProxyBuilder" /> implementation to generate a proxy type.
+              As such caller should expect any type of exception that given <see cref = "T:Castle.DynamicProxy.IProxyBuilder" /> implementation may throw.
+            </remarks>
+        </member>
+        <member name="M:Castle.DynamicProxy.ProxyGenerator.CreateClassProxy``1(System.Object[],Castle.DynamicProxy.IInterceptor[])">
+            <summary>
+              Creates proxy object intercepting calls to virtual members of type <typeparamref name = "TClass" /> on newly created instance of that type with given <paramref
+               name = "interceptors" />.
+            </summary>
+            <typeparam name = "TClass">Type of class which will be proxied.</typeparam>
+            <param name = "constructorArguments">Arguments of constructor of type <typeparamref name = "TClass" /> which should be used to create a new instance of that type.</param>
+            <param name = "interceptors">The interceptors called during the invocation of proxied methods.</param>
+            <returns>
+              New object of type <typeparamref name = "TClass" /> proxying calls to virtual members of <typeparamref name = "TClass" /> type.
+            </returns>
+            <exception cref = "T:System.ArgumentNullException">Thrown when given <typeparamref name = "TClass" /> object is a null reference (Nothing in Visual Basic).</exception>
+            <exception cref = "T:System.ArgumentException">Thrown when given <typeparamref name = "TClass" /> is a generic type definition.</exception>
+            <exception cref = "T:System.ArgumentException">Thrown when given <typeparamref name = "TClass" /> is not a class type.</exception>
+            <exception cref = "T:System.ArgumentException">Thrown when no constructor exists on type <typeparamref name = "TClass" /> with parameters matching <paramref
+               name = "constructorArguments" />.</exception>
+            <exception cref = "T:System.Reflection.TargetInvocationException">Thrown when constructor of type <typeparamref name = "TClass" /> throws an exception.</exception>
             <remarks>
               This method uses <see cref = "T:Castle.DynamicProxy.IProxyBuilder" /> implementation to generate a proxy type.
               As such caller should expect any type of exception that given <see cref = "T:Castle.DynamicProxy.IProxyBuilder" /> implementation may throw.
