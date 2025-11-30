@@ -1,8 +1,9 @@
-using System;
-using System.Collections.Generic;
+using SistemaChamados.Data.Repositories;
 using SistemaChamados.Interfaces;
 using SistemaChamados.Models;
-using SistemaChamados.Data.Repositories;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SistemaChamados.Controllers
 {
@@ -306,6 +307,41 @@ namespace SistemaChamados.Controllers
             {
                 Console.WriteLine($"Erro ao obter estatísticas: {ex.Message}");
                 return new Dictionary<string, int>();
+            }
+        }
+
+        public Chamados BuscarChamadoPorTitulo(string titulo)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(titulo))
+                    return null;
+
+                // Buscar todos os chamados e filtrar pelo título
+                var todosChamados = _database.ListarTodosChamados();
+
+                // Buscar o mais recente com este título
+                var chamado = todosChamados
+                    .Where(c => c.Titulo != null && c.Titulo.Equals(titulo, StringComparison.OrdinalIgnoreCase))
+                    .OrderByDescending(c => c.DataChamado)
+                    .FirstOrDefault();
+
+                if (chamado != null)
+                {
+                    Console.WriteLine($"✅ Chamado encontrado por título: #{chamado.IdChamado}");
+                    Console.WriteLine($"   Prioridade: {chamado.Prioridade}");
+                }
+                else
+                {
+                    Console.WriteLine($"⚠️ Nenhum chamado encontrado com título: {titulo}");
+                }
+
+                return chamado;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Erro ao buscar chamado por título: {ex.Message}");
+                return null;
             }
         }
     }

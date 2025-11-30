@@ -799,26 +799,26 @@ namespace SistemaChamados.Forms
 
         private void ExibirResultadoIA(IAResponse analise)
         {
-            // ✅ FIX: Se a IA não retornou prioridade, calcular localmente
-            if (string.IsNullOrEmpty(analise.Prioridade) || analise.Prioridade.Trim() == "")
+            Console.WriteLine("═══════════════════════════════════════════════");
+            Console.WriteLine("🤖 EXIBINDO RESULTADO DA IA");
+            Console.WriteLine($"   Prioridade recebida: '{analise.Prioridade}'");
+            Console.WriteLine($"   Justificativa length: {analise.Justificativa?.Length ?? 0}");
+
+            if (string.IsNullOrWhiteSpace(analise.Prioridade))
             {
                 Console.WriteLine("⚠️ ATENÇÃO: N8N não retornou prioridade! Calculando localmente...");
-
-                // Calcular prioridade baseada nas respostas do usuário
                 string prioridadeCalculada = CalcularPrioridadeLocal();
                 analise.Prioridade = prioridadeCalculada;
-
                 Console.WriteLine($"✅ Prioridade calculada localmente: {prioridadeCalculada}");
-
                 lblPrioridadeIA.Text = $"⚡ Prioridade Sugerida: {prioridadeCalculada} (calculada automaticamente)";
             }
             else
             {
+                analise.Prioridade = analise.Prioridade.Trim();
+                Console.WriteLine($"✅ Prioridade da IA (limpa): '{analise.Prioridade}'");
                 lblPrioridadeIA.Text = $"⚡ Prioridade Sugerida: {analise.Prioridade}";
-                Console.WriteLine($"✅ Prioridade da IA: {analise.Prioridade}");
             }
 
-            // Buscar el RichTextBox por nombre
             RichTextBox rtbJustificativa = pnlResultadoIA.Controls["rtbJustificativaIA"] as RichTextBox;
 
             if (rtbJustificativa != null)
@@ -834,12 +834,14 @@ namespace SistemaChamados.Forms
                 }
             }
 
-            // Colorir baseado na prioridade
             Color corIA = ObterCorPorPrioridadeTexto(analise.Prioridade);
             lblPrioridadeIA.ForeColor = corIA;
 
             pnlResultadoIA.Visible = true;
+
+            Console.WriteLine("═══════════════════════════════════════════════");
         }
+
 
         private string CalcularPrioridadeLocal()
         {
@@ -1167,24 +1169,34 @@ namespace SistemaChamados.Forms
                 string pessoasAfetadasTexto = afetado;
                 string bloqueiaTrabalhoTexto = impedeTrabalho ? "sim" : "não";
 
-                // --- CORREÇÃO AQUI ---
-                string userPriorityReason = "";
-                string prioridadeParaEnviar = ""; // Nova variável
+                // ✅ LÓGICA CORRETA: SEMPRE enviar a prioridade da IA
+                // A contestação é apenas um registro para o técnico revisar
+                string prioridadeParaEnviar = analiseIA.Prioridade; // SEMPRE a prioridade da IA
+                string userPriorityReason;
 
                 if (contestaPrioridade)
                 {
-                    // Se contesta, envia a justificativa e prioridade vazia (para análise humana/técnica)
-                    userPriorityReason = justificativaContestacao;
-                    prioridadeParaEnviar = "";
-                    Console.WriteLine($"⚠️ Usuário contesta: {userPriorityReason}");
+                    // Contestação: envia a justificativa do usuário
+                    userPriorityReason = $"{justificativaContestacao}";
+                    Console.WriteLine($"⚠️ Usuário CONTESTA a prioridade '{analiseIA.Prioridade}'");
+                    Console.WriteLine($"   Justificativa: {justificativaContestacao}");
+                    Console.WriteLine($"   ✅ Mantendo prioridade da IA para técnico revisar");
                 }
                 else
                 {
-                    // Se aceita, ENVIA A PRIORIDADE DA IA explicitamente
-                    userPriorityReason = "";
-                    prioridadeParaEnviar = analiseIA.Prioridade; // Envia "Média", "Baixa", etc.
-                    Console.WriteLine($"✅ Usuário aceita prioridade da IA: {prioridadeParaEnviar}");
+                    // Aceita: envia a justificativa da IA
+                    userPriorityReason = analiseIA.Justificativa ?? "";
+                    Console.WriteLine($"✅ Usuário ACEITA prioridade da IA: {prioridadeParaEnviar}");
                 }
+
+                // Validação: garantir que prioridade não está vazia
+                if (string.IsNullOrWhiteSpace(prioridadeParaEnviar))
+                {
+                    prioridadeParaEnviar = "Média";
+                    Console.WriteLine($"⚠️ Prioridade vazia detectada, usando fallback: {prioridadeParaEnviar}");
+                }
+
+                Console.WriteLine($"📤 Enviando para N8N: Prioridade='{prioridadeParaEnviar}'");
 
                 IAResponse resultadoSalvar = await IAService.SendToN8nToIa(
                     _funcionarioLogado.Id.ToString(),
@@ -1195,8 +1207,8 @@ namespace SistemaChamados.Forms
                     descricao,
                     pessoasAfetadasTexto,
                     bloqueiaTrabalhoTexto,
-                    prioridadeParaEnviar,   
-                    userPriorityReason,
+                    prioridadeParaEnviar,   // ✅ SEMPRE a prioridade da IA
+                    userPriorityReason,     // Justificativa (da IA ou contestação)
                     2
                 );
 
@@ -1204,19 +1216,20 @@ namespace SistemaChamados.Forms
                 {
                     Console.WriteLine("✅ Chamado salvo na nuvem com sucesso!");
 
-                    string mensagemSucesso = $"✅ Chamado salvo na nuvem!\n\n" +
+                    string mensagemSucesso = $"✅ Chamado criado com sucesso!\n\n" +
                                             $"Título: {tituloChamado}\n" +
                                             $"Prioridade: {analiseIA.Prioridade}";
 
                     if (contestaPrioridade)
                     {
                         mensagemSucesso += $"\n\n⚠️ CONTESTAÇÃO REGISTRADA\n" +
-                                          $"Um técnico revisará sua solicitação.";
+                                          $"Sua contestação foi registrada no chamado.\n" +
+                                          $"Um técnico revisará e ajustará a prioridade se necessário.";
                     }
                     else
                     {
-                        mensagemSucesso += "\n\n🔧 Técnico atribuído automaticamente pelo N8N\n" +
-                                          "📊 Sincronização automática com banco local.";
+                        mensagemSucesso += "\n\n🔧 Técnico atribuído automaticamente\n" +
+                                          "📊 Chamado criado com a prioridade sugerida pela IA.";
                     }
 
                     MessageBox.Show(mensagemSucesso, "Sucesso!", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -1227,12 +1240,18 @@ namespace SistemaChamados.Forms
                     return;
                 }
 
+                // ======================================================================
                 // FALLBACK: Salvar localmente
+                // ======================================================================
                 Console.WriteLine("⚠️ Salvamento na nuvem falhou, salvando localmente...");
                 btnProximo.Text = "Criando localmente...";
 
-                // Prioridade final = sempre da IA
+                // ✅ Prioridade SEMPRE da IA (mesmo se contestou)
                 int prioridadeFinal = ConverterPrioridadeTextoParaNumero(analiseIA.Prioridade);
+
+                Console.WriteLine($"🔍 SALVAMENTO LOCAL - PRIORIDADE:");
+                Console.WriteLine($"   Texto IA: '{analiseIA.Prioridade}'");
+                Console.WriteLine($"   Número: {prioridadeFinal}");
 
                 string descricaoCompleta = $"DESCRIÇÃO:\n{descricao}\n\n" +
                                           $"AFETADOS: {ObterTextoAfetado()}\n" +
@@ -1242,14 +1261,14 @@ namespace SistemaChamados.Forms
 
                 if (contestaPrioridade)
                 {
-                    descricaoCompleta += $"\n\nCONTESTAÇÃO:\n{userPriorityReason}";
+                    descricaoCompleta += $"\n\n⚠️ USUÁRIO CONTESTOU A PRIORIDADE\n{justificativaContestacao}";
                 }
 
                 var chamado = new Chamados
                 {
                     Titulo = tituloChamado,
                     Categoria = categoria,
-                    Prioridade = prioridadeFinal,
+                    Prioridade = prioridadeFinal, // ✅ Sempre da IA
                     Descricao = descricaoCompleta,
                     Afetado = _funcionarioLogado.Id,
                     DataChamado = DateTime.Now,
@@ -1257,13 +1276,14 @@ namespace SistemaChamados.Forms
                     TecnicoResponsavel = null
                 };
 
+                // Registrar contestação no histórico (se houver)
                 if (contestaPrioridade)
                 {
                     string contestacao = $"[CONTESTAÇÃO DE PRIORIDADE - {DateTime.Now:dd/MM/yyyy HH:mm}]\n" +
                                        $"Funcionário: {_funcionarioLogado.Nome}\n" +
                                        $"Prioridade IA: {analiseIA.Prioridade}\n" +
-                                       $"Justificativa:\n{justificativaContestacao}\n" +
-                                       $"Status: Aguardando revisão";
+                                       $"Justificativa da Contestação:\n{justificativaContestacao}\n" +
+                                       $"Status: Aguardando revisão do técnico";
 
                     chamado.Contestacoes = contestacao;
                 }
@@ -1273,13 +1293,26 @@ namespace SistemaChamados.Forms
                 if (idChamado > 0)
                 {
                     Console.WriteLine($"✅ Chamado #{idChamado} criado localmente");
+                    Console.WriteLine($"   Prioridade: {chamado.Prioridade} ({ObterTextoPrioridade(chamado.Prioridade)})");
 
-                    MessageBox.Show(
-                        $"✅ Chamado criado localmente!\n\nNúmero: #{idChamado}\n\n" +
-                        $"⚠️ Será sincronizado com a nuvem em breve.",
-                        "Chamado Criado",
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Information);
+                    if (contestaPrioridade)
+                    {
+                        Console.WriteLine($"   ⚠️ Contestação registrada para revisão técnica");
+                    }
+
+                    string msgLocal = $"✅ Chamado criado localmente!\n\n" +
+                                    $"Número: #{idChamado}\n" +
+                                    $"Prioridade: {ObterTextoPrioridade(chamado.Prioridade)}";
+
+                    if (contestaPrioridade)
+                    {
+                        msgLocal += $"\n\n⚠️ Contestação registrada.\n" +
+                                   $"O técnico revisará sua solicitação.";
+                    }
+
+                    msgLocal += "\n\n⚠️ Será sincronizado com a nuvem em breve.";
+
+                    MessageBox.Show(msgLocal, "Chamado Criado", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
                     this.DialogResult = DialogResult.OK;
                     this.FormClosing -= CriarChamadoForm_FormClosing;
@@ -1310,27 +1343,58 @@ namespace SistemaChamados.Forms
         }
 
 
+
         private int ConverterPrioridadeTextoParaNumero(string prioridade)
         {
-            if (string.IsNullOrEmpty(prioridade)) return 2; // Padrão: Média
+            if (string.IsNullOrEmpty(prioridade))
+            {
+                Console.WriteLine("⚠️ Prioridade vazia, usando padrão: Média (2)");
+                return 2;
+            }
 
-            string prioridadeLower = prioridade.ToLower();
+            string prioridadeLower = prioridade.ToLower().Trim();
+
+            // Remover acentos
+            prioridadeLower = prioridadeLower
+                .Replace("í", "i")
+                .Replace("é", "e")
+                .Replace("ê", "e")
+                .Replace("á", "a")
+                .Replace("à", "a")
+                .Replace("ã", "a");
+
+            Console.WriteLine($"🔄 Convertendo prioridade: '{prioridade}' -> '{prioridadeLower}'");
 
             if (prioridadeLower.Contains("baixa") || prioridadeLower.Contains("low"))
+            {
+                Console.WriteLine("   ✅ Resultado: 1 (Baixa)");
                 return 1;
-            else if (prioridadeLower.Contains("média") || prioridadeLower.Contains("media") || prioridadeLower.Contains("medium"))
+            }
+            else if (prioridadeLower.Contains("media") || prioridadeLower.Contains("medium"))
+            {
+                Console.WriteLine("   ✅ Resultado: 2 (Média)");
                 return 2;
+            }
             else if (prioridadeLower.Contains("alta") || prioridadeLower.Contains("high"))
+            {
+                Console.WriteLine("   ✅ Resultado: 3 (Alta)");
                 return 3;
-            else if (prioridadeLower.Contains("crítica") || prioridadeLower.Contains("critica") || prioridadeLower.Contains("urgent"))
+            }
+            else if (prioridadeLower.Contains("critica") || prioridadeLower.Contains("urgent") || prioridadeLower.Contains("critical"))
+            {
+                Console.WriteLine("   ✅ Resultado: 4 (Crítica)");
                 return 4;
+            }
 
-            return 2; // Padrão: Média
+            Console.WriteLine($"   ⚠️ Não reconhecido: '{prioridade}', usando padrão: 2 (Média)");
+            return 2;
         }
+
+
 
         private void CriarChamadoForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            // Se está criando um chamado, prevenir cierre accidental
+            // Se está criando um chamado, prevenir fechamento acidental
             if (_criandoChamado && e.CloseReason == CloseReason.UserClosing)
             {
                 var resultado = MessageBox.Show(
@@ -1347,6 +1411,5 @@ namespace SistemaChamados.Forms
                 }
             }
         }
-
     }
 }

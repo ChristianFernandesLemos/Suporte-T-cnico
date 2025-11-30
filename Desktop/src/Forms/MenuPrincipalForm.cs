@@ -1211,8 +1211,8 @@ Apenas administradores podem alterar senhas no menu 'Alterar Senha'.
 Este manual contém todas as informações necessárias. Para dúvidas específicas, contate o suporte.
 
 📞 SUPORTE TÉCNICO:
-• E-mail: suporte@interfix.com
-• Telefone: (12) 3456-7890
+• E-mail: interfix87@gmail.com
+• Telefone: (12) 99164-1425
 • Horário: Segunda a Sexta, 8h às 18h";
         }
 
