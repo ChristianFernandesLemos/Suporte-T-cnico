@@ -12,13 +12,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Adiciona botão de logout
     addLogoutButton();
+
+    // Adiciona estilos de animação se ainda não estiverem presentes
+    addAnimationStyles();
 });
 
 // Verifica se usuário está autenticado
 async function checkAuth() {
     const token = localStorage.getItem('token');
-
-    if (!token) {
+    const user = localStorage.getItem('user'); // Adiciona verificação dos dados do usuário
+    
+    // Se não há token OU não há dados do usuário, redireciona imediatamente
+    if (!token || !user) {
         redirectToLogin();
         return;
     }
@@ -30,11 +35,14 @@ async function checkAuth() {
             }
         });
 
+        // Se a resposta não for OK (ex: 401 Unauthorized), redireciona
         if (!response.ok) {
+            console.warn('Verificação de token falhou no backend. Redirecionando...');
             redirectToLogin();
         }
     } catch (error) {
-        console.error('Erro ao verificar autenticação:', error);
+        // Erro de rede ou servidor
+        console.error('Erro ao verificar autenticação (Falha de Rede/Servidor):', error);
         redirectToLogin();
     }
 }
@@ -100,15 +108,15 @@ function setupNavigation() {
             const routes = {
                 'Registrar Chamado': '/registrar-chamado',
                 'Visualizar Chamados': '/chamados',
-                'Ver Relatórios': '/relatorios'
+                // 'Ver Relatórios' foi removido
             };
 
             const route = routes[text];
             
             if (route) {
                 window.location.href = route;
-            } else {
-                showMessage('Página em desenvolvimento.', 'info');
+            } else if (text !== 'Ver Relatórios' && text !== 'Gerenciar Acessos') { 
+                 showMessage('Página em desenvolvimento.', 'info');
             }
         });
     });
@@ -116,8 +124,6 @@ function setupNavigation() {
 
 /**
  * Retorna o conteúdo estruturado do Manual do Usuário, adaptado para a versão web.
- * @param {string} userType - O tipo de usuário logado ('funcionario', 'tecnico', 'admin').
- * @returns {Array<Object>} Uma lista de abas (TABS) do manual.
  */
 function getManualContent(userType) {
     const isAdmin = userType === 'admin';
@@ -134,7 +140,7 @@ function getManualContent(userType) {
         if (userType === 'funcionario') {
             return "• Criar novos chamados\n• Visualizar seus chamados\n• Adicionar contestações";
         } else if (userType === 'tecnico') {
-            return "• Visualizar todos os chamados\n• Gerenciar chamados (Atribuir, Alterar Prioridade, Resolver)\n• Gerar relatórios (Acesso via Dashboard)";
+            return "• Visualizar todos os chamados\n• Gerenciar chamados (Atribuir, Alterar Prioridade, Resolver)";
         } else if (userType === 'admin') {
             return "• Criar novos chamados\n• Visualizar todos os chamados\n• Gerenciar chamados\n• Acesso completo às funcionalidades web";
         }
@@ -389,6 +395,8 @@ function addLogoutButton() {
     const logoutBtn = document.createElement('button');
     logoutBtn.textContent = 'Sair';
     logoutBtn.className = 'logout-btn';
+    
+    // Estilos do botão de logout
     logoutBtn.style.cssText = `
         width: 100%;
         padding: 10px;
@@ -402,6 +410,7 @@ function addLogoutButton() {
         transition: background-color 0.3s;
     `;
 
+    // Adiciona os eventos de mouse (hover)
     logoutBtn.addEventListener('mouseenter', function() {
         this.style.backgroundColor = '#c82333';
     });
@@ -410,20 +419,21 @@ function addLogoutButton() {
         this.style.backgroundColor = '#dc3545';
     });
 
+
     logoutBtn.addEventListener('click', handleLogout);
 
     userInfo.appendChild(logoutBtn);
 }
 
-// Função de logout
+// Função de logout simplificada
 async function handleLogout() {
     // Confirmação antes de sair
     if (!confirm('Deseja realmente sair?')) {
-        return; // Se cancelar, não faz logout
+        return; 
     }
 
+    // Tenta fazer o logout no servidor
     const token = localStorage.getItem('token');
-
     try {
         await fetch('/api/auth/logout', {
             method: 'POST',
@@ -432,14 +442,10 @@ async function handleLogout() {
             }
         });
     } catch (error) {
-        console.error('Erro no logout:', error);
+        console.error('Erro no logout (apenas informativo):', error);
     } finally {
-        // Limpa dados locais
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        
-        // Redireciona para login
-        window.location.href = '/login';
+        // Redireciona de forma direta, limpando os dados locais
+        redirectToLogin();
     }
 }
 
@@ -487,28 +493,33 @@ function showMessage(message, type) {
     }, 3000);
 }
 
-// Adiciona estilos de animação
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes slideIn {
-        from {
-            transform: translateX(100%);
-            opacity: 0;
-        }
-        to {
-            transform: translateX(0);
-            opacity: 1;
-        }
+// Adiciona estilos de animação (garante que showMessage funcione)
+function addAnimationStyles() {
+    if (!document.querySelector('style[data-animation="interfix"]')) {
+        const style = document.createElement('style');
+        style.setAttribute('data-animation', 'interfix');
+        style.textContent = `
+            @keyframes slideIn {
+                from {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            @keyframes slideOut {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
     }
-    @keyframes slideOut {
-        from {
-            transform: translateX(0);
-            opacity: 1;
-        }
-        to {
-            transform: translateX(100%);
-            opacity: 0;
-        }
-    }
-`;
-document.head.appendChild(style);
+}

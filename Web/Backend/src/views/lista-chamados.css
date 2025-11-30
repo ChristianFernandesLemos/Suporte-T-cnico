@@ -47,7 +47,7 @@
 
 body {
     font-family: var(--font-family-sans);
-    background-color: var(--color-background-body);
+    background: linear-gradient(to bottom, #111, #222);
     color: var(--color-text);
     line-height: 1.6;
 }
@@ -58,7 +58,7 @@ body {
 |--------------------------------------------------------------------------
 */
 .header {
-    background-color: var(--color-background-element);
+    background:#111;
     box-shadow: 0 2px 4px color-mix(in srgb, var(--primary-color-dark) 10%, transparent); 
     padding: var(--spacing-default) 0;
 }
@@ -71,7 +71,7 @@ body {
 
 .back-link {
     /* Cor de baixo contraste para o link de 'voltar' */
-    color: var(--third-color-blue); 
+    color: white; 
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
@@ -81,7 +81,7 @@ body {
 }
 
 .back-link:hover {
-    color: var(--eighth-color-blue); 
+    color: var(--tenth-color-blue); 
     text-decoration: underline;
 }
 
@@ -120,6 +120,50 @@ body {
 
 /*
 |--------------------------------------------------------------------------
+| Filtros
+|--------------------------------------------------------------------------
+*/
+.filters-container {
+    display: flex;
+    gap: var(--spacing-large, 20px);
+    margin-bottom: var(--spacing-large, 20px);
+    padding: var(--spacing-default);
+    background-color: #f9f9f9; /* Fundo levemente cinza para filtros */
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    min-width: 200px;
+}
+
+.filter-group label {
+    font-weight: 600;
+    color: var(--third-color-blue);
+    margin-bottom: 0.5rem;
+}
+
+.filter-group select {
+    padding: 0.6rem;
+    border: 1px solid var(--fourth-color-blue);
+    border-radius: 4px;
+    background-color: #fff;
+    color: var(--primary-color-dark);
+    font-size: 1rem;
+    cursor: pointer;
+    transition: border-color 0.2s;
+}
+
+.filter-group select:focus {
+    border-color: var(--tenth-color-blue);
+    outline: none;
+}
+
+
+/*
+|--------------------------------------------------------------------------
 | Tabela (Tickets)
 |--------------------------------------------------------------------------
 */
@@ -129,14 +173,13 @@ body {
     width: 100%;
     overflow-x: auto; 
     border-radius: 6px;
-    /* Remove a sombra da seção, pois a tabela já tem borda */
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.05); 
 }
 
 .tickets-table {
     width: 100%;
     border-collapse: collapse;
-    min-width: 700px; /* Garante que a tabela não fique muito estreita em mobile */
+    min-width: 800px; /* Garante que a tabela não fique muito estreita em mobile e acomode 7 colunas */
 }
 
 .tickets-table thead {
@@ -149,7 +192,8 @@ body {
 .tickets-table th, 
 .tickets-table td {
     padding: 1rem;
-    border-bottom: 1px solid var(--fourth-color-blue); /* Divisória sutil */
+    border-bottom: 1px solid var(--fifth-color-blue); /* Divisória sutil */
+    vertical-align: middle; /* Alinhamento vertical centralizado */
 }
 
 .tickets-table th {
@@ -171,52 +215,12 @@ body {
 
 /* Estilo ao passar o mouse */
 .tickets-table tbody tr:hover {
-    background-color: color-mix(in srgb, var(--tenth-color-blue) 15%, transparent); /* Destaque ao passar o mouse */
-}
-
-/* Estilização para as células de status e prioridade (tags) */
-.priority-tag,
-.status-tag {
-    display: inline-block;
-    padding: 0.3rem 0.6rem;
-    border-radius: 12px;
-    font-size: 0.8rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    white-space: nowrap;
-}
-
-/* Cores de Prioridade */
-.priority-alta, .priority-urgente {
-    background-color: var(--third-color-blue);
-    color: var(--color-background-element);
-}
-.priority-media {
-    background-color: var(--sixth-color-blue);
-    color: var(--ninth-color-blue);
-}
-.priority-baixa {
-    background-color: var(--fourth-color-blue);
-    color: var(--ninth-color-blue);
-}
-
-/* Cores de Status */
-.status-aberto {
-    background-color: #fca5a5; /* Red 300 - Precisa de ação imediata */
-    color: var(--primary-color-dark);
-}
-.status-andamento {
-    background-color: #a5d8f6; /* Blue 300 - Em progresso */
-    color: var(--primary-color-dark);
-}
-.status-concluido {
-    background-color: var(--color-action); /* sixth-color-blue - Sucesso */
-    color: var(--ninth-color-blue);
+    background-color: color-mix(in srgb, var(--tenth-color-blue) 10%, transparent); /* Destaque ao passar o mouse */
 }
 
 /* Célula de Botões */
-.actions-cell {
-    width: 1%; /* Garante que a coluna de botões seja pequena */
+.action-cell {
+    width: 1%; 
     white-space: nowrap;
     text-align: center;
 }
@@ -239,6 +243,71 @@ body {
     color: var(--color-background-element);
     border-color: var(--tenth-color-blue);
 }
+
+/*
+|--------------------------------------------------------------------------
+| Classes de Cores para Tabela (ALTO CONTRASTE - APENAS COR DE TEXTO) 🌟
+|--------------------------------------------------------------------------
+*/
+
+/* --- CORES DE PRIORIDADE --- */
+
+/* PRIORIDADE: BAIXA (1) - Verde Escuro */
+.priority-1 { 
+    color: #1b5e20; 
+    font-weight: 600; 
+} 
+
+/* PRIORIDADE: MÉDIA (2) - Laranja Escuro/Ocre */
+.priority-2 { 
+    color: #d84315; 
+    font-weight: 600; 
+} 
+
+/* PRIORIDADE: ALTA (3) - Vermelho/Marrom Escuro */
+.priority-3 { 
+    color: #a03510; 
+    font-weight: 700; 
+} 
+
+/* PRIORIDADE: CRÍTICA (4) - Vermelho Profundo */
+.priority-4 { 
+    color: #b71c1c; 
+    font-weight: 700; 
+} 
+
+/* --- CORES DE STATUS --- */
+
+/* STATUS: ABERTO (1) - Laranja Escuro */
+.status-1 { 
+    color: #f57f17; 
+    font-weight: 600; 
+} 
+
+/* STATUS: EM ANDAMENTO (2) - Azul Escuro */
+.status-2 { 
+    color: #1565c0; 
+    font-weight: 600; 
+} 
+
+/* STATUS: RESOLVIDO (3) - Verde-Mar Escuro */
+.status-3 { 
+    color: #00695c; 
+    font-weight: 600; 
+} 
+
+/* STATUS: FECHADO (4) - Verde Escuro */
+.status-4 { 
+    color: #2e7d32; 
+    font-weight: 600; 
+} 
+
+/* STATUS: CANCELADO (5) - Cinza Escuro */
+.status-5 { 
+    color: #424242; 
+    font-weight: 600; 
+}
+
 
 /*
 |--------------------------------------------------------------------------
@@ -278,64 +347,3 @@ body {
     border-color: var(--color-action);
     pointer-events: none; /* Desativa clique na página atual */
 }
-/*
-|--------------------------------------------------------------------------
-| Estilos Mínimos para Filtros e Cores de Tabela
-|--------------------------------------------------------------------------
-*/
-.filters-container {
-    display: flex;
-    gap: var(--spacing-large, 20px);
-    margin-bottom: var(--spacing-large, 20px);
-    padding: var(--spacing-medium, 15px);
-    background-color: var(--color-background-element, #fff);
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-
-.filter-group {
-    display: flex;
-    flex-direction: column;
-    min-width: 200px;
-}
-
-.filter-group label {
-    font-weight: 600;
-    color: var(--third-color-blue);
-    margin-bottom: 0.5rem;
-}
-
-.filter-group select {
-    padding: 0.6rem;
-    border: 1px solid var(--fourth-color-blue);
-    border-radius: 4px;
-    background-color: #fff;
-    color: var(--primary-color-dark);
-    font-size: 1rem;
-    cursor: pointer;
-    transition: border-color 0.2s;
-}
-
-.filter-group select:focus {
-    border-color: var(--tenth-color-blue);
-    outline: none;
-}
-
-/*
-|--------------------------------------------------------------------------
-| Classes de Cores para Tabela (Essenciais para o visual do Chamado)
-|--------------------------------------------------------------------------
-*/
-
-/* Cores de Prioridade */
-.priority-1 { color: #2ecc71; font-weight: 600; } /* Baixa: Verde */
-.priority-2 { color: #f1c40f; font-weight: 600; } /* Média: Amarelo */
-.priority-3 { color: #e67e22; font-weight: 600; } /* Alta: Laranja */
-.priority-4 { color: #e74c3c; font-weight: 700; } /* Crítica: Vermelho */
-
-/* Cores de Status */
-.status-1 { color: #f1c40f; } /* Aberto: Amarelo */
-.status-2 { color: #3498db; } /* Em Andamento: Azul */
-.status-3 { color: var(--sixth-color-blue); } /* Resolvido: Sua cor de ação */
-.status-4 { color: #2ecc71; } /* Fechado: Verde */
-.status-5 { color: #95a5a6; } /* Cancelado: Cinza */

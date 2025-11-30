@@ -20,6 +20,14 @@ const PRIORIDADE = {
   4: 'Crítica'
 };
 
+// 🌟 NOVO: Mapeamento para tratar IDs de Categoria (Assumindo 2 = Hardware)
+const CATEGORIA = {
+  1: 'Software',
+  2: 'Hardware',
+  3: 'Rede',
+  4: 'Outros'
+};
+
 // ========================================
 // CONFIGURAÇÃO DA API
 // ========================================
@@ -153,11 +161,28 @@ async function preencherFormulario(chamado) {
   });
 
   // Preenche SELECT de Categoria
-  const selectCategoria = document.getElementById('categoria');
-  if (selectCategoria && chamado.categoria) {
-    selectCategoria.value = chamado.categoria;
-    console.log(`✓ Categoria selecionada: ${chamado.categoria}`);
-  }
+    const selectCategoria = document.getElementById('categoria');
+    if (selectCategoria && chamado.categoria) {
+        let categoriaValor = chamado.categoria;
+
+        // 1. Tenta traduzir o ID (caso a API esteja retornando um número por engano)
+        if (CATEGORIA[categoriaValor]) {
+            categoriaValor = CATEGORIA[categoriaValor];
+        }
+
+        // 2. Garante a capitalização correta e remove espaços (Caso de string inconsistente)
+        if (typeof categoriaValor === 'string') {
+            const trimmedLower = categoriaValor.toLowerCase().trim();
+            // Verifica o trimmedLower para padronizar com a capitalização do HTML (ex: "Hardware")
+            if (trimmedLower === 'software') categoriaValor = 'Software';
+            else if (trimmedLower === 'hardware') categoriaValor = 'Hardware';
+            else if (trimmedLower === 'rede') categoriaValor = 'Rede';
+            else if (trimmedLower.startsWith('outros')) categoriaValor = 'Outros';
+        }
+        
+        selectCategoria.value = categoriaValor; // Define o valor corrigido
+        console.log(`✓ Categoria selecionada: ${categoriaValor}`);
+    }
 
   // Preenche SELECT de Prioridade (valor numérico)
   const selectPrioridade = document.getElementById('prioridade');
@@ -197,43 +222,28 @@ function renderizarContestacoesReadonly(contestacoes) {
   }
 
   // Ajusta altura do textarea baseado na quantidade de contestações
-  contestacaoTextarea.rows = contestacoes.length > 0 ? Math.min(contestacoes.length * 4 + 2, 20) : 3;
+  // Mantemos o ajuste de altura, mas com um mínimo razoável.
+  contestacaoTextarea.rows = contestacoes.length > 0 ? Math.min(contestacoes.length * 5 + 2, 20) : 3;
   
   if (contestacoes.length === 0) {
     contestacaoTextarea.value = '📋 Nenhuma contestação registrada para este chamado.';
     return;
   }
 
-  // Formata contestações como texto
-  let texto = `╔════════════════════════════════════════════════════════════╗\n`;
-  texto += `║          HISTÓRICO DE CONTESTAÇÕES DO CHAMADO             ║\n`;
-  texto += `╠════════════════════════════════════════════════════════════╣\n`;
-  texto += `║ Total de Contestações: ${contestacoes.length.toString().padStart(2, '0')}                                    ║\n`;
-  texto += `╚════════════════════════════════════════════════════════════╝\n\n`;
+  // Formata contestações para exibir APENAS a justificativa
+  let texto = '';
   
   contestacoes.forEach((cont, index) => {
-    texto += `┌────────────────────────────────────────────────────────────┐\n`;
-    texto += `│ 📌 CONTESTAÇÃO #${(index + 1).toString().padStart(2, '0')}                                        │\n`;
-    texto += `├────────────────────────────────────────────────────────────┤\n`;
-    texto += `│ Tipo: ${cont.Tipo || 'Não especificado'}`.padEnd(60) + '│\n';
-    texto += `│ Data: ${formatarData(cont.DataContestacao)}`.padEnd(60) + '│\n';
-    texto += `│ Usuário: ${(cont.usuarioNome || 'Não identificado')}`.padEnd(60) + '│\n';
-    texto += `├────────────────────────────────────────────────────────────┤\n`;
-    texto += `│ JUSTIFICATIVA:                                             │\n`;
     
-    // Quebra a justificativa em linhas de 56 caracteres
+    // Obtém a justificativa ou um texto padrão
     const justificativa = cont.Justificativa || 'Sem justificativa fornecida';
-    const linhas = justificativa.match(/.{1,56}/g) || [justificativa];
     
-    linhas.forEach(linha => {
-      texto += `│ ${linha.padEnd(56)} │\n`;
-    });
-    
-    texto += `└────────────────────────────────────────────────────────────┘\n\n`;
+    // Adiciona a justificativa
+    texto += justificativa + '\n\n';
   });
   
-  contestacaoTextarea.value = texto;
-  console.log('✅ Contestações renderizadas no formulário (readonly)');
+  contestacaoTextarea.value = texto.trim(); // .trim() para remover espaços extras no final
+  console.log('✅ Contestações renderizadas no formulário (apenas justificativas)');
 }
 
 // ========================================
@@ -290,8 +300,8 @@ async function salvarAlteracoes(event) {
       console.log('✅ Chamado atualizado com sucesso!');
       alert('✅ Chamado atualizado com sucesso!');
       
-      // Redireciona para detalhes
-      window.location.href = `/detalhes-chamado?id=${chamadoId}`;
+      // 🎯 CORREÇÃO: Redireciona para /detalhes (a rota correta no pages.js)
+      window.location.href = `/detalhes?id=${chamadoId}`;
     } else {
       throw new Error(data.message || 'Erro ao atualizar chamado');
     }
