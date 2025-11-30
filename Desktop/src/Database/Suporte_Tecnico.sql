@@ -10,6 +10,14 @@ GO
 select * from Usuario
 select * from chamados
 select * from Historial_Contestacoes
+select * from E_mail
+
+ALTER TABLE Usuario 
+ALTER COLUMN Cpf VARCHAR(14); -- Para formato 000.000.000-00
+
+UPDATE Usuario 
+SET Cpf = '333.333.333-33' 
+WHERE id_usuario = '18';
 
 -- Verificar se o banco existe e excluí-lo
 IF EXISTS (SELECT name FROM sys.databases WHERE name = N'Suporte_Tecnico')

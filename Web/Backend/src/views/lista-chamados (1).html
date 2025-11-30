@@ -6,6 +6,7 @@
     <title>Lista de Chamados - Sistema de Gerenciamento</title>
     <link rel="shortcut icon" href="/static/img/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="/static/lista-chamados.css">
+    <script src="https://kit.fontawesome.com/d6b6410536.js" crossorigin="anonymous"></script> 
 </head>
 <body>
     <header class="header">
@@ -23,6 +24,40 @@
         <section class="ticket-list-section">
             <h1 class="section-title">Lista de Chamados</h1>
             
+            <div class="filters-container">
+                <div class="filter-group">
+                    <label for="filtroStatus">Filtrar por Status:</label>
+                    <select id="filtroStatus">
+                        <option value="">Todos os Status</option>
+                        <option value="1">Aberto</option>
+                        <option value="2">Em Andamento</option>
+                        <option value="3">Resolvido</option>
+                        <option value="4">Fechado</option>
+                        <option value="5">Cancelado</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="filtroPrioridade">Filtrar por Prioridade:</label>
+                    <select id="filtroPrioridade">
+                        <option value="">Todas as Prioridades</option>
+                        <option value="1">Baixa</option>
+                        <option value="2">Média</option>
+                        <option value="3">Alta</option>
+                        <option value="4">Crítica</option>
+                    </select>
+                </div>
+                <div class="filter-group"> 
+                    <label for="filtroCategoria">Filtrar por Categoria:</label>
+                    <select id="filtroCategoria">
+                        <option value="">Todas as Categorias</option>
+                        <option value="1">Hardware</option>
+                        <option value="2">Software</option>
+                        <option value="3">Rede</option>
+                        <option value="4">Financeiro</option>
+                        <option value="5">Outros</option>
+                    </select>
+                </div>
+                </div>
             <div class="table-container">
                 <table class="tickets-table">
                     <thead>
@@ -32,13 +67,12 @@
                             <th scope="col">Título</th>
                             <th scope="col">Criado em</th>
                             <th scope="col">Prioridade</th>
-                            <th scope="col">Status</th>
+                            <th scope="col">Categoria</th> <th scope="col">Status</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <!--Os dados serão carregados aqui pelo JavaScript -->
+                    <tbody id="chamados-body"> 
                         <tr>
-                            <td colspan="6" style="text-align: center; padding: 40px;">
+                            <td colspan="7" style="text-align: center; padding: 40px;">
                                 ⏳ Carregando chamados...
                             </td>
                         </tr>
@@ -47,7 +81,7 @@
             </div>
 
             <nav class="pagination" aria-label="Navegação de páginas">
-                <ul class="pagination-list">
+                <ul class="pagination-list" id="pagination-list">
                     <li><a href="#" class="pagination-link active" aria-current="page">1</a></li>
                     <li><a href="#" class="pagination-link">2</a></li>
                     <li><a href="#" class="pagination-link">3</a></li>
@@ -56,7 +90,6 @@
         </section>
     </main>
 
-    <!-- CAMINHO CORRIGIDO - adiciona /static/ -->
     <script src="/static/VizualizarChamados.js"></script>
 </body>
 </html>

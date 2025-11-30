@@ -13,14 +13,13 @@ class AuthController {
     try {
       const { email, senha } = req.body;
 
-      // Validação básica
+      // Validação básica 
       if (!email || !senha) {
         return res.status(400).json({
           success: false,
           message: 'Email e senha são obrigatórios.'
         });
       }
-
       console.log('🔍 Tentativa de login:');
       console.log('   Email:', email);
       console.log('   Senha digitada:', senha);

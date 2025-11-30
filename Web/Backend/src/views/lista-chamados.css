@@ -278,3 +278,64 @@ body {
     border-color: var(--color-action);
     pointer-events: none; /* Desativa clique na página atual */
 }
+/*
+|--------------------------------------------------------------------------
+| Estilos Mínimos para Filtros e Cores de Tabela
+|--------------------------------------------------------------------------
+*/
+.filters-container {
+    display: flex;
+    gap: var(--spacing-large, 20px);
+    margin-bottom: var(--spacing-large, 20px);
+    padding: var(--spacing-medium, 15px);
+    background-color: var(--color-background-element, #fff);
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    min-width: 200px;
+}
+
+.filter-group label {
+    font-weight: 600;
+    color: var(--third-color-blue);
+    margin-bottom: 0.5rem;
+}
+
+.filter-group select {
+    padding: 0.6rem;
+    border: 1px solid var(--fourth-color-blue);
+    border-radius: 4px;
+    background-color: #fff;
+    color: var(--primary-color-dark);
+    font-size: 1rem;
+    cursor: pointer;
+    transition: border-color 0.2s;
+}
+
+.filter-group select:focus {
+    border-color: var(--tenth-color-blue);
+    outline: none;
+}
+
+/*
+|--------------------------------------------------------------------------
+| Classes de Cores para Tabela (Essenciais para o visual do Chamado)
+|--------------------------------------------------------------------------
+*/
+
+/* Cores de Prioridade */
+.priority-1 { color: #2ecc71; font-weight: 600; } /* Baixa: Verde */
+.priority-2 { color: #f1c40f; font-weight: 600; } /* Média: Amarelo */
+.priority-3 { color: #e67e22; font-weight: 600; } /* Alta: Laranja */
+.priority-4 { color: #e74c3c; font-weight: 700; } /* Crítica: Vermelho */
+
+/* Cores de Status */
+.status-1 { color: #f1c40f; } /* Aberto: Amarelo */
+.status-2 { color: #3498db; } /* Em Andamento: Azul */
+.status-3 { color: var(--sixth-color-blue); } /* Resolvido: Sua cor de ação */
+.status-4 { color: #2ecc71; } /* Fechado: Verde */
+.status-5 { color: #95a5a6; } /* Cancelado: Cinza */

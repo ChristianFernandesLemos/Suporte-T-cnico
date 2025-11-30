@@ -22,7 +22,7 @@ router.get('/chamado/:idChamado', async (req, res) => {
           hc.Id_usuario as idUsuario,
           hc.Justificativa,
           hc.DataContestacao,
-          hc.Tipo,
+          -- hc.Tipo, <--- REMOVIDO
           u.nome as usuarioNome,
           e.E_mail as usuarioEmail
         FROM dbo.Historial_Contestacoes hc
@@ -34,8 +34,9 @@ router.get('/chamado/:idChamado', async (req, res) => {
 
     if (result.recordset.length === 0) {
       console.log(`ℹ️ Nenhuma contestação encontrada para o chamado #${idChamado}`);
-      return res.status(404).json({
-        success: false,
+      
+      return res.status(200).json({ 
+        success: true, 
         message: 'Nenhuma contestação encontrada',
         contestacoes: []
       });
@@ -78,7 +79,7 @@ router.get('/:id', async (req, res) => {
           hc.Id_usuario as idUsuario,
           hc.Justificativa,
           hc.DataContestacao,
-          hc.Tipo,
+          -- hc.Tipo, <--- REMOVIDO
           u.nome as usuarioNome,
           e.E_mail as usuarioEmail
         FROM dbo.Historial_Contestacoes hc
@@ -116,29 +117,23 @@ router.get('/:id', async (req, res) => {
 // ========================================
 router.post('/', async (req, res) => {
   try {
+    // Campo 'tipo' removido da desestruturação
     const {
       idChamado,
       idUsuario,
-      justificativa,
-      tipo
+      justificativa
+      // tipo removido
     } = req.body;
 
-    // Validação básica
-    if (!idChamado || !idUsuario || !justificativa || !tipo) {
+    // Validação básica corrigida (removido 'tipo')
+    if (!idChamado || !idUsuario || !justificativa) {
       return res.status(400).json({
         success: false,
-        message: 'idChamado, idUsuario, justificativa e tipo são obrigatórios'
+        message: 'idChamado, idUsuario e justificativa são obrigatórios'
       });
     }
 
-    // Validação do tipo
-    const tiposValidos = ['Discordo da Prioridade', 'Outro'];
-    if (!tiposValidos.includes(tipo)) {
-      return res.status(400).json({
-        success: false,
-        message: `Tipo inválido. Tipos válidos: ${tiposValidos.join(', ')}`
-      });
-    }
+    // ❌ Validação de tipo removida, pois a coluna não existe.
 
     const pool = await getConnection();
     
@@ -166,19 +161,21 @@ router.post('/', async (req, res) => {
       });
     }
 
-    // Insere a contestação
+    // Insere a contestação (campo 'Tipo' removido do INSERT)
     const result = await pool.request()
       .input('idChamado', sql.Int, idChamado)
       .input('idUsuario', sql.Int, idUsuario)
       .input('justificativa', sql.NVarChar(1000), justificativa)
-      .input('tipo', sql.NVarChar(20), tipo)
+      // .input('tipo', sql.NVarChar(20), tipo) <-- INPUT REMOVIDO
       .query(`
         INSERT INTO dbo.Historial_Contestacoes (
-          id_chamado, Id_usuario, Justificativa, DataContestacao, Tipo
+          id_chamado, Id_usuario, Justificativa, DataContestacao
+          -- Tipo REMOVIDO
         )
         OUTPUT INSERTED.Id
         VALUES (
-          @idChamado, @idUsuario, @justificativa, GETDATE(), @tipo
+          @idChamado, @idUsuario, @justificativa, GETDATE()
+          -- @tipo REMOVIDO
         )
       `);
 
@@ -208,12 +205,15 @@ router.post('/', async (req, res) => {
 router.put('/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const { justificativa, tipo } = req.body;
+    // O campo 'tipo' foi mantido apenas para checar se ele está sendo enviado, mas a lógica de atualização foi removida.
+    const { justificativa, tipo } = req.body; 
 
-    if (!justificativa && !tipo) {
+    // Validação corrigida (checando apenas justificativa, se for o único campo editável)
+    if (!justificativa) {
+      // Aviso: Se a coluna 'Tipo' foi removida, a variável 'tipo' deve ser removida da desestruturação do req.body acima.
       return res.status(400).json({
         success: false,
-        message: 'Nenhum campo para atualizar'
+        message: 'Nenhum campo válido para atualizar (Apenas Justificativa permitida)'
       });
     }
 
@@ -226,18 +226,23 @@ router.put('/:id', async (req, res) => {
       updates.push('Justificativa = @justificativa');
       request.input('justificativa', sql.NVarChar(1000), justificativa);
     }
-
+    
+    // ❌ LÓGICA DE ATUALIZAÇÃO DO 'TIPO' REMOVIDA
+    /*
     if (tipo) {
-      const tiposValidos = ['Discordo da Prioridade', 'Outro'];
-      if (!tiposValidos.includes(tipo)) {
-        return res.status(400).json({
-          success: false,
-          message: `Tipo inválido. Tipos válidos: ${tiposValidos.join(', ')}`
-        });
-      }
       updates.push('Tipo = @tipo');
       request.input('tipo', sql.NVarChar(20), tipo);
     }
+    */
+    
+    // Se não há atualizações válidas, retorna erro
+    if (updates.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Nenhum campo válido para atualizar.'
+      });
+    }
+
 
     const query = `
       UPDATE dbo.Historial_Contestacoes 
@@ -272,7 +277,7 @@ router.put('/:id', async (req, res) => {
 });
 
 // ========================================
-// DELETAR CONTESTAÇÃO
+// DELETAR CONTESTAÇÃO (NÃO ALTERADO)
 // ========================================
 router.delete('/:id', async (req, res) => {
   try {
@@ -325,7 +330,7 @@ router.get('/', async (req, res) => {
         hc.Id_usuario as idUsuario,
         hc.Justificativa,
         hc.DataContestacao,
-        hc.Tipo,
+        -- hc.Tipo, <--- REMOVIDO
         u.nome as usuarioNome,
         e.E_mail as usuarioEmail,
         c.titulo as chamadoTitulo,

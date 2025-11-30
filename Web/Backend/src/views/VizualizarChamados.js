@@ -1,28 +1,64 @@
-// VizualizarChamados.js - Frontend para lista-chamados (1).html
-console.log('🚀 VizualizarChamados.js carregado');
+// VizualizarChamados.js - Frontend para lista-chamados.html
+console.log('🚀 VizualizarChamados.js (Versão Completa com Filtros e Categoria Corrigida) carregado');
 
 // ========================================
 // MAPEAMENTOS
 // ========================================
 const STATUS = {
-  ABERTO: 1,
-  EM_ANDAMENTO: 2,
-  RESOLVIDO: 3,
-  FECHADO: 4,
-  CANCELADO: 5
+  1: 'Aberto',
+  2: 'Em Andamento',
+  3: 'Resolvido',
+  4: 'Fechado',
+  5: 'Cancelado'
 };
 
 const PRIORIDADE = {
-  BAIXA: 1,
-  MEDIA: 2,
-  ALTA: 3,
-  CRITICA: 4
+  1: 'Baixa',
+  2: 'Média',
+  3: 'Alta',
+  4: 'Crítica'
 };
+
+// Mapeamento de Categorias (ID -> Nome)
+const CATEGORIA = {
+  1: 'Hardware',
+  2: 'Software',
+  3: 'Rede',
+  4: 'Financeiro',
+  5: 'Outros'
+};
+
+// 🌟 NOVO: Mapeamento Reverso (Nome -> ID) para Filtragem
+const CATEGORIA_NOME_PARA_ID = {};
+// Preenche o mapeamento reverso
+for (const [id, nome] of Object.entries(CATEGORIA)) {
+    // Garante que o nome esteja em maiúsculas e sem acentos para comparação robusta
+    CATEGORIA_NOME_PARA_ID[nome.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")] = id;
+}
+// Exemplo: CATEGORIA_NOME_PARA_ID['HARDWARE'] = '1'
 
 // ========================================
 // CONFIGURAÇÃO DA API
 // ========================================
 const API_URL = 'http://localhost:3000/api/chamados';
+
+// ========================================
+// VARIÁVEIS GLOBAIS
+// ========================================
+let chamadosCarregados = []; 
+let chamadosFiltrados = []; 
+
+// Variáveis de Paginação
+let currentPage = 1;
+const pageSize = 10; 
+
+// Elementos DOM (Incluindo Filtros)
+const chamadosBody = document.getElementById('chamados-body');
+const filtroStatus = document.getElementById('filtroStatus');
+const filtroPrioridade = document.getElementById('filtroPrioridade');
+const filtroCategoria = document.getElementById('filtroCategoria');
+const paginationList = document.getElementById('pagination-list');
+
 
 // ========================================
 // FUNÇÕES DE AUTENTICAÇÃO
@@ -38,258 +74,246 @@ function obterUsuarioLogado() {
   }
 }
 
-function podeEditarChamados() {
-  const usuario = obterUsuarioLogado();
-  if (!usuario) return false;
-  
-  // Permite edição apenas para Admin e Técnico
-  // tipo_usuario retornado pelo backend: 'admin', 'tecnico', 'funcionario'
-  const tiposPermitidos = ['admin', 'tecnico'];
-  const podeEditar = tiposPermitidos.includes(usuario.tipo_usuario);
-  
-  console.log(`🔐 Verificação de permissão: ${usuario.tipo_usuario} - ${podeEditar ? 'PODE' : 'NÃO PODE'} editar`);
-  
-  return podeEditar;
-}
-
 // ========================================
-// FUNÇÕES DE LABELS
+// FUNÇÕES AUXILIARES
 // ========================================
-function getPrioridadeLabel(prioridade) {
-  const labels = {
-    [PRIORIDADE.BAIXA]: 'Baixa',
-    [PRIORIDADE.MEDIA]: 'Média',
-    [PRIORIDADE.ALTA]: 'Alta',
-    [PRIORIDADE.CRITICA]: 'Crítica'
-  };
-  return labels[prioridade] || 'Desconhecida';
-}
 
-function getPrioridadeClass(prioridade) {
-  const classes = {
-    [PRIORIDADE.BAIXA]: 'priority-low',
-    [PRIORIDADE.MEDIA]: 'priority-medium',
-    [PRIORIDADE.ALTA]: 'priority-high',
-    [PRIORIDADE.CRITICA]: 'priority-critical'
-  };
-  return classes[prioridade] || 'priority-low';
-}
-
-function getStatusLabel(status) {
-  const labels = {
-    [STATUS.ABERTO]: 'Aberto',
-    [STATUS.EM_ANDAMENTO]: 'Em Andamento',
-    [STATUS.RESOLVIDO]: 'Resolvido',
-    [STATUS.FECHADO]: 'Fechado',
-    [STATUS.CANCELADO]: 'Cancelado'
-  };
-  return labels[status] || 'Desconhecido';
-}
-
+/**
+ * Converte data ISO para formato brasileiro.
+ */
 function formatarData(dataStr) {
-  if (!dataStr) return 'N/A';
-  
-  const data = new Date(dataStr);
-  
-  // Formata como DD/MM/YYYY
-  const dia = String(data.getDate()).padStart(2, '0');
-  const mes = String(data.getMonth() + 1).padStart(2, '0');
-  const ano = data.getFullYear();
-  
-  return `${dia}/${mes}/${ano}`;
+    if (!dataStr) return 'N/A';
+    
+    const data = new Date(dataStr.split('.')[0]); 
+    const dia = String(data.getDate()).padStart(2, '0');
+    const mes = String(data.getMonth() + 1).padStart(2, '0');
+    const ano = data.getFullYear();
+    const hora = String(data.getHours()).padStart(2, '0');
+    const minuto = String(data.getMinutes()).padStart(2, '0');
+    
+    return `${dia}/${mes}/${ano} ${hora}:${minuto}`;
 }
 
-// ========================================
-// BUSCAR CHAMADOS DO BANCO
-// ========================================
-async function buscarChamados() {
-  try {
-    console.log('📡 Buscando chamados do banco de dados...', API_URL);
-    
-    const response = await fetch(API_URL);
-    console.log('📊 Response status:', response.status);
-    
-    if (!response.ok) {
-      throw new Error(`Erro HTTP: ${response.status}`);
-    }
-
-    const data = await response.json();
-    console.log('📦 Dados recebidos:', data);
-    
-    if (data.success) {
-      console.log(`✅ ${data.total} chamados encontrados:`, data.chamados);
-      return data.chamados;
-    } else {
-      console.error('❌ Erro no formato da resposta:', data);
-      throw new Error(data.message || 'Erro ao buscar chamados');
-    }
-  } catch (error) {
-    console.error('❌ Erro completo ao buscar chamados:', error);
-    mostrarErro(`Erro: ${error.message}`);
-    return [];
-  }
-}
-
-// ========================================
-// RENDERIZAR TABELA
-// ========================================
-function renderizarTabela(chamados) {
-  const tbody = document.querySelector('.tickets-table tbody');
-  
-  if (!tbody) {
-    console.error('❌ Tbody não encontrado');
-    return;
-  }
-
-  // Limpa tbody
-  tbody.innerHTML = '';
-
-  if (chamados.length === 0) {
-    tbody.innerHTML = `
-      <tr>
-        <td colspan="6" style="text-align: center; padding: 40px;">
-          📭 Nenhum chamado encontrado
-        </td>
-      </tr>
-    `;
-    return;
-  }
-
-  // Verifica permissão de edição
-  const podeEditar = podeEditarChamados();
-  const usuario = obterUsuarioLogado();
-  
-  console.log(`👤 Usuário: ${usuario?.nome || 'Não identificado'} - Nível: ${usuario?.nivelAcesso || 'Desconhecido'}`);
-
-  // Renderiza cada chamado
-  chamados.forEach(chamado => {
-    const tr = document.createElement('tr');
-    
-    const prioridadeClass = getPrioridadeClass(chamado.prioridade);
-    const prioridadeLabel = getPrioridadeLabel(chamado.prioridade);
-    const statusLabel = getStatusLabel(chamado.status);
-    const dataFormatada = formatarData(chamado.dataAbertura);
-    
-    const titulo = chamado.titulo || 'Sem categoria';
-    
-    // Botão de editar só aparece para Administrador e Técnico
-    const botaoEditar = podeEditar ? `
-      <button class="action-btn" aria-label="Editar chamado ${chamado.id}" onclick="editarChamado(${chamado.id})" title="Editar chamado">
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M14.5 2.5a2.121 2.121 0 113 3L6 17H3v-3L14.5 2.5z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </button>
-    ` : '';
-    
-    tr.innerHTML = `
-      <td class="actions-cell">
-        <button class="action-btn" aria-label="Visualizar chamado ${chamado.id}" onclick="verDetalhes(${chamado.id})" title="Visualizar detalhes">
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M10 4C5 4 1.73 7.11 1 10c.73 2.89 4 6 9 6s8.27-3.11 9-6c-.73-2.89-4-6-9-6z" stroke="currentColor" stroke-width="2"/>
-            <circle cx="10" cy="10" r="3" stroke="currentColor" stroke-width="2"/>
-          </svg>
+/**
+ * Cria o HTML para os botões de ação na tabela.
+ */
+function criarBotoesAcao(idChamado) {
+    return `
+        <button class="action-button view-button" onclick="window.location.href='/detalhes?id=${idChamado}'" title="Ver Detalhes">
+            <i class="fa-solid fa-eye"></i>
         </button>
-        ${botaoEditar}
-      </td>
-      <td>${chamado.id}</td>
-      <td>${titulo}</td>
-      <td>${dataFormatada}</td>
-      <td><span class="priority-badge ${prioridadeClass}">${prioridadeLabel}</span></td>
-      <td>${statusLabel}</td>
+        <button class="action-button edit-button" onclick="window.location.href='/editar?id=${idChamado}'" title="Editar Chamado">
+            <i class="fa-solid fa-pen-to-square"></i>
+        </button>
     `;
+}
+
+/**
+ * Renderiza uma linha da tabela para um chamado, incluindo a Categoria.
+ */
+function renderizarLinha(chamado) {
+    const prioridadeClasse = `priority-${chamado.prioridade}`;
+    const statusClasse = `status-${chamado.status}`;
     
-    tbody.appendChild(tr);
-  });
-  
-  console.log(`✅ Tabela renderizada com ${chamados.length} chamados`);
-}
+    // Obtém o valor da categoria. Se a API retornar o ID, ele usa CATEGORIA[ID]. 
+    // Se a API retornar o Nome (string), ele usa o nome diretamente.
+    let categoriaValor;
+    if (CATEGORIA[chamado.categoria]) {
+        // Se a API retornou o ID numérico (ex: 1)
+        categoriaValor = CATEGORIA[chamado.categoria];
+    } else {
+        // Se a API retornou o Nome (string) (ex: 'Hardware')
+        categoriaValor = chamado.categoria || 'N/A';
+    }
 
-// ========================================
-// AÇÕES - REDIRECIONAMENTO PARA PÁGINAS
-// ========================================
-function verDetalhes(id) {
-  console.log('👁️ Redirecionando para detalhes do chamado:', id);
-  window.location.href = `/detalhes-chamado?id=${id}`;
-}
-
-function editarChamado(id) {
-  console.log('✏️ Redirecionando para edição do chamado:', id);
-  
-  // Verifica permissão antes de redirecionar
-  if (!podeEditarChamados()) {
-    alert('❌ Você não tem permissão para editar chamados.');
-    return;
-  }
-  
-  window.location.href = `/editar-chamado?id=${id}`;
-}
-
-// ========================================
-// MOSTRAR ERRO
-// ========================================
-function mostrarErro(mensagem) {
-  const tbody = document.querySelector('.tickets-table tbody');
-  if (tbody) {
-    tbody.innerHTML = `
-      <tr>
-        <td colspan="6" style="text-align: center; padding: 40px; color: #e53e3e;">
-          ❌ ${mensagem}
-          <br><br>
-          <button onclick="location.reload()" style="padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer;">
-            🔄 Tentar Novamente
-          </button>
-        </td>
-      </tr>
+    return `
+        <tr>
+            <td class="action-cell">${criarBotoesAcao(chamado.id)}</td>
+            <td>${chamado.id}</td>
+            <td>${chamado.titulo}</td>
+            <td>${formatarData(chamado.dataAbertura)}</td>
+            <td class="${prioridadeClasse}">${PRIORIDADE[chamado.prioridade] || 'N/A'}</td>
+            <td>${categoriaValor}</td> <td class="${statusClasse}">${STATUS[chamado.status] || 'N/A'}</td>
+        </tr>
     `;
-  }
+}
+
+
+// ========================================
+// FUNÇÕES DE PAGINAÇÃO
+// ========================================
+
+/**
+ * Renderiza os links de paginação baseado no total de chamados filtrados.
+ */
+function renderizarPaginacao() {
+    if (!paginationList) return;
+
+    const totalPaginas = Math.ceil(chamadosFiltrados.length / pageSize);
+    let html = '';
+
+    for (let i = 1; i <= totalPaginas; i++) {
+        const activeClass = i === currentPage ? 'active' : '';
+        html += `
+            <li>
+                <a href="#" class="pagination-link ${activeClass}" 
+                   data-page="${i}" onclick="mudarPagina(${i}); return false;">
+                   ${i}
+                </a>
+            </li>
+        `;
+    }
+    
+    paginationList.innerHTML = html;
+}
+
+/**
+ * Altera a página atual e re-renderiza a tabela.
+ */
+function mudarPagina(page) {
+    const totalPaginas = Math.ceil(chamadosFiltrados.length / pageSize);
+    
+    if (page < 1 || page > totalPaginas) return;
+
+    currentPage = page;
+    renderizarChamados(); 
+    renderizarPaginacao();
+    window.scrollTo(0, 0); 
 }
 
 // ========================================
-// INICIALIZAÇÃO
+// FUNÇÕES DE RENDERIZAÇÃO E FILTRO
 // ========================================
-async function inicializar() {
-  console.log('🚀 Inicializando lista de chamados');
-  
-  // Verifica se usuário está logado
-  const usuario = obterUsuarioLogado();
-  if (!usuario) {
-    console.warn('⚠️ Usuário não está logado');
-    alert('Você precisa estar logado para acessar esta página.');
-    window.location.href = '/login';
-    return;
-  }
-  
-  console.log(`👤 Usuário logado: ${usuario.nome} (${usuario.nivelAcesso})`);
-  
-  // Mostra loading
-  const tbody = document.querySelector('.tickets-table tbody');
-  if (tbody) {
-    tbody.innerHTML = `
-      <tr>
-        <td colspan="6" style="text-align: center; padding: 40px;">
-          ⏳ Carregando chamados do banco de dados...
-        </td>
-      </tr>
-    `;
-  }
-  
-  try {
-    // Busca chamados do banco
-    const chamados = await buscarChamados();
+
+/**
+ * Renderiza a lista de chamados na tabela (função principal de visualização).
+ */
+function renderizarChamados() {
+    if (!chamadosBody) return;
+
+    const start = (currentPage - 1) * pageSize;
+    const end = start + pageSize;
     
-    // Renderiza tabela
-    renderizarTabela(chamados);
+    const chamadosDaPagina = chamadosFiltrados.slice(start, end);
+
+    if (chamadosDaPagina.length === 0) {
+        // COLSPAN é 7
+        chamadosBody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 30px;">Nenhum chamado encontrado.</td></tr>`;
+        return;
+    }
+
+    const html = chamadosDaPagina.map(renderizarLinha).join('');
+    chamadosBody.innerHTML = html;
+}
+
+/**
+ * Aplica os filtros de Status, Prioridade e Categoria (REVISADO).
+ */
+function aplicarFiltros() {
+    console.log('🔄 Aplicando filtros...');
     
-    console.log('✅ Sistema inicializado com sucesso');
-  } catch (error) {
-    console.error('❌ Erro ao inicializar:', error);
-    mostrarErro('Erro ao carregar chamados. Tente novamente.');
-  }
+    const statusSelecionado = filtroStatus ? filtroStatus.value : '';
+    const prioridadeSelecionada = filtroPrioridade ? filtroPrioridade.value : '';
+    const categoriaSelecionada = filtroCategoria ? filtroCategoria.value : ''; // ID numérico do filtro (ex: '1')
+    
+    const tempFiltrados = chamadosCarregados.filter(chamado => {
+        
+        const chamadoStatus = String(chamado.status || '');
+        const chamadoPrioridade = String(chamado.prioridade || '');
+        
+        // 🌟 CORREÇÃO DE CATEGORIA: Tenta converter o valor do chamado para ID numérico
+        let idCategoriaDoChamado = '';
+        const valorChamadoCategoria = chamado.categoria ? String(chamado.categoria) : '';
+
+        if (!valorChamadoCategoria) {
+            // Categoria vazia, id é ''
+            idCategoriaDoChamado = '';
+        } else if (CATEGORIA[valorChamadoCategoria]) {
+            // Caso 1: A API retornou o ID numérico (ex: '1')
+            idCategoriaDoChamado = valorChamadoCategoria;
+        } else {
+            // Caso 2: A API retornou o NOME (ex: 'Hardware'). Faz o reverse lookup.
+            const nomeFormatado = valorChamadoCategoria.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            idCategoriaDoChamado = CATEGORIA_NOME_PARA_ID[nomeFormatado] || '';
+        }
+
+        // Verifica se o chamado passa pelo filtro de Status
+        const filtroStatusPassa = !statusSelecionado || chamadoStatus === statusSelecionado;
+        
+        // Verifica se o chamado passa pelo filtro de Prioridade
+        const filtroPrioridadePassa = !prioridadeSelecionada || chamadoPrioridade === prioridadeSelecionada;
+
+        // Verifica se o chamado passa pelo filtro de Categoria
+        const filtroCategoriaPassa = !categoriaSelecionada || idCategoriaDoChamado === categoriaSelecionada; 
+        
+        return filtroStatusPassa && filtroPrioridadePassa && filtroCategoriaPassa; 
+    });
+
+    chamadosFiltrados = tempFiltrados;
+    currentPage = 1; 
+    
+    renderizarChamados();
+    renderizarPaginacao();
+}
+
+/**
+ * Busca a lista completa de chamados na API.
+ */
+async function carregarChamados() {
+    try {
+        console.log('📡 Buscando todos os chamados na API...');
+        
+        const response = await fetch(API_URL);
+        
+        if (!response.ok) {
+            throw new Error(`Erro HTTP: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        if (data.success && data.chamados) {
+            chamadosCarregados = data.chamados.sort((a, b) => b.id - a.id); 
+            console.log(`✅ ${chamadosCarregados.length} chamados carregados.`);
+            
+            aplicarFiltros(); 
+
+        } else {
+            throw new Error(data.mensagem || 'Resposta da API inválida.');
+        }
+
+    } catch (error) {
+        console.error('❌ Erro ao carregar chamados:', error);
+        if (chamadosBody) {
+            // COLSPAN é 7
+            chamadosBody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 30px; color: red;">
+                Erro ao carregar chamados: ${error.message}
+            </td></tr>`;
+        }
+    }
 }
 
 // ========================================
-// CONFIGURA BOTÃO VOLTAR
+// CONFIGURAÇÃO
 // ========================================
+
+/**
+ * Configura os event listeners para os campos de filtro.
+ */
+function configurarEventListeners() {
+    if (filtroStatus) {
+        filtroStatus.addEventListener('change', aplicarFiltros);
+    }
+    if (filtroPrioridade) {
+        filtroPrioridade.addEventListener('change', aplicarFiltros);
+    }
+    if (filtroCategoria) { 
+        filtroCategoria.addEventListener('change', aplicarFiltros);
+    }
+}
+
+/**
+ * Configura o botão de voltar.
+ */
 function configurarBotaoVoltar() {
   const backLink = document.querySelector('.back-link');
   if (backLink) {
@@ -300,35 +324,38 @@ function configurarBotaoVoltar() {
   }
 }
 
+/**
+ * Inicializa a aplicação.
+ */
+async function inicializar() {
+  console.log('🚀 Inicializando lista de chamados');
+  
+  const usuario = obterUsuarioLogado();
+  if (!usuario) {
+    console.warn('⚠️ Usuário não está logado');
+    alert('Você precisa estar logado para acessar esta página.');
+    window.location.href = '/login';
+    return;
+  }
+  
+  console.log(`👤 Usuário logado: ${usuario.nome} (${usuario.tipo_usuario})`);
+  
+  configurarEventListeners();
+  configurarBotaoVoltar();
+  
+  await carregarChamados();
+  
+  console.log('✅ Sistema inicializado com sucesso');
+}
+
 // ========================================
 // EXECUÇÃO
 // ========================================
-// Aguarda DOM carregar
+
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => {
-    inicializar();
-    configurarBotaoVoltar();
-  });
+  document.addEventListener('DOMContentLoaded', inicializar);
 } else {
-  // DOM já carregado
   inicializar();
-  configurarBotaoVoltar();
 }
 
-// Atualiza a cada 30 segundos
-setInterval(async () => {
-  console.log('🔄 Atualizando chamados...');
-  const chamados = await buscarChamados();
-  renderizarTabela(chamados);
-}, 30000);
-
-// Expõe funções globalmente para os botões HTML
-window.verDetalhes = verDetalhes;
-window.editarChamado = editarChamado;
-
-//============================================
-// Pesquisa e filtro de chamados
-//============================================
-
-// Pesquisa chamados pelo Titulo ou Descrição
-
+window.mudarPagina = mudarPagina;

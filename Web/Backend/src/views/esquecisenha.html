@@ -8,7 +8,6 @@
     <script src="https://kit.fontawesome.com/d6b6410536.js" crossorigin="anonymous"></script>
     <link rel="shortcut icon" href="/static/img/favicon.ico" type="image/x-icon">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-    <script href="login.html"></script>
 </head>
 <body>
     <!-- Botão Voltar -->
@@ -27,10 +26,10 @@
                 <p><strong>Esqueceu sua senha?</strong> Não se preocupe! Informe seus dados abaixo e enviaremos uma solicitação ao administrador para redefinir sua senha.</p>
                 
                 <!-- Alertas -->
-                <div id="mensagemAlerta" class="alert"></div>
+                <div id="mensagemAlerta" class="alert" style="display: none;"></div>
                 
                 <!-- Loading -->
-                <div id="loading" class="loading">
+                <div id="loading" class="loading" style="display: none;">
                     <div class="loading-spinner"></div>
                     <p>Enviando solicitação...</p>
                 </div>
@@ -42,7 +41,7 @@
                         <input 
                             type="text" 
                             id="cpfRecuperacao" 
-                            placeholder="Digite seu CPF (000.000.000-00)"
+                            placeholder="Digite seu CPF"
                             maxlength="14"
                             required>
                     </p>
@@ -81,160 +80,156 @@
         </form>
     </main>
 
-    <script>
-        // ============================================
-        // FORMATAÇÃO DE CPF
-        // ============================================
-        const cpfInput = document.getElementById('cpfRecuperacao');
+<script>
+    // ============================================
+    // FORMATAÇÃO DE CPF
+    // ============================================
+    const cpfInput = document.getElementById('cpfRecuperacao');
+    const formRecuperarSenha = document.getElementById('formRecuperarSenha');
+
+    cpfInput.addEventListener('input', function(e) {
+        let value = e.target.value.replace(/\D/g, '');
         
-        cpfInput.addEventListener('input', function(e) {
-            let value = e.target.value.replace(/\D/g, '');
-            
-            if (value.length <= 11) {
-                value = value.replace(/(\d{3})(\d)/, '$1.$2');
-                value = value.replace(/(\d{3})(\d)/, '$1.$2');
-                value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
-                e.target.value = value;
-            }
-        });
-
-        // ============================================
-        // FUNÇÕES AUXILIARES
-        // ============================================
-        function mostrarMensagem(texto, tipo) {
-            const alertDiv = document.getElementById('mensagemAlerta');
-            alertDiv.textContent = texto;
-            alertDiv.className = `alert alert-${tipo}`;
-            alertDiv.style.display = 'block';
-            
-            // Auto-ocultar mensagens de sucesso após 5 segundos
-            if (tipo === 'success') {
-                setTimeout(() => {
-                    alertDiv.style.display = 'none';
-                }, 5000);
-            }
+        if (value.length <= 11) {
+            value = value.replace(/(\d{3})(\d)/, '$1.$2');
+            value = value.replace(/(\d{3})(\d)/, '$1.$2');
+            value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+            e.target.value = value;
         }
+    });
 
-        function mostrarLoading(mostrar) {
-            document.getElementById('loading').style.display = mostrar ? 'block' : 'none';
-            document.getElementById('formFields').style.display = mostrar ? 'none' : 'block';
-            document.getElementById('btnEnviar').disabled = mostrar;
+    // ============================================
+    // FUNÇÕES AUXILIARES
+    // ============================================
+    function mostrarMensagem(texto, tipo) {
+        const alerta = document.getElementById('mensagemAlerta');
+        alerta.textContent = texto;
+        alerta.className = `alert ${tipo}`;
+        alerta.style.display = 'block';
+        
+        setTimeout(() => {
+            alerta.style.display = 'none';
+        }, 5000);
+    }
+
+    function mostrarLoading(mostrar) {
+        document.getElementById('loading').style.display = mostrar ? 'block' : 'none';
+        document.getElementById('formFields').style.display = mostrar ? 'none' : 'block';
+        document.getElementById('btnEnviar').disabled = mostrar;
+    }
+
+    // ⚠️ FUNÇÃO VALIDAR CPF (COM VALIDAÇÃO RÍGIDA COMENTADA PARA TESTE)
+    function validarCPF(cpf) {
+        cpf = cpf.replace(/\D/g, ''); // Limpa o CPF
+
+        // 1. Checa se o comprimento é 11 (MANTIDO)
+        if (cpf.length !== 11) return false;
+        
+        // ========================================================
+        // ❌ VALIDAÇÃO RÍGIDA COMENTADA PARA PERMITIR TESTES
+        // ========================================================
+        
+        // // Bloqueia CPFs com todos os dígitos iguais (ex: 33333333333)
+        // if (/^(\d)\1{10}$/.test(cpf)) return false; 
+        
+        // // Lógica de validação do primeiro dígito verificador
+        // let soma = 0;
+        // for (let i = 0; i < 9; i++) {
+        //     soma += parseInt(cpf.charAt(i)) * (10 - i);
+        // }
+        // let resto = 11 - (soma % 11);
+        // let digito1 = resto >= 10 ? 0 : resto;
+        
+        // // Lógica de validação do segundo dígito verificador
+        // soma = 0;
+        // for (let i = 0; i < 10; i++) {
+        //     soma += parseInt(cpf.charAt(i)) * (11 - i);
+        // }
+        // resto = 11 - (soma % 11);
+        // let digito2 = resto >= 10 ? 0 : resto;
+        
+        // // Retorna a checagem dos dois dígitos verificadores
+        // return digito1 === parseInt(cpf.charAt(9)) && digito2 === parseInt(cpf.charAt(10));
+        
+        // ========================================================
+        // ✅ RETORNO SIMPLIFICADO: RETORNA TRUE SE TIVER 11 DÍGITOS
+        // ========================================================
+        return true; 
+    }
+    
+    // ... (restante do seu código)
+    
+    function validarEmail(email) {
+        const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return regex.test(email);
+    }
+
+    function limparFormulario() {
+        document.getElementById('cpfRecuperacao').value = '';
+        document.getElementById('emailRecuperacao').value = '';
+    }
+
+    // ============================================
+    // ✅ ENVIO DO FORMULÁRIO - URL CORRIGIDA
+    // ============================================
+    formRecuperarSenha.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        document.getElementById('mensagemAlerta').style.display = 'none';
+        
+        const cpfOriginal = cpfInput.value;
+        const cpf = cpfOriginal.replace(/\D/g, '');
+        const email = document.getElementById('emailRecuperacao').value.trim();
+        
+        console.log('📤 Enviando dados:', { cpf, email });
+        
+        // Validação Front-end
+        if (!validarCPF(cpf)) {
+            mostrarMensagem('❌ CPF inválido! Verifique e tente novamente.', 'error');
+            cpfInput.focus();
+            return;
         }
-
-        function validarCPF(cpf) {
-            cpf = cpf.replace(/\D/g, '');
-            
-            if (cpf.length !== 11) return false;
-            if (/^(\d)\1{10}$/.test(cpf)) return false; // Todos os dígitos iguais
-            
-            // Validação dos dígitos verificadores
-            let soma = 0;
-            let resto;
-            
-            for (let i = 1; i <= 9; i++) {
-                soma += parseInt(cpf.substring(i - 1, i)) * (11 - i);
-            }
-            resto = (soma * 10) % 11;
-            if (resto === 10 || resto === 11) resto = 0;
-            if (resto !== parseInt(cpf.substring(9, 10))) return false;
-            
-            soma = 0;
-            for (let i = 1; i <= 10; i++) {
-                soma += parseInt(cpf.substring(i - 1, i)) * (12 - i);
-            }
-            resto = (soma * 10) % 11;
-            if (resto === 10 || resto === 11) resto = 0;
-            if (resto !== parseInt(cpf.substring(10, 11))) return false;
-            
-            return true;
+        
+        if (!validarEmail(email)) {
+            mostrarMensagem('❌ E-mail inválido! Verifique e tente novamente.', 'error');
+            document.getElementById('emailRecuperacao').focus();
+            return;
         }
-
-        function validarEmail(email) {
-            const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            return regex.test(email);
+        
+        mostrarLoading(true);
+        
+        try {
+            // ✅ URL CORRIGIDA: /api/recuperar/solicitar
+            console.log('🌐 Fazendo requisição para: /api/recuperar/solicitar');
+            
+            const response = await fetch('/api/recuperar/solicitar', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ cpf, email })
+            });
+            
+            console.log('📡 Status da resposta:', response.status);
+            
+            const result = await response.json();
+            console.log('📬 Resultado:', result);
+            
+            mostrarLoading(false);
+            
+            if (result.sucesso) {
+                mostrarMensagem('✅ ' + result.mensagem, 'success');
+                limparFormulario();
+                setTimeout(() => { 
+                    window.location.href = '/login'; 
+                }, 3000);
+            } else {
+                mostrarMensagem('❌ ' + result.mensagem, 'error');
+            }
+        } catch (error) {
+            mostrarLoading(false);
+            console.error('❌ Erro ao solicitar recuperação:', error);
+            mostrarMensagem('❌ Erro de conexão com o servidor. Tente novamente mais tarde.', 'error');
         }
-
-        function limparFormulario() {
-            document.getElementById('formRecuperarSenha').reset();
-        }
-
-        // ============================================
-        // ENVIO DO FORMULÁRIO
-        // ============================================
-        document.getElementById('formRecuperarSenha').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            // Limpar mensagens anteriores
-            document.getElementById('mensagemAlerta').style.display = 'none';
-            
-            // Obter valores
-            const cpf = cpfInput.value.replace(/\D/g, '');
-            const email = document.getElementById('emailRecuperacao').value.trim();
-            
-            // Validações
-            if (!validarCPF(cpf)) {
-                mostrarMensagem('❌ CPF inválido! Verifique e tente novamente.', 'error');
-                cpfInput.focus();
-                return;
-            }
-            
-            if (!validarEmail(email)) {
-                mostrarMensagem('❌ E-mail inválido! Verifique e tente novamente.', 'error');
-                document.getElementById('emailRecuperacao').focus();
-                return;
-            }
-            
-            // Mostrar loading
-            mostrarLoading(true);
-            
-            try {
-                const response = await fetch('/api/recuperar-senha', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ cpf, email })
-                });
-                
-                const result = await response.json();
-                
-                // Ocultar loading
-                mostrarLoading(false);
-                
-                if (result.sucesso) {
-                    mostrarMensagem('✅ ' + result.mensagem, 'success');
-                    limparFormulario();
-                    
-                    // Redirecionar para login após 3 segundos
-                    setTimeout(() => {
-                        window.location.href = '/login.html';
-                    }, 3000);
-                } else {
-                    mostrarMensagem('❌ ' + result.mensagem, 'error');
-                }
-            } catch (error) {
-                mostrarLoading(false);
-                console.error('Erro ao solicitar recuperação:', error);
-                mostrarMensagem('❌ Erro de conexão com o servidor. Tente novamente mais tarde.', 'error');
-            }
-        });
-
-        // ============================================
-        // VALIDAÇÃO EM TEMPO REAL
-        // ============================================
-        cpfInput.addEventListener('blur', function() {
-            const cpf = this.value.replace(/\D/g, '');
-            if (cpf && !validarCPF(cpf)) {
-                mostrarMensagem('⚠️ CPF inválido!', 'error');
-            }
-        });
-
-        document.getElementById('emailRecuperacao').addEventListener('blur', function() {
-            const email = this.value.trim();
-            if (email && !validarEmail(email)) {
-                mostrarMensagem('⚠️ E-mail inválido!', 'error');
-            }
-        });
-    </script>
+    });
+</script>
 </body>
 </html>

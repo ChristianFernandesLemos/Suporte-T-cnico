@@ -84,12 +84,9 @@ async function buscarContestacoes(idChamado) {
     
     const response = await fetch(`${CONTESTACOES_URL}/chamado/${idChamado}`);
     
+    // 🚨 CORREÇÃO: Removemos a checagem específica por 404.
     if (!response.ok) {
-      if (response.status === 404) {
-        console.log('ℹ️ Nenhuma contestação encontrada');
-        return [];
-      }
-      throw new Error(`Erro HTTP: ${response.status}`);
+      throw new Error(`Erro HTTP: ${response.status} ao buscar contestações.`);
     }
 
     const data = await response.json();

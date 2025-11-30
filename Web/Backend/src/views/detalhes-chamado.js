@@ -84,12 +84,10 @@ async function buscarContestacoes(idChamado) {
     
     const response = await fetch(`${CONTESTACOES_URL}/chamado/${idChamado}`);
     
+    // 🚨 CORREÇÃO: Removemos a checagem específica por 404. 
+    // Se a busca falhar (4xx ou 5xx), lançamos um erro.
     if (!response.ok) {
-      if (response.status === 404) {
-        console.log('ℹ️ Nenhuma contestação encontrada (404)');
-        return [];
-      }
-      throw new Error(`Erro HTTP: ${response.status}`);
+      throw new Error(`Erro HTTP: ${response.status} ao buscar contestações.`);
     }
 
     const data = await response.json();
@@ -99,11 +97,13 @@ async function buscarContestacoes(idChamado) {
       console.log(`✅ ${data.contestacoes.length} contestação(ões) encontrada(s)`);
       return data.contestacoes;
     } else {
-      console.log('ℹ️ Nenhuma contestação no resultado');
+      console.log('ℹ️ Nenhuma contestação no resultado ou formato inválido do Backend.');
       return [];
     }
   } catch (error) {
     console.error('⚠️ Erro ao buscar contestações:', error);
+    // 🚨 AQUI, AGORA, LOGAREMOS O ERRO NO CONSOLE (ex: Erro HTTP: 500)
+    // O retorno [] garante que a renderização não quebre.
     return [];
   }
 }
