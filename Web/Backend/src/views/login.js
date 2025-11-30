@@ -134,35 +134,126 @@ document.addEventListener('DOMContentLoaded', function() {
     `;
     document.head.appendChild(style);
 
-    // Esqueci a senha
-    const forgotLink = document.querySelector('.forgot');
-    if (forgotLink) {
-        forgotLink.addEventListener('click', async function(e) {
-            e.preventDefault();
-            
-            const email = emailInput.value.trim();
-            
-            if (!email) {
-                showMessage('Digite seu e-mail para recuperar a senha.', 'error');
-                emailInput.focus();
-                return;
-            }
+    const emailService = require('./emailService');
+     const db = require('./database'); // Seu módulo de banco de dados
 
-            try {
-                const response = await fetch('/api/auth/forgot-password', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ email })
-                });
+    
+    // 1. Seleciona o link
+    const linkEsqueciSenha = document.querySelector('.forgot');
+    linkEsqueciSenha.addEventListener('click', function(event) {
+    event.preventDefault(window.location.assign("/esquecisenha"));
+     });
+  
 
-                const data = await response.json();
-                showMessage(data.message, 'success');
-            } catch (error) {
-                console.error('Erro:', error);
-                showMessage('Erro ao processar solicitação.', 'error');
-            }
+ /**
+  * 🔐 RECUPERAÇÃO DE SENHA
+  * Implementa funcionalidade de recuperação de senha via e-mail
+  */
+
+ // ============================================
+ // SOLICITAÇÃO DE RECUPERAÇÃO DE SENHA
+ // ============================================
+
+ async function solicitarRecuperacaoSenha(cpf, email) {
+    try {
+        // 1. Validar entrada (Mantido do original)
+        if (!cpf || !email) {
+            return {
+                sucesso: false,
+                mensagem: 'CPF e e-mail são obrigatórios!' 
+            }; 
+        }
+
+        // 2. Buscar usuário no banco de dados (Mantido do original)
+        const usuario = await db.buscarUsuarioPorCpf(cpf);
+        if (!usuario) {
+            return {
+                sucesso: false,
+                mensagem: 'CPF não encontrado no sistema!'
+            }; 
+        }
+
+        // 3. Verificar se o e-mail corresponde (Mantido do original)
+        if (usuario.email.toLowerCase() !== email.toLowerCase()) {
+            return {
+                sucesso: false,
+                mensagem: 'E-mail não corresponde ao cadastrado!'
+            }; 
+        }
+
+        // ======================================================
+        // 4. NOVA LÓGICA: Integração com n8n
+        // ======================================================
+        
+        const webhookUrl = 'https://n8n.srv993727.hstgr.cloud/webhook/emailsenharecuperar';
+
+        // Envia os dados para o n8n via POST
+        const response = await fetch(webhookUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                email: usuario.email,
+                cpf: cpf,
+                nome: usuario.nome // Enviando o nome também para personalizar o e-mail no n8n
+            })
         });
+
+        // O n8n retorna texto puro: "Enviado" ou "Não enviado"
+        const respostaN8N = await response.text();
+
+        // 5. Verificar resposta do n8n
+        if (respostaN8N.trim() === 'Enviado') {
+            
+            // 6. Registrar solicitação no banco (Opcional - mantido do original)
+            await db.registrarSolicitacaoRecuperacao(usuario.id); // 
+
+            return {
+                sucesso: true,
+                mensagem: 'Solicitação enviada! O administrador receberá sua solicitação.' 
+            };
+        } else {
+            // Caso o n8n retorne "Não enviado" ou outra coisa
+            console.error('Erro no n8n:', respostaN8N);
+            return {
+                sucesso: false,
+                mensagem: 'Erro ao enviar e-mail via sistema externo. Tente novamente.'
+            };
+        }
+
+    } catch (error) {
+        console.error('Erro ao solicitar recuperação de senha:', error);
+        return {
+            sucesso: false,
+            mensagem: 'Erro interno do servidor. Tente novamente mais tarde.'
+        };
     }
+}
+
+// ============================================
+// GERADOR DE SENHA TEMPORÁRIA
+// ============================================
+
+function gerarSenhaTemporaria(tamanho = 8) {
+    const caracteres = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let senha = '';
+    
+    for (let i = 0; i < tamanho; i++) {
+        const indice = Math.floor(Math.random() * caracteres.length);
+        senha += caracteres.charAt(indice);
+    }
+    
+    return senha;
+}
+
+// ============================================
+// EXPORTAR FUNÇÕES
+// ============================================
+
+module.exports = {
+    solicitarRecuperacaoSenha,
+    redefinirSenhaUsuario,
+    gerarSenhaTemporaria
+};
 });

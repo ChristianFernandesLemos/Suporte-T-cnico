@@ -7,12 +7,12 @@ const viewsPath = path.join(__dirname, '../views');
 
 // Página de login
 router.get('/login', (req, res) => {
-  res.sendFile(path.join(viewsPath, 'login.html'));
+  res.sendFile(path.join(viewsPath, 'Index.html'));
 });
 
 // Página Esqueci a senha
 router.get('/esquecisenha', (req, res) => {
-  res.sendFile(path.join(viewsPath, '.html'));
+  res.sendFile(path.join(viewsPath, 'esquecisenha.html'));
 });
 
 // Página do menu principal

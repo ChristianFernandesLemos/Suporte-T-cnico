@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recuperar Senha | InterFix</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="https://kit.fontawesome.com/d6b6410536.js" crossorigin="anonymous"></script>
+    <link rel="shortcut icon" href="/static/img/favicon.ico" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <script href="login.html"></script>
+</head>
+<body>
+    <!-- Botão Voltar -->
+    <a href="/login" class="back-button">
+        <i class="fa-solid fa-arrow-left"></i>
+        Voltar ao Login
+    </a>
+
+    <main class="container">
+        <form class="login-box" id="formRecuperarSenha">
+            <div class="login-form">
+                <h1>
+                    <i class="fa-solid fa-key"></i>
+                    Recuperar Senha
+                </h1>
+                <p><strong>Esqueceu sua senha?</strong> Não se preocupe! Informe seus dados abaixo e enviaremos uma solicitação ao administrador para redefinir sua senha.</p>
+                
+                <!-- Alertas -->
+                <div id="mensagemAlerta" class="alert"></div>
+                
+                <!-- Loading -->
+                <div id="loading" class="loading">
+                    <div class="loading-spinner"></div>
+                    <p>Enviando solicitação...</p>
+                </div>
+
+                <!-- Formulário -->
+                <div id="formFields">
+                    <p class="input-group">
+                        <span class="icon"><i class="fa-solid fa-id-card"></i></span>
+                        <input 
+                            type="text" 
+                            id="cpfRecuperacao" 
+                            placeholder="Digite seu CPF (000.000.000-00)"
+                            maxlength="14"
+                            required>
+                    </p>
+                    <p class="input-group">
+                        <span class="icon"><i class="fa-solid fa-envelope"></i></span>
+                        <input 
+                            type="email" 
+                            id="emailRecuperacao" 
+                            placeholder="Digite seu e-mail cadastrado"
+                            required>
+                    </p>
+
+                    <button type="submit" id="btnEnviar">
+                        <i class="fa-solid fa-paper-plane"></i>
+                        Solicitar Recuperação
+                    </button>
+                </div>
+
+                <!-- Informações -->
+                <div class="info-box">
+                    <h3><i class="fa-solid fa-circle-info"></i> Como funciona?</h3>
+                    <ol>
+                        <li>Informe seu CPF e e-mail cadastrados</li>
+                        <li>Uma solicitação será enviada ao administrador</li>
+                        <li>O administrador verificará sua identidade</li>
+                        <li>Você receberá uma senha temporária por e-mail</li>
+                        <li>Altere a senha temporária no primeiro login</li>
+                    </ol>
+                </div>
+            </div>
+
+            <picture class="login-logo">
+                <img src="/static/img/logo.png" alt="InterFix Logo">
+                <img src="/static/img/logotipo-bg.png" alt="InterFix">
+            </picture>
+        </form>
+    </main>
+
+    <script>
+        // ============================================
+        // FORMATAÇÃO DE CPF
+        // ============================================
+        const cpfInput = document.getElementById('cpfRecuperacao');
+        
+        cpfInput.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            
+            if (value.length <= 11) {
+                value = value.replace(/(\d{3})(\d)/, '$1.$2');
+                value = value.replace(/(\d{3})(\d)/, '$1.$2');
+                value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+                e.target.value = value;
+            }
+        });
+
+        // ============================================
+        // FUNÇÕES AUXILIARES
+        // ============================================
+        function mostrarMensagem(texto, tipo) {
+            const alertDiv = document.getElementById('mensagemAlerta');
+            alertDiv.textContent = texto;
+            alertDiv.className = `alert alert-${tipo}`;
+            alertDiv.style.display = 'block';
+            
+            // Auto-ocultar mensagens de sucesso após 5 segundos
+            if (tipo === 'success') {
+                setTimeout(() => {
+                    alertDiv.style.display = 'none';
+                }, 5000);
+            }
+        }
+
+        function mostrarLoading(mostrar) {
+            document.getElementById('loading').style.display = mostrar ? 'block' : 'none';
+            document.getElementById('formFields').style.display = mostrar ? 'none' : 'block';
+            document.getElementById('btnEnviar').disabled = mostrar;
+        }
+
+        function validarCPF(cpf) {
+            cpf = cpf.replace(/\D/g, '');
+            
+            if (cpf.length !== 11) return false;
+            if (/^(\d)\1{10}$/.test(cpf)) return false; // Todos os dígitos iguais
+            
+            // Validação dos dígitos verificadores
+            let soma = 0;
+            let resto;
+            
+            for (let i = 1; i <= 9; i++) {
+                soma += parseInt(cpf.substring(i - 1, i)) * (11 - i);
+            }
+            resto = (soma * 10) % 11;
+            if (resto === 10 || resto === 11) resto = 0;
+            if (resto !== parseInt(cpf.substring(9, 10))) return false;
+            
+            soma = 0;
+            for (let i = 1; i <= 10; i++) {
+                soma += parseInt(cpf.substring(i - 1, i)) * (12 - i);
+            }
+            resto = (soma * 10) % 11;
+            if (resto === 10 || resto === 11) resto = 0;
+            if (resto !== parseInt(cpf.substring(10, 11))) return false;
+            
+            return true;
+        }
+
+        function validarEmail(email) {
+            const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return regex.test(email);
+        }
+
+        function limparFormulario() {
+            document.getElementById('formRecuperarSenha').reset();
+        }
+
+        // ============================================
+        // ENVIO DO FORMULÁRIO
+        // ============================================
+        document.getElementById('formRecuperarSenha').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Limpar mensagens anteriores
+            document.getElementById('mensagemAlerta').style.display = 'none';
+            
+            // Obter valores
+            const cpf = cpfInput.value.replace(/\D/g, '');
+            const email = document.getElementById('emailRecuperacao').value.trim();
+            
+            // Validações
+            if (!validarCPF(cpf)) {
+                mostrarMensagem('❌ CPF inválido! Verifique e tente novamente.', 'error');
+                cpfInput.focus();
+                return;
+            }
+            
+            if (!validarEmail(email)) {
+                mostrarMensagem('❌ E-mail inválido! Verifique e tente novamente.', 'error');
+                document.getElementById('emailRecuperacao').focus();
+                return;
+            }
+            
+            // Mostrar loading
+            mostrarLoading(true);
+            
+            try {
+                const response = await fetch('/api/recuperar-senha', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ cpf, email })
+                });
+                
+                const result = await response.json();
+                
+                // Ocultar loading
+                mostrarLoading(false);
+                
+                if (result.sucesso) {
+                    mostrarMensagem('✅ ' + result.mensagem, 'success');
+                    limparFormulario();
+                    
+                    // Redirecionar para login após 3 segundos
+                    setTimeout(() => {
+                        window.location.href = '/login.html';
+                    }, 3000);
+                } else {
+                    mostrarMensagem('❌ ' + result.mensagem, 'error');
+                }
+            } catch (error) {
+                mostrarLoading(false);
+                console.error('Erro ao solicitar recuperação:', error);
+                mostrarMensagem('❌ Erro de conexão com o servidor. Tente novamente mais tarde.', 'error');
+            }
+        });
+
+        // ============================================
+        // VALIDAÇÃO EM TEMPO REAL
+        // ============================================
+        cpfInput.addEventListener('blur', function() {
+            const cpf = this.value.replace(/\D/g, '');
+            if (cpf && !validarCPF(cpf)) {
+                mostrarMensagem('⚠️ CPF inválido!', 'error');
+            }
+        });
+
+        document.getElementById('emailRecuperacao').addEventListener('blur', function() {
+            const email = this.value.trim();
+            if (email && !validarEmail(email)) {
+                mostrarMensagem('⚠️ E-mail inválido!', 'error');
+            }
+        });
+    </script>
+</body>
+</html>
