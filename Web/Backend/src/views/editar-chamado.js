@@ -20,6 +20,14 @@ const PRIORIDADE = {
   4: 'Crítica'
 };
 
+// 🌟 NOVO: Mapeamento para tratar IDs de Categoria (Assumindo 2 = Hardware)
+const CATEGORIA = {
+  1: 'Software',
+  2: 'Hardware',
+  3: 'Rede',
+  4: 'Outros'
+};
+
 // ========================================
 // CONFIGURAÇÃO DA API
 // ========================================
@@ -153,11 +161,28 @@ async function preencherFormulario(chamado) {
   });
 
   // Preenche SELECT de Categoria
-  const selectCategoria = document.getElementById('categoria');
-  if (selectCategoria && chamado.categoria) {
-    selectCategoria.value = chamado.categoria;
-    console.log(`✓ Categoria selecionada: ${chamado.categoria}`);
-  }
+    const selectCategoria = document.getElementById('categoria');
+    if (selectCategoria && chamado.categoria) {
+        let categoriaValor = chamado.categoria;
+
+        // 1. Tenta traduzir o ID (caso a API esteja retornando um número por engano)
+        if (CATEGORIA[categoriaValor]) {
+            categoriaValor = CATEGORIA[categoriaValor];
+        }
+
+        // 2. Garante a capitalização correta e remove espaços (Caso de string inconsistente)
+        if (typeof categoriaValor === 'string') {
+            const trimmedLower = categoriaValor.toLowerCase().trim();
+            // Verifica o trimmedLower para padronizar com a capitalização do HTML (ex: "Hardware")
+            if (trimmedLower === 'software') categoriaValor = 'Software';
+            else if (trimmedLower === 'hardware') categoriaValor = 'Hardware';
+            else if (trimmedLower === 'rede') categoriaValor = 'Rede';
+            else if (trimmedLower.startsWith('outros')) categoriaValor = 'Outros';
+        }
+        
+        selectCategoria.value = categoriaValor; // Define o valor corrigido
+        console.log(`✓ Categoria selecionada: ${categoriaValor}`);
+    }
 
   // Preenche SELECT de Prioridade (valor numérico)
   const selectPrioridade = document.getElementById('prioridade');
@@ -275,8 +300,8 @@ async function salvarAlteracoes(event) {
       console.log('✅ Chamado atualizado com sucesso!');
       alert('✅ Chamado atualizado com sucesso!');
       
-      // Redireciona para detalhes
-      window.location.href = `/detalhes-chamado?id=${chamadoId}`;
+      // 🎯 CORREÇÃO: Redireciona para /detalhes (a rota correta no pages.js)
+      window.location.href = `/detalhes?id=${chamadoId}`;
     } else {
       throw new Error(data.message || 'Erro ao atualizar chamado');
     }
