@@ -197,43 +197,28 @@ function renderizarContestacoesReadonly(contestacoes) {
   }
 
   // Ajusta altura do textarea baseado na quantidade de contestações
-  contestacaoTextarea.rows = contestacoes.length > 0 ? Math.min(contestacoes.length * 4 + 2, 20) : 3;
+  // Mantemos o ajuste de altura, mas com um mínimo razoável.
+  contestacaoTextarea.rows = contestacoes.length > 0 ? Math.min(contestacoes.length * 5 + 2, 20) : 3;
   
   if (contestacoes.length === 0) {
     contestacaoTextarea.value = '📋 Nenhuma contestação registrada para este chamado.';
     return;
   }
 
-  // Formata contestações como texto
-  let texto = `╔════════════════════════════════════════════════════════════╗\n`;
-  texto += `║          HISTÓRICO DE CONTESTAÇÕES DO CHAMADO             ║\n`;
-  texto += `╠════════════════════════════════════════════════════════════╣\n`;
-  texto += `║ Total de Contestações: ${contestacoes.length.toString().padStart(2, '0')}                                    ║\n`;
-  texto += `╚════════════════════════════════════════════════════════════╝\n\n`;
+  // Formata contestações para exibir APENAS a justificativa
+  let texto = '';
   
   contestacoes.forEach((cont, index) => {
-    texto += `┌────────────────────────────────────────────────────────────┐\n`;
-    texto += `│ 📌 CONTESTAÇÃO #${(index + 1).toString().padStart(2, '0')}                                        │\n`;
-    texto += `├────────────────────────────────────────────────────────────┤\n`;
-    texto += `│ Tipo: ${cont.Tipo || 'Não especificado'}`.padEnd(60) + '│\n';
-    texto += `│ Data: ${formatarData(cont.DataContestacao)}`.padEnd(60) + '│\n';
-    texto += `│ Usuário: ${(cont.usuarioNome || 'Não identificado')}`.padEnd(60) + '│\n';
-    texto += `├────────────────────────────────────────────────────────────┤\n`;
-    texto += `│ JUSTIFICATIVA:                                             │\n`;
     
-    // Quebra a justificativa em linhas de 56 caracteres
+    // Obtém a justificativa ou um texto padrão
     const justificativa = cont.Justificativa || 'Sem justificativa fornecida';
-    const linhas = justificativa.match(/.{1,56}/g) || [justificativa];
     
-    linhas.forEach(linha => {
-      texto += `│ ${linha.padEnd(56)} │\n`;
-    });
-    
-    texto += `└────────────────────────────────────────────────────────────┘\n\n`;
+    // Adiciona a justificativa
+    texto += justificativa + '\n\n';
   });
   
-  contestacaoTextarea.value = texto;
-  console.log('✅ Contestações renderizadas no formulário (readonly)');
+  contestacaoTextarea.value = texto.trim(); // .trim() para remover espaços extras no final
+  console.log('✅ Contestações renderizadas no formulário (apenas justificativas)');
 }
 
 // ========================================

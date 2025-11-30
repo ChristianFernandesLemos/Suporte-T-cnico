@@ -20,7 +20,11 @@ router.get('/menu', (req, res) => {
   res.sendFile(path.join(viewsPath, 'MenuPrincipal.html'));
 });
 
-// Página de registrar chamado
+// ===========================================
+// ROTAS DE REGISTRO
+// ===========================================
+
+// Página de registrar chamado (Passo 1)
 router.get('/registrar-chamado', (req, res) => {
   res.sendFile(path.join(viewsPath, 'Registrar-Chamados.html'));
 });
@@ -46,6 +50,27 @@ router.get('/contestacao', (req,res) => {
 })
 
 
+// ===========================================
+// ROTAS DE CHAMADOS
+// ===========================================
+
+// Página de visualizar chamados (Lista)
+router.get('/chamados', (req, res) => {
+  // Assumindo que o nome do arquivo de lista é 'lista-chamados.html' ou 'VizualizarChamados.html'
+  // Usamos 'VizualizarChamados.html' baseado na estrutura do seu 'server.js'
+  res.sendFile(path.join(viewsPath, 'lista-chamados (1).html'));
+});
+
+// 🌟 CORREÇÃO: Rota para a página de Detalhes de um chamado
+router.get('/detalhes', (req, res) => {
+  res.sendFile(path.join(viewsPath, 'detalhes-chamado.html'));
+});
+
+// 🌟 CORREÇÃO: Rota para a página de Edição de um chamado
+router.get('/editar', (req, res) => {
+  res.sendFile(path.join(viewsPath, 'editar-chamado.html'));
+});
+
 // Página de concluir chamado
 router.get('/concluir-chamado', (req, res) => {
   res.sendFile(path.join(viewsPath, 'Concluir-Chamados.html'));
@@ -56,24 +81,15 @@ router.get('/prioridade-chamados', (req, res) => {
   res.sendFile(path.join(viewsPath, 'Prioridade-Chamados.html'));
 });
 
+
+// ===========================================
+// ROTAS DE ADMINISTRAÇÃO/USUÁRIOS
+// ===========================================
+
 // Página de adicionar usuário
 router.get('/adicionar-usuario', (req, res) => {
   res.sendFile(path.join(viewsPath, 'adicionar-usuario.html'));
 });
 
-// Página de visualizar chamados
-router.get('/chamados', (req, res) => {
-  res.sendFile(path.join(viewsPath, 'lista-chamados (1).html'));
-});
-
-// Página de editar chamado
-router.get('/editar-chamado', (req, res) => {
-  res.sendFile(path.join(viewsPath, 'editar-chamado.html'));
-});
-
-// Página de visualizar chamados
-router.get('/detalhes-chamado', (req, res) => {
-  res.sendFile(path.join(viewsPath, 'detalhes-chamado.html'));
-});
 
 module.exports = router;
