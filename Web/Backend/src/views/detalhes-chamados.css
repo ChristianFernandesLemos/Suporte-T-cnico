@@ -1,21 +1,5 @@
 @charset "UTF-8";
-
-:root {
-    --primary-color-blue: #0d1b2a;
-    --second-color-blue: #1b263b;
-    --third-color-blue: #415a77;
-    --fourth-color-blue: #778da9;
-    --fifth-color-blue: #e0e1dd;
-    --sixth-color-blue: #49a09d;
-    --seventh-color-blue: #004258;
-    --eighth-color-blue: #026687;
-    --ninth-color-blue: #021c33;
-    --tenth-color-blue: #1aa4e5;
-    --primary-color-dark: #050505;
-    --second-color-dark: #222222;
-}                                                                                                                                                 
-@charset "UTF-8";
-
+                                                                                                                
 /*
 |--------------------------------------------------------------------------
 | Variáveis Globais (Paleta de Cores Fornecida) 🎨
@@ -61,7 +45,7 @@
 
 body {
     font-family: var(--font-family-sans);
-    background-color: var(--color-background-body);
+    background: linear-gradient(to bottom, #111, #222);
     color: var(--color-text);
     line-height: 1.6;
 }
@@ -72,7 +56,7 @@ body {
 |--------------------------------------------------------------------------
 */
 .header {
-    background-color: var(--color-background-element);
+    background-color:#111;
     box-shadow: 0 0 4px color-mix(in srgb, var(--primary-color-dark) 15%, transparent); 
     padding: var(--spacing-default) 0;
 }
@@ -84,7 +68,7 @@ body {
 }
 
 .back-link {
-    color: var(--third-color-blue); 
+    color: white; 
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
@@ -94,7 +78,7 @@ body {
 }
 
 .back-link:hover {
-    color: var(--eighth-color-blue); 
+    color: var(--tenth-color-blue); 
     text-decoration: underline;
 }
 

@@ -148,6 +148,11 @@ function addLogoutButton() {
 
 // Função de logout
 async function handleLogout() {
+    // Confirmação antes de sair
+    if (!confirm('Deseja realmente sair?')) {
+        return; // Se cancelar, não faz logout
+    }
+
     const token = localStorage.getItem('token');
 
     try {

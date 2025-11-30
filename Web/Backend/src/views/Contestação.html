@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registrar Chamado</title>
+    <title>Contestar Prioridade</title>
     <link rel="shortcut icon" href="/static/img/favicon.ico" type="image/x-icon">
-    <link rel="stylesheet" href="Forms.css">
+    <link rel="stylesheet" href="/static/Forms.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
@@ -13,22 +13,26 @@
 <body>
 
     <header class="top-bar">
-        <a href="#" class="back-link">
+        <a href="/prioridadeia" class="back-link">
             <span class="arrow-icon">←</span>
-            Registrar Chamado
+            voltar
         </a>
     </header>
  
     <main class="container">
         <section class="card"> 
-            <h2>Novo Chamado</h2>
-            <form action="#" method="post">
+            <h2>Contestar Prioridade</h2>
+            <p style="margin-bottom: 20px; color: #666;">Explique por que você discorda da prioridade sugerida pela IA. Um supervisor revisará sua solicitação.</p>
+            
+            <form>
                 <div class="form-group">
-                    <label for="descricao">Contestação:</label>
-                    <textarea id="descricao" name="descricao" rows="4" placeholder="Não concordo com a prioridade porque..." required></textarea>
+                    <label for="descricao">Motivo da Contestação:</label>
+                    <textarea id="descricao" name="descricao" rows="6" placeholder="Ex: A prioridade deveria ser Alta porque este problema está impedindo todo o setor de vendas de trabalhar..." required></textarea>
                 </div>
+                
                 <div class="form-actions">
-                    <button type="submit" id="avancar">Avançar</button>
+                    <button type="button" class="back-button">Cancelar</button>
+                    <button type="button" class="submit-button">Finalizar Contestação</button>
                 </div>
             </form>
         </section>

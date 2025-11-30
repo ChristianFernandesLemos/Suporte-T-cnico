@@ -24,6 +24,7 @@
             <h1 class="form-title">Carregando...</h1>
             
             <form class="ticket-form" method="post" action="#">
+                <!-- Campos READONLY (não editáveis) -->
                 <div class="form-group">
                     <label for="titulo" class="form-label">Título:</label>
                     <input 
@@ -32,94 +33,87 @@
                         name="titulo" 
                         class="form-input" 
                         placeholder="Carregando..."
-                        required
+                        readonly
                     >
                 </div>
                 
                 <div class="form-group">
-                    <label for="nome" class="form-label">Nome:</label>
+                    <label for="nome" class="form-label">Nome do Afetado:</label>
                     <input 
                         type="text" 
                         id="nome" 
                         name="nome" 
                         class="form-input" 
                         placeholder="Carregando..."
-                        required
+                        readonly
                     >
                 </div>
                 
                 <div class="form-group">
-                    <label for="email" class="form-label">Email:</label>
+                    <label for="email" class="form-label">Email do Afetado:</label>
                     <input 
                         type="email" 
                         id="email" 
                         name="email" 
                         class="form-input" 
                         placeholder="Carregando..."
-                        required
+                        readonly
                     >
                 </div>
                 
+                <!-- Campo EDITÁVEL - Categoria com SELECT -->
                 <div class="form-group">
                     <label for="categoria" class="form-label">Categoria:</label>
-                    <input 
-                        type="text" 
+                    <select 
                         id="categoria" 
                         name="categoria" 
-                        class="form-input" 
-                        placeholder="Carregando..."
+                        class="form-input"
                         required
                     >
+                        <option value="" disabled selected>Selecione...</option>
+                        <option value="Software">Software</option>
+                        <option value="Hardware">Hardware</option>
+                        <option value="Rede">Rede</option>
+                        <option value="Outros">Outros...</option>
+                    </select>
                 </div>
                 
-                <div class="form-group">
-                    <label for="impacto" class="form-label">Impacto:</label>
-                    <input 
-                        type="text" 
-                        id="impacto" 
-                        name="impacto" 
-                        class="form-input" 
-                        placeholder="Carregando..."
-                        required
-                    >
-                </div>
-                
-                <div class="form-group">
-                    <label for="bloqueio" class="form-label">Bloqueio Total:</label>
-                    <input 
-                        type="text" 
-                        id="bloqueio" 
-                        name="bloqueio" 
-                        class="form-input" 
-                        placeholder="Carregando..."
-                        required
-                    >
-                </div>
-                
+                <!-- Campo EDITÁVEL - Prioridade com SELECT -->
                 <div class="form-group">
                     <label for="prioridade" class="form-label">Prioridade:</label>
-                    <input 
-                        type="text" 
+                    <select 
                         id="prioridade" 
                         name="prioridade" 
-                        class="form-input" 
-                        placeholder="Carregando..."
+                        class="form-input"
                         required
                     >
+                        <option value="" disabled selected>Selecione...</option>
+                        <option value="1">Baixa</option>
+                        <option value="2">Média</option>
+                        <option value="3">Alta</option>
+                        <option value="4">Crítica</option>
+                    </select>
                 </div>
                 
+                <!-- Campo EDITÁVEL - Status com SELECT -->
                 <div class="form-group">
                     <label for="status" class="form-label">Status:</label>
-                    <input 
-                        type="text" 
+                    <select 
                         id="status" 
                         name="status" 
-                        class="form-input" 
-                        placeholder="Carregando..."
+                        class="form-input"
                         required
                     >
+                        <option value="" disabled selected>Selecione...</option>
+                        <option value="1">Aberto</option>
+                        <option value="2">Em Andamento</option>
+                        <option value="3">Resolvido</option>
+                        <option value="4">Fechado</option>
+                        <option value="5">Cancelado</option>
+                    </select>
                 </div>
                 
+                <!-- Campo READONLY - Descrição -->
                 <div class="form-group">
                     <label for="descricao" class="form-label">Descrição:</label>
                     <textarea 
@@ -128,7 +122,20 @@
                         class="form-textarea" 
                         rows="5"
                         placeholder="Carregando..."
-                        required
+                        readonly
+                    ></textarea>
+                </div>
+
+                <!-- Campo READONLY - Contestações -->
+                <div class="form-group">
+                    <label for="contestacao" class="form-label">Histórico de Contestações:</label>
+                    <textarea 
+                        id="contestacao" 
+                        name="contestacao" 
+                        class="form-textarea" 
+                        rows="5"
+                        placeholder="Carregando..."
+                        readonly
                     ></textarea>
                 </div>
                 
