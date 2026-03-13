@@ -1,3 +1,26 @@
+USE Suporte_Tecnico;
+GO
+
+-- 1. Primero eliminamos los datos de las tablas que dependen de 'chamados'
+-- Esto es necesario porque la tabla 'registra' tiene una llave foránea apuntando a 'chamados'
+DELETE FROM registra;
+DELETE FROM Historial_Contestacoes; -- Si tu versión actual usa esta tabla vinculada
+
+-- 2. Ahora sí podemos eliminar los datos de la tabla principal sin errores
+DELETE FROM chamados;
+
+-- 3. EL PASO CLAVE: Reiniciar el contador de identidad a 0
+-- Al ponerlo en 0, el próximo registro que se cree será el 1 automatically
+DBCC CHECKIDENT ('chamados', RESEED, 0);
+GO
+
+-- Verificación opcional (para confirmar que está vacía y lista)
+PRINT 'Tabla chamados limpiada. El próximo ID será el 1.';
+SELECT * FROM chamados;
+
+select * from Historial_Contestacoes
+select * from usuario
+
 -- ============================================
 -- SCRIPT DE CRIAÇÃO DO BANCO DE DADOS
 -- Sistema de Gerenciamento de Chamados InterFix

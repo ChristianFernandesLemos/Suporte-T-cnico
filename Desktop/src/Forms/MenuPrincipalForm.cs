@@ -16,6 +16,7 @@ namespace SistemaChamados.Forms
         private FuncionariosController _funcionariosController;
         private ChamadosController _chamadosController;
 
+
         // Componentes do Sidebar
         private Panel panelSidebar;
         private Panel panelHeader;
@@ -634,8 +635,7 @@ namespace SistemaChamados.Forms
         {
             try
             {
-                var formVisualizarChamados = new VisualizarChamadosForm(_usuarioLogado, _chamadosController);
-                formVisualizarChamados.ShowDialog(this);
+                var formVisualizarChamados = new VisualizarChamadosForm(_usuarioLogado, _chamadosController, _funcionariosController); formVisualizarChamados.ShowDialog(this);
                 MostrarDashboard();
             }
             catch (Exception ex)
