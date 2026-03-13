@@ -7,10 +7,10 @@
 USE master;
 GO
 
-select * from Usuario
 select * from chamados
 select * from Historial_Contestacoes
 select * from E_mail
+select * from Usuario
 
 ALTER TABLE Usuario 
 ALTER COLUMN Cpf VARCHAR(14); -- Para formato 000.000.000-00
